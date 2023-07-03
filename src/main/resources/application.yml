@@ -1,0 +1,86 @@
+spring:
+  #프로필 설정
+  profiles:
+    active: dev
+
+  #view 설정
+  mvc:
+    view:
+      prefix: /WEB-INF/view/
+      suffix: .jsp
+
+  #devtools 설정
+  devtools:
+    livereload:
+      enabled: true
+
+  #database 설정
+  datasource:
+    #Hikari(springboot 기본 설정)
+    hikari:
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      jdbc-url: jdbc:mysql://db-fqi4k.pub-cdb.ntruss.com:3306/monitoring_db?useSSL=false&allowPublicKeyRetrieval=true
+#      jdbc-url: jdbc:mysql://dbkrems.4st.co.kr:3306/monitoring_db?useSSL=false&allowPublicKeyRetrieval=true
+      username: monuser
+      password: monuser!
+      connection-test-query: SELECT 1
+      pool-name: SpringBootMyBatisHikariCP
+      maximum-pool-size: 10
+      minimum-idle: 5
+      idle-timeout: 10000
+      connection-timeout: 10000
+      validation-timeout: 10000
+      max-lifetime: 580000
+      data-source-properties:
+        cachePrepStmts: true
+        prepStmtCacheSize: 250
+        prepStmtCacheSqlLimit: 2048
+        useServerPrepStmts: true
+        useLocalSessionState: true
+        useLocalTransactionState: true
+        rewriteBatchedStatements: true
+        cacheResultSetMetadata: true
+        cacheServerConfiguration: true
+        elideSetAutoCommits: true
+        maintainTimeStats: false
+
+#mybatis 설정
+mybatis:
+  type-aliases-package: com.kevin.server_monitor.model
+  mapper-locations: /mybatis/mapper/*.xml
+
+#log 설정
+logging:
+  level:
+    root: info
+    com:
+      kevin:
+        server_monitor: info
+  logback:
+    rollingpolicy:
+      max-file-size: 10MB
+      max-history: 7
+      total-size-cap: 1GB
+      file-name-pattern: "/logs/spring/monitoring.%d{yyyy-MM-dd}.%i"
+  file:
+    path: logs/spring/
+
+#톰캣 설정
+server:
+  tomcat:
+    keep-alive-timeout: 30s
+    max-keep-alive-requests: 100
+    accesslog:
+      directory: logs/tomcat
+      enabled: true
+      file-date-format: .yyyy-MM-dd
+      max-days: 7
+      pattern: '%h %l %u %t "%r" %s %b %D'
+      prefix: access_log
+      rotate: true
+      suffix: .log
+    basedir: .
+  port: 80
+  compression:
+    enabled: true
+#  address: server.4st.co.kr

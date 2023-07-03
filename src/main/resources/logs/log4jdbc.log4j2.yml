@@ -1,0 +1,11 @@
+log4jdbc:
+  spylogdelegator:
+    name: net.sf.log4jdbc.log.slf4j.Slf4jSpyLogDelegator
+  dump:
+    sql:
+      maxlinelength: 0
+  drivers: com.mysql.cj.jdbc.Driver
+  auto:
+    load:
+      popular:
+        drivers: false

@@ -1,0 +1,49 @@
+plugins {
+	id 'java'
+	id 'war'
+	id 'org.springframework.boot' version '2.7.12'
+	id 'io.spring.dependency-management' version '1.0.15.RELEASE'
+}
+
+group = 'com.kevin'
+version = ''
+sourceCompatibility = '11'
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	// https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-autoconfigure
+	implementation group: 'org.springframework.boot', name: 'spring-boot-autoconfigure', version: '2.7.12'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.apache.tomcat.embed:tomcat-embed-jasper'
+	implementation 'javax.servlet:jstl'
+	implementation 'org.bgee.log4jdbc-log4j2:log4jdbc-log4j2-jdbc4.1:1.16'
+	// https://mvnrepository.com/artifact/org.netbeans.external/com-jcraft-jsch
+	implementation group: 'org.netbeans.external', name: 'com-jcraft-jsch', version: 'RELEASE180'
+	implementation group: 'org.springframework.boot', name: 'spring-boot-devtools', version: '2.7.1'
+	implementation 'org.springframework.boot:spring-boot-devtools'
+	implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:2.3.1'
+	compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.26'
+	// https://mvnrepository.com/artifact/com.mysql/mysql-connector-j
+	implementation group: 'com.mysql', name: 'mysql-connector-j', version: '8.0.33'
+	// https://mvnrepository.com/artifact/jakarta.servlet/jakarta.servlet-api
+	compileOnly group: 'jakarta.servlet', name: 'jakarta.servlet-api', version: '6.0.0'
+	// https://mvnrepository.com/artifact/org.apache.tomcat.embed/tomcat-embed-core
+	implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.75'
+	annotationProcessor 'org.projectlombok:lombok'
+	// https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-jdbc
+	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-jdbc', version: '2.7.12'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.springframework.security:spring-security-test'
+	// https://mvnrepository.com/artifact/com.zaxxer/HikariCP
+	implementation group: 'com.zaxxer', name: 'HikariCP', version: '5.0.1'
+	// https://mvnrepository.com/artifact/org.mybatis.spring.boot/mybatis-spring-boot-autoconfigure
+	implementation group: 'org.mybatis.spring.boot', name: 'mybatis-spring-boot-autoconfigure', version: '2.3.1'
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}

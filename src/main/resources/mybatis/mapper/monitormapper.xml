@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kevin.server_monitor.mapper.MonitorMapper">
+    <!-- User 테이블 가져오기 -->
+    <select id="getIDCheck" resultType="int" parameterType="map">
+        SELECT COUNT(*)
+        FROM (
+            SELECT ID FROM monitoring_admin WHERE ID = #{id}
+        ) as `A`
+    </select>
+</mapper>
