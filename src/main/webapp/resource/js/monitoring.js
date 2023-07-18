@@ -4,7 +4,6 @@ let popup;
 let popupbody;
 let h1;
 let select_value;
-let plus_value;
 let btn_manual;
 let httpRequest;
 let popup_user_plus;
@@ -136,6 +135,21 @@ function getClock(){
     let week = WEEKDAY[weakday.getDay()];
 
     clock.innerText = `${year}-${month}-${day}(${week}) ${hour}:${minutes}:${second}`;
+}
+
+function isStringValue(value) {
+    return !!value?.trim()
+}
+
+function ObjectToMap(object) {
+    let dataMap = new Map();
+
+    for (let key of Object.keys(object)) {
+        const value = object[key];
+        dataMap.set(key, value);
+    }
+
+    return dataMap;
 }
 
 am5.ready(function () {
@@ -396,7 +410,7 @@ function rankCreate(result) {
 function tableRowSpan(table_id) {
     let rows = table_id.getElementsByTagName("tr");
     let i = 0;
-    let j = 0;
+    let j;
 
     // tr만큼 루프돌면서 컬럼값 접근
     for (j = 1; j < rows.length; j++) {
@@ -463,6 +477,12 @@ function ranking_create(table_id) {
 }
 
 function popupOpen(data, power, process) {
+    let datamap = new Map();
+
+    if(data !== undefined && data !== null) {
+        datamap = ObjectToMap(data);
+    }
+
     if (process === 'power') {
         popup.className = open;
 
@@ -475,13 +495,7 @@ function popupOpen(data, power, process) {
         h1.style.padding = "0 30px 20px 50px";
         btn_blue.className = "btn blue";
         btn_red.className = "btn red";
-        let datamap = new Map();
         data.power = power;
-
-        for (let key of Object.keys(data)) {
-            const value = data[key];
-            datamap.set(key, value);
-        }
 
         if (power === "on") {
             h1.textContent = datamap.get("server_name") + "서버를 구동 하시겠습니까?";
@@ -601,6 +615,80 @@ function popupOpen(data, power, process) {
 
         btn_user_plus_blue.addEventListener("click", () => user_management('user_plus'));
         btn_user_plus_red.addEventListener("click", () => popupClose('user_plus'));
+    } else if (process === 'result_server_plus') {
+        popup.className = open;
+
+        const btn_blue = document.createElement("button");
+        const span_blue = document.createElement("span");
+
+        popupbody.replaceChildren();
+        h1.style.padding = "0px 0px 20px 0px";
+        btn_blue.className = "btn blue";
+        h1.textContent = datamap.get("name") + "서버를 추가하는데 성공했습니다.";
+        span_blue.textContent = "확인";
+        btn_blue.appendChild(span_blue);
+
+        popupbody.appendChild(h1);
+        popupbody.appendChild(btn_blue);
+        btn_blue.addEventListener("click", () => popupClose('power'));
+    } else if (process === 'error_server_plus') {
+        popup.className = open;
+
+        const popup_plus = document.querySelector('.popup_wrapper.plus');
+        const btn_blue = document.createElement("button");
+        const span_blue = document.createElement("span");
+
+        popupbody.replaceChildren();
+        popup_plus.style.zIndex = 800;
+        h1.style.padding = "0px 0px 20px 0px";
+        btn_blue.className = "btn blue";
+
+        if(power === 'detect') {
+            h1.textContent = datamap.get("name") + "서버가 이미 리스트에 존재합니다.";
+        } else {
+            h1.textContent = datamap.get("name") + "서버를 추가하는데 실패했습니다.";
+        }
+        span_blue.textContent = "확인";
+        btn_blue.appendChild(span_blue);
+
+        popupbody.appendChild(h1);
+        popupbody.appendChild(btn_blue);
+        btn_blue.addEventListener("click", () => popupClose('power'));
+    } else if (process === 'result_server_delete') {
+        popup.className = open;
+
+        const btn_blue = document.createElement("button");
+        const span_blue = document.createElement("span");
+
+        popupbody.replaceChildren();
+        h1.style.padding = "0px 0px 20px 0px";
+        btn_blue.className = "btn blue";
+        h1.textContent = datamap.get("name") + "서버를 삭제하는데 성공했습니다.";
+        span_blue.textContent = "확인";
+        btn_blue.appendChild(span_blue);
+
+        popupbody.appendChild(h1);
+        popupbody.appendChild(btn_blue);
+        btn_blue.addEventListener("click", () => popupClose('power'));
+    } else if (process === 'error_server_delete') {
+        popup.className = open;
+
+        const popup_plus = document.querySelector('.popup_wrapper.delete');
+        const btn_blue = document.createElement("button");
+        const span_blue = document.createElement("span");
+
+        popupbody.replaceChildren();
+        popup_plus.style.zIndex = 800;
+        h1.style.padding = "0px 0px 20px 0px";
+        btn_blue.className = "btn blue";
+
+        h1.textContent = datamap.get("name") + "서버가 서버리스트에 없습니다.";
+        span_blue.textContent = "확인";
+        btn_blue.appendChild(span_blue);
+
+        popupbody.appendChild(h1);
+        popupbody.appendChild(btn_blue);
+        btn_blue.addEventListener("click", () => popupClose('power'));
     }
 }
 
@@ -748,7 +836,7 @@ function select_function(process) {
             btn_select.classList.remove('on');
         }
     };
-    popup_head_select.clickHandler = (event) => {
+    popup_head_select.clickHandler = () => {
         if (select_value !== "사용자 권한" && select_value !== undefined) {
             btn_select.innerText = select_value;
         }
@@ -791,7 +879,7 @@ function id_check() {
     const put_id = document.getElementById('user_plus_id');
     let id = put_id.value;
     console.log(id);
-    if (!(id === undefined || id === "")) {
+    if (!isStringValue(id)) {
         let data = {};
         data.id = id;
         httpRequest = new XMLHttpRequest();
@@ -856,7 +944,7 @@ function pw_check(pw, process) {
     let checkNumber = pw.search(/[0-9]/g);
     let checkEnglish = pw.search(/[a-z]/ig);
 
-    if (pw !== "" || pw !== undefined) {
+    if (!isStringValue(pw)) {
         if(!/^(?=.*[a-zA-Z])(?=.*[!@#$%^*+=-])(?=.*[0-9]).{8,20}$/.test(pw)){
             pw_p.innerText= `숫자+영문자+특수문자 조합으로 8~20자리 사용해야 합니다.`;
             pw_p.style.display = 'block';
@@ -917,16 +1005,26 @@ function tel_check(tel, process) {
     const popup = document.querySelector(".popup_"+process);
     const tel_p = document.getElementById('tel_check_'+process);
 
-    if (!regexTel.test(tel)) {
+    if(!isStringValue(tel)) {
+        if (!regexTel.test(tel)) {
+            tel_p.innerText = "전화번호는 숫자만 가능하고, 형식은 000-0000-0000으로\n-를 포함하여 입력해주세요.";
+            tel_p.style.display = 'block';
+            popup.style.height = "auto";
+            popup.style.overflow = 'hidden';
+            return false;
+        } else {
+            tel_p.style.display = 'none';
+            popup.style.height = "356px";
+
+            return true;
+        }
+    } else {
+        tel_p.innerText = '전화번호를 입력하셔야 됩니다.'
         tel_p.style.display = 'block';
         popup.style.height = "auto";
         popup.style.overflow = 'hidden';
-        return false;
-    } else {
-        tel_p.style.display = 'none';
-        popup.style.height = "356px";
 
-        return true;
+        return false;
     }
 }
 
@@ -935,49 +1033,45 @@ function ip_check(ip, process) {
     const popup = document.querySelector(".popup_"+process);
     const ip_p = document.getElementById('ip_check_'+process);
 
-    if(ip !== "" || ip !== undefined) {
+    if(isStringValue(ip)) {
         if (!regexIP.test(ip)) {
+            ip_p.innerText = "IP는 숫자만 사용가능하고\nIP는 000.000.000.000형식으로 작성해야합니다";
             ip_p.style.display = 'block';
-            popup.style.height = "auto";
             popup.style.overflow = 'hidden';
             return false;
         } else {
             ip_p.style.display = 'none';
-            popup.style.height = "356px";
 
             return true;
         }
     } else {
         ip_p.innerText = 'IP를 입력하셔야됩니다.'
         ip_p.style.display = 'block';
-        popup.style.height = "auto";
         popup.style.overflow = 'hidden';
 
         return false;
     }
 }
 
-function port_check(port, process) {
+function port_check(port, process, portname) {
     let regexPort = /(6553[0-5]|655[0-2]\d|65[0-4]\d{2}|6[0-4]\d{3}|5\d{4}|[0-9]\d{0,3})/;
     const popup = document.querySelector(".popup_"+process);
-    const port_p = document.getElementById('port_check_'+process);
+    const port_p = document.getElementById(portname + '_port_check_'+process);
 
-    if(port !== "" || port !== undefined) {
+    if(isStringValue(port)) {
         if (!regexPort.test(port)) {
+            port_p.innerText = '포트는 65535이하의 숫자로 입력하셔야 됩니다.';
             port_p.style.display = 'block';
-            popup.style.height = "auto";
             popup.style.overflow = 'hidden';
             return false;
         } else {
             port_p.style.display = 'none';
-            popup.style.height = "356px";
 
             return true;
         }
     } else {
         port_p.innerText = '포트번호를 입력하셔야됩니다.';
         port_p.style.display = 'block';
-        popup.style.height = "auto";
         popup.style.overflow = 'hidden';
 
         return false;
@@ -988,36 +1082,43 @@ function system_check(system, process) {
     const popup = document.querySelector(".popup_"+process);
     const system_p = document.getElementById('system_check_'+process);
 
-    if(system === "" || system === undefined) {
+    if(!isStringValue(system)) {
         system_p.innerText = "시스템이 입력되지 않았습니다."
         system_p.style.display = "block";
-        popup.style.height = "auto";
         popup.style.overflow = 'hidden';
 
         return false;
     } else {
         system_p.style.display = 'none';
-        popup.style.height = "356px";
 
         return true;
     }
 }
 
-function name_check(name, process) {
-    const popup = document.querySelector(".popup_"+process);
-    const name_p = document.getElementById('name_check_'+process);
+function name_check(name, process, checkname) {
+    const popup = document.querySelector(".popup_" + process);
+    const name_p = document.getElementById(checkname + '_check_' + process);
 
-    if(name === "" || name === undefined) {
-        name_p.innerText = "서버 이름이 입력되지 않았습니다."
+    if(!isStringValue(name)) {
+        if(checkname === "name") {
+            name_p.innerText = "서버 이름이 입력되지 않았습니다."
+        } else if(checkname === "id") {
+            name_p.innerText = "서버 로그인 ID가 입력되지 않았습니다."
+        } else if(checkname === "pw") {
+            name_p.innerText = "서버 로그인 PW가 입력되지 않았습니다."
+        } else if(checkname === "tomcat_dir") {
+            name_p.innerText = "톰캣 폴더 위치가 입력되지 않았습니다."
+        }
         name_p.style.display = "block";
-        popup.style.height = "auto";
         popup.style.overflow = 'hidden';
 
         return false;
     } else {
-        name_p.style.display = 'none';
-        popup.style.height = "356px";
-
+        if(name_p !== null && name_p !== undefined) {
+            name_p.style.display = 'none';
+        } else {
+            return true;
+        }
         return true;
     }
 }
@@ -1052,7 +1153,7 @@ function user_management(process) {
             }
         }
 
-        httpRequest.open('POST', "/"+process, true);
+        httpRequest.open('POST', "/user_"+process, true);
         httpRequest.responseType = "json";
         httpRequest.setRequestHeader('Content-Type', 'application/json');
         httpRequest.setRequestHeader(header, token);
@@ -1070,19 +1171,41 @@ function user_management(process) {
 function server_management(process) {
     const server_system = document.getElementById('system_'+process);
     const server_ip = document.getElementById('ip_'+process);
+    const server_id = document.getElementById('server_id_'+process);
+    const server_pw = document.getElementById('server_pw_'+process);
     const server_name = document.getElementById('server_name_'+process);
     const server_port = document.getElementById('server_port_'+process);
+    const tomcat_port = document.getElementById('tomcat_port_'+process);
+    let tomcat_dir;
     let system = server_system.value;
     let ip = server_ip.value;
+    let id = server_id.value;
+    let pw = server_pw.value;
     let name = server_name.value;
-    let port = server_port.value;
+    let serverport = server_port.value;
+    let tomcatport = tomcat_port.value;
+    let tomcatdir;
+    if(process === "plus") {
+        tomcat_dir = document.getElementById('tomcat_dir_'+process);
+        tomcatdir = tomcat_dir.value;
+    } else if(process === "delete") {
+        tomcatdir = "delete";
+    }
+    console.log("서버 추가 process : " + process);
+    console.log("서버 정보 : " + system,ip,name,serverport,tomcatport);
 
-    if (system_check(system, process) && ip_check(ip, process) && name_check(name, process) && port_check(port, process)) {
+    if (system_check(system, process) && ip_check(ip, process) && name_check(id, process, "id") && name_check(pw, process, "pw")
+        && name_check(name, process, "name") && port_check(serverport, process, "server") && port_check(tomcatport, process, "tomcat")
+        && name_check(tomcatdir, process, "tomcat_dir")) {
         let data = {}
         data.system = system;
         data.ip = ip;
+        data.id = id;
+        data.pw = pw;
         data.name = name;
-        data.port = port;
+        data.serverport = serverport;
+        data.tomcatport = tomcatport;
+        data.tomcatdir = tomcatdir;
 
         httpRequest = new XMLHttpRequest();
 
@@ -1091,14 +1214,22 @@ function server_management(process) {
             if (httpRequest.readyState === XMLHttpRequest.DONE) {
                 popupClose("progress");
                 if (httpRequest.status === 200) {
-                    console.log("server_ajax");
+                    let res = httpRequest.response;
+                    if(res.result === "ok") {
+                        popupClose(process);
+                        popupOpen(data, null, "result_server_"+process);
+                    } else if(res.result === "detect") {
+                        popupOpen(data, "detect", "error_server_"+process);
+                    } else {
+                        popupOpen(data, null, "error_server_"+process);
+                    }
                 } else {
                     console.log("request error");
                 }
             }
         }
 
-        httpRequest.open('POST', "/" + process, true);
+        httpRequest.open('POST', "/server_" + process, true);
         httpRequest.responseType = "json";
         httpRequest.setRequestHeader('Content-Type', 'application/json');
         httpRequest.setRequestHeader(header, token);

@@ -31,9 +31,24 @@
                     <p id="name_check_delete">서버 이름을 입력하셔야됩니다.</p>
                 </li>
                 <li>
+                    <label for="server_id_delete">서버 ID</label>
+                    <input type="text" id="server_id_delete" placeholder="서버 ID"/>
+                    <p id="id_check_delete">서버 로그인 아이디를 입력하셔야 됩니다.</p>
+                </li>
+                <li>
+                    <label for="server_pw_delete">서버 PW</label>
+                    <input type="text" id="server_pw_delete" placeholder="서버 PW"/>
+                    <p id="pw_check_delete">서버 로그인 비밀번호를 입력하셔야 됩니다.</p>
+                </li>
+                <li>
                     <label for="server_port_delete">서버 포트</label>
                     <input type="text" id="server_port_delete" placeholder="서버 포트"/>
-                    <p id="port_check_delete">포트번호는 숫자로 작성해야합니다.</p>
+                    <p id="server_port_check_delete">포트번호는 숫자로 작성해야합니다.</p>
+                </li>
+                <li>
+                    <label for="tomcat_port_delete">톰캣 포트</label>
+                    <input type="text" id="tomcat_port_delete" placeholder="톰캣 포트"/>
+                    <p id="tomcat_port_check_delete">포트번호는 숫자로 작성해야합니다.</p>
                 </li>
             </ul>
             <button class="btn blue"><span>확인</span></button>

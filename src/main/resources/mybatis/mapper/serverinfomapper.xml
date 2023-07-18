@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kevin.server_monitor.mapper.ServerDBMapper">
+
+    <!-- 서버 정보 추출 -->
+    <select id="selectServerInfo" resultType="map">
+        SELECT
+            *
+        FROM
+            server_info_sensor
+        ORDER BY `system` DESC
+    </select>
+
+    <!-- 서버 정보 저장 -->
+    <insert id="insertServerInfo"  parameterType="map">
+        /* 서버 정보 저장 InfoDBMapper.insertServerInfo */
+        INSERT monitoring_db.server_info_raw
+            (`system`, ip, name, tomcat_port, val_date, status, trapic_tx, trapic_rx, cpu, memory, disk, reg_date)
+        VALUES
+            (#{system}, #{ip}, #{name}, #{tomcat_port}, #{val_date}, #{status}, #{trapic_tx}, #{trapic_rx}, #{cpu}, #{memory}, #{disk}, NOW())
+    </insert>
+
+    <update id="updateServerInfo" parameterType="map">
+        /* 서버 정보 업데이트 InfoDBMapper.updateServerInfo */
+        UPDATE
+            monitoring_db.server_info_sensor
+        SET
+            `system` = #{system},
+            val_date = #{val_date},
+            status = #{status},
+            trapic_tx = #{trapic_tx},
+            trapic_rx = #{trapic_rx},
+            cpu = #{cpu},
+            memory = #{memory},
+            disk = #{disk}
+        WHERE
+            ip = #{ip}
+          AND
+            name = #{name}
+          AND
+            tomcat_port = ${tomcat_port}
+    </update>
+    
+    <select id="detectServerInsert" parameterType="map" resultType="map">
+        SELECT
+            *
+        FROM monitoring_db.server_info_sensor
+        WHERE ip = #{ip} AND name = #{name} AND tomcat_port = ${tomcat_port}
+    </select>
+
+    <insert id="insertServerSensor" parameterType="map">
+        INSERT IGNORE INTO monitoring_db.server_info_sensor
+        (`system`, ip, name, tomcat_port, id, pw, server_port, info_dir, tomcat_dir, reg_date)
+        VALUES
+        (#{system}, #{ip}, #{name}, ${tomcat_port}, #{id}, #{pw}, ${server_port}, #{info_dir}, #{tomcat_dir}, NOW())
+    </insert>
+
+    <select id="detectServerDelete" parameterType="map" resultType="map">
+        SELECT
+            *
+        FROM monitoring_db.server_info_sensor
+        WHERE ip = #{ip} AND name = #{name}
+    </select>
+
+    <delete id="deleteServerSensor" parameterType="map">
+        DELETE FROM monitoring_db.server_info_sensor WHERE name = #{name} AND ip = #{ip} AND tomcat_port = #{tomcat_port}
+    </delete>
+</mapper>

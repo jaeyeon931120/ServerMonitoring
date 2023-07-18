@@ -1,4 +1,3 @@
-<jsp:useBean id="username" scope="session"/>
 <%--
   Created by IntelliJ IDEA.
   User: user

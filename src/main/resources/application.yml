@@ -18,11 +18,13 @@ spring:
   datasource:
     #Hikari(springboot 기본 설정)
     hikari:
-      driver-class-name: com.mysql.cj.jdbc.Driver
-      jdbc-url: jdbc:mysql://db-fqi4k.pub-cdb.ntruss.com:3306/monitoring_db?useSSL=false&allowPublicKeyRetrieval=true
+#      driver-class-name: com.mysql.cj.jdbc.Driver
+      driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
+      jdbc-url: jdbc:log4jdbc:mysql://db-fqi4k.pub-cdb.ntruss.com:3306/monitoring_db?rewriteBatchedStatements=true&profileSQL=true&logger=Slf4JLogger&maxQuerySizeToLog=999999&allowMultiQueries=true
+#      jdbc-url: jdbc:log4jdbc:mysql://localhost:3306/test_bugang?rewriteBatchedStatements=true&profileSQL=true&logger=Slf4JLogger&maxQuerySizeToLog=999999&allowMultiQueries=true
 #      jdbc-url: jdbc:mysql://dbkrems.4st.co.kr:3306/monitoring_db?useSSL=false&allowPublicKeyRetrieval=true
-      username: monuser
-      password: monuser!
+      username: kremsuser
+      password: kremsuser!
       connection-test-query: SELECT 1
       pool-name: SpringBootMyBatisHikariCP
       maximum-pool-size: 10
@@ -64,6 +66,8 @@ logging:
       file-name-pattern: "/logs/spring/monitoring.%d{yyyy-MM-dd}.%i"
   file:
     path: logs/spring/
+    name: monitoring
+#  config: classpath:logback.xml
 
 #톰캣 설정
 server:

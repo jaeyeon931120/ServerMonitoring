@@ -1,4 +1,4 @@
-package com.kevin.server_monitor.utill;
+package com.kevin.server_monitor.util;
 
 import java.util.List;
 import java.util.Map;

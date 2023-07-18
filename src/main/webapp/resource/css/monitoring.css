@@ -774,7 +774,7 @@ a.btn {
     height: 198px;
     display: block;
     margin-top: -150px;
-    margin-left: -280px;
+    margin-left: -275px;
     position: relative;
     top: 50%;
     left: 50%;
@@ -839,6 +839,7 @@ a.btn {
     text-align: center;
     line-height: 20px;
     font-weight: bold;
+    margin-left: 130px;
 }
 
 .popup_body > ul > li > label {
@@ -878,11 +879,10 @@ a.btn {
 }
 
 .popup_plus, .popup_delete {
-    margin-top: -217px;
-    margin-left: -250px;
+    margin-top: -315px;
+    margin-left: -245px;
     border-radius: 20px;
     width: 538px;
-    height: 355px;
     display: block;
     position: relative;
     top: 50%;
@@ -954,6 +954,11 @@ a.btn {
 }
 
 /* 서버 삭제 팝업 스타일 */
+.popup_delete {
+    margin-top: -250px;
+    margin-left: -245px;
+}
+
 .popup_wrapper.open.delete .popup_delete {
     opacity: 1;
 }
@@ -1126,6 +1131,7 @@ a.btn {
     display: block !important;
     font-size: 13px !important;
     color: #D3D3D3 !important;
+    margin-left: 107px !important;
 }
 
 .popup_body.user_edit > ul {
@@ -1445,7 +1451,7 @@ a.btn {
     height: 100vh;
     position: fixed;
     top: 0;
-    left: 0;
+    left: -30px;
     backdrop-filter: blur(2px);
     display: none;
     opacity: 0;
@@ -1775,10 +1781,18 @@ a.btn {
         opacity: 0;
         transition: all 0.5s ease-in-out;
     }
-    .popup_plus, .popup_delete {
-        margin-left: -253px;
+    .popup_plus {
+        margin-top: -280px;
+        margin-left: -250px;
+    }
+    .popup_delete {
+        margin-left: -250px;
+        margin-top: -270px;
     }
     .cont-select > label {
         margin-left: 14px;
+    }
+    .popup_progress_back {
+        left: -45px;
     }
 }

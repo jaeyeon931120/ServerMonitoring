@@ -26,6 +26,16 @@
                     <p id="ip_check_plus">IP는 숫자만 사용가능하고<br>IP는 000.000.000.000형식으로 작성해야합니다</p>
                 </li>
                 <li>
+                    <label for="server_id_plus">서버 ID</label>
+                    <input type="text" id="server_id_plus" placeholder="서버 ID"/>
+                    <p id="id_check_plus">서버 로그인 아이디를 입력하셔야 됩니다.</p>
+                </li>
+                <li>
+                    <label for="server_pw_plus">서버 PW</label>
+                    <input type="text" id="server_pw_plus" placeholder="서버 PW"/>
+                    <p id="pw_check_plus">서버 로그인 비밀번호를 입력하셔야 됩니다.</p>
+                </li>
+                <li>
                     <label for="server_name_plus">서버 이름</label>
                     <input type="text" id="server_name_plus" placeholder="서버 이름"/>
                     <p id="name_check_plus">서버 이름을 입력하셔야됩니다.</p>
@@ -33,7 +43,17 @@
                 <li>
                     <label for="server_port_plus">서버 포트</label>
                     <input type="text" id="server_port_plus" placeholder="서버 포트"/>
-                    <p id="port_check_plus">포트는 65535이하의 숫자로 입력하셔야 됩니다.</p>
+                    <p id="server_port_check_plus">포트는 65535이하의 숫자로 입력하셔야 됩니다.</p>
+                </li>
+                <li>
+                    <label for="tomcat_port_plus">톰캣 포트</label>
+                    <input type="text" id="tomcat_port_plus" placeholder="톰캣 포트"/>
+                    <p id="tomcat_port_check_plus">포트는 65535이하의 숫자로 입력하셔야 됩니다.</p>
+                </li>
+                <li>
+                    <label for="tomcat_dir_plus">톰캣 폴더 위치</label>
+                    <input type="text" id="tomcat_dir_plus" placeholder="톰캣 폴더 위치"/>
+                    <p id="tomcat_dir_check_plus">톰캣 폴더 위치를 입력하셔야 됩니다.</p>
                 </li>
             </ul>
             <button class="btn blue"><span>확인</span></button>

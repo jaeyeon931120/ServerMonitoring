@@ -5,7 +5,7 @@
     <select id="getIDCheck" resultType="int" parameterType="map">
         SELECT COUNT(*)
         FROM (
-            SELECT ID FROM monitoring_admin WHERE ID = #{id}
-        ) as `A`
+                 SELECT ID FROM monitoring_admin WHERE ID = #{id}
+             ) as `A`
     </select>
 </mapper>

@@ -1,4 +1,4 @@
-package com.kevin.server_monitor.service;
+package com.kevin.server_monitor.service.mybatis;
 
 import com.kevin.server_monitor.mapper.MonitorMapper;
 import org.springframework.stereotype.Service;

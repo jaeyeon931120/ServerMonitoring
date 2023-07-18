@@ -13,6 +13,12 @@ repositories {
 	mavenCentral()
 }
 
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	// https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-autoconfigure
@@ -20,12 +26,14 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.apache.tomcat.embed:tomcat-embed-jasper'
 	implementation 'javax.servlet:jstl'
-	implementation 'org.bgee.log4jdbc-log4j2:log4jdbc-log4j2-jdbc4.1:1.16'
+	// https://mvnrepository.com/artifact/com.fasterxml.jackson.dataformat/jackson-dataformat-yaml
+	implementation group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version: '2.15.2'
 	// https://mvnrepository.com/artifact/org.netbeans.external/com-jcraft-jsch
 	implementation group: 'org.netbeans.external', name: 'com-jcraft-jsch', version: 'RELEASE180'
 	implementation group: 'org.springframework.boot', name: 'spring-boot-devtools', version: '2.7.1'
 	implementation 'org.springframework.boot:spring-boot-devtools'
 	implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:2.3.1'
+	implementation 'org.springframework.boot:spring-boot-starter-batch'
 	compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.26'
 	// https://mvnrepository.com/artifact/com.mysql/mysql-connector-j
 	implementation group: 'com.mysql', name: 'mysql-connector-j', version: '8.0.33'
@@ -42,6 +50,9 @@ dependencies {
 	implementation group: 'com.zaxxer', name: 'HikariCP', version: '5.0.1'
 	// https://mvnrepository.com/artifact/org.mybatis.spring.boot/mybatis-spring-boot-autoconfigure
 	implementation group: 'org.mybatis.spring.boot', name: 'mybatis-spring-boot-autoconfigure', version: '2.3.1'
+	implementation group: 'org.aspectj', name: 'aspectjtools', version: '1.9.19'
+	// https://mvnrepository.com/artifact/org.bgee.log4jdbc-log4j2/log4jdbc-log4j2-jdbc4.1
+	implementation group: 'org.bgee.log4jdbc-log4j2', name: 'log4jdbc-log4j2-jdbc4.1', version: '1.16'
 }
 
 tasks.named('test') {

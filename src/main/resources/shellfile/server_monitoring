@@ -1,0 +1,39 @@
+#!/bin/bash
+
+IP="$1"
+PORT="$2"
+
+#CPU 사용률
+CPU_PERCENT=`mpstat | tail -1 | awk '{print 100-$NF}'`
+
+#MEMORY 사용률
+MEMORY_TOTAL=`cat /proc/meminfo | grep Mem | grep MemTotal | awk '{print $2}'`
+MEMORY_AVAILABLE=`cat /proc/meminfo | grep Mem | grep MemAvailable | awk '{print $2}'`
+
+MEMORY_PERCENT=`echo "scale=4;(($MEMORY_TOTAL-$MEMORY_AVAILABLE)/$MEMORY_TOTAL) * 100" | bc`
+
+#DISK 사용률
+DISK_TOTAL=`df --total | grep total | awk '{print $2}'`
+DISK_USED=`df --total | grep total | awk '{print $3}'`
+DISK_PERCENT=`echo "scale=4;($DISK_USED/$DISK_TOTAL)*100" | bc`
+
+TIME_COUNTER=0
+
+while [ $( echo "$TIME_COUNTER < 2" | bc -l) -eq 1 ]
+do
+	START_TIME=`date +%s.%N`
+
+  	echo > /dev/tcp/$IP/$PORT
+  	PORT_STATUS=`echo $?`
+
+	RX=`iftop -t -s 2 | grep "Total send rate" | awk '{print $4}'`
+	TX=`iftop -t -s 2 | grep "Total receive" | awk '{print $4}'`
+#	TOTAL=`iftop -t -s 2 | grep "Total send and" | awk '{print $6}'`
+
+	echo "{\"cpu\":\"$CPU_PERCENT\",\"memory\":\"$MEMORY_PERCENT\",\"disk\":\"$DISK_PERCENT\",\"port_status\":\"$PORT_STATUS\",\"RX\":\"$RX\",\"TX\":\"$TX\"}"
+
+	END_TIME=`date +%s.%N`
+	DURATION=$( echo "$END_TIME-$START_TIME" | bc -l)
+
+	TIME_COUNTER=$( echo "$TIME_COUNTER + $DURATION" | bc -l)
+done
