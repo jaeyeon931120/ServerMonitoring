@@ -1,11 +1,11 @@
 let token;
 let header;
 let popup;
+let popuphead;
 let popupbody;
 let h1;
 let select_value;
 let btn_manual;
-let httpRequest;
 let popup_user_plus;
 let id_check_btn;
 let ok_img;
@@ -15,19 +15,42 @@ let id_check_plus;
 let pw_check_plus;
 let auth_check_plus;
 let tel_check_plus;
-let id_check_plus_result;
+let id_check_result;
 let clock;
+let myChartBar;
+let myChartLine;
+let ctx1;
+let ctx2;
+let gradient1;
+let gradient2;
+let gradient3;
+let serverlist = [];
+let tomcatportMap = new Map();
+let iplist = new Map();
+let cpulist = new Map();
+let memorylist = new Map();
+let disklist = new Map();
+let trapic = new Map();
+let trapic_tx = new Map();
+let trapic_rx = new Map();
+let animation;
 const open = "popup_wrapper open";
+const colorlabel = {
+    'red' : 'rgba(255, 99, 132, 1)',
+    'blue': ''
+}
+let currSlide = 1;
 
 window.onload = function () {
     token = document.querySelector("input[name='_csrf']").value;
     header = document.querySelector("input[name='_csrf_header']").value;
     popup = document.querySelector(".popup_wrapper");
+    popuphead = document.querySelector(".popup_head");
     popupbody = document.querySelector(".popup_body");
     h1 = document.createElement("h1");
     btn_manual = document.querySelector('.btn_manual_download');
     popup_user_plus = document.querySelector('.popup_user_plus');
-    id_check_btn = document.querySelector('.popup_body.user_plus > ul > li > .btn.red');
+    id_check_btn = document.querySelector('.popup_body.user_plus > ul > li > .btn_check');
     ok_img = document.querySelector('.popup_body.user_plus > ul > li > img');
     user_plus_id = document.getElementById('user_plus_id');
     user_plus_pw = document.getElementById('user_plus_password');
@@ -36,20 +59,22 @@ window.onload = function () {
     auth_check_plus = document.getElementById('auth_check_user_plus');
     tel_check_plus = document.getElementById('tel_check_user_plus');
     clock = document.getElementById('clock');
+    ctx1 = document.getElementById('myChart1').getContext('2d');
+    ctx2 = document.getElementById('myChart2').getContext('2d');
     const gear_check = document.getElementById("setting")
     const menu_button = document.querySelectorAll('.menu_body.setting > ul > a');
     const content = document.getElementsByClassName('tb1-content');
     const content_table = document.querySelectorAll('table');
     const tb1header = document.getElementsByClassName('tb1-header');
-    const table = document.getElementById('server_list');
-    const rowList = table.rows;
     let scrollwidth;
 
     getClock();
     setInterval(getClock, 1000);
+    setCanvasSize();
 
-    /*서버리스트 및 정보 불러오는 함수*/
-    // serverList();
+    /*메인데이터를 불러오는 함수*/
+    getServerInfo();
+    createGraphLine();
     for (let i = 0; i < content.length; i++) {
         if (content_table.item(i) !== undefined) {
             scrollwidth = content.item(i).width - content_table.item(i).clientWidth;
@@ -62,75 +87,46 @@ window.onload = function () {
     btn_manual.addEventListener("click", () => manual_download());
 
     for (let i = 0; i < menu_button.length; i++) {
-        menu_button[i].addEventListener('click', () => gear_check.checked = false);
-    }
-
-    for (let i = 0; i < rowList.length; i++) {
-        let row = rowList[i];
-        const btnblue = row.querySelector('.btn.blue');
-        if (btnblue !== null) {
-            const btnred = row.querySelector('.btn.red');
-            let tdsNum = row.childElementCount;
-
-            let data = {};
-            for (let j = 0; j < (tdsNum - 2); j++) {
-                let row_value = row.cells[j].innerHTML;
-                switch (j) {
-                    case 0 :
-                        data.system = row_value;
-                        break;
-                    case 1:
-                        data.ip = row_value;
-                        break;
-                    case 2:
-                        data.server_name = row_value;
-                        break;
-                    case 3:
-                        data.server_port = row_value;
-                        break;
-                    case 4:
-                        data.status = row_value;
-                        break;
-                    case 5:
-                        data.cpu = row_value;
-                        break;
-                    case 6:
-                        data.memory = row_value;
-                        break;
-                    case 7:
-                        data.disk = row_value;
-                        break;
-                    case 8:
-                        data.trapictx = row_value;
-                        break;
-                    case 9:
-                        data.trapicrx = row_value;
-                        break;
-                }
-                if (row_value === "가동") {
-                    row.cells[j].style.background = "linear-gradient(0deg, rgb(0, 172, 238) 0%, rgb(2, 126, 251) 100%)";
-                    row.cells[j].style.fontWeight = "bold";
-                } else if (row_value === "정지") {
-                    row.cells[j].style.background = "linear-gradient(0deg, rgb(255, 151, 0) 0%, rgb(251, 75, 2) 100%)";
-                    row.cells[j].style.fontWeight = "bold";
-                }
-            }
-
-            btnblue.addEventListener("click", () => popupOpen(data, 'on', 'power'));
-            btnred.addEventListener("click", () => popupOpen(data, 'off', 'power'));
+        if (menu_button[i].clickHandler) {
+            menu_button[i].removeEventListener('click', () => gear_check.checked = false);
         }
+        menu_button[i].addEventListener('click', () => gear_check.checked = false);
     }
 }
 
-function getClock(){
+function addListener(btn, data, action, process, work) {
+    if (btn.clickHandler) {
+        btn.removeEventListener("click", btn.clickHandler);
+    }
+    btn.clickHandler = () => {
+        if (work === "open") {
+            popupOpen(data, action, process);
+        } else if (work === "close") {
+            popupClose(process);
+        } else if (work === "result_open") {
+            result_popupOpen(data, action, process);
+        } else if (work === "error_open") {
+            error_popupOpen(data, action, process);
+        } else if (work === "server_manage") {
+            server_management(process);
+        } else if (work === "user_manage") {
+            user_management(process);
+        } else if (work === "power_work") {
+            power_work(data, action);
+        }
+    }
+    btn.addEventListener("click", btn.clickHandler);
+}
+
+function getClock() {
     const date = new Date()
     const year = date.getFullYear();
     const month = ("0" + (date.getMonth() + 1)).slice(-2);
     const day = ("0" + date.getDate()).slice(-2);
-    const hour = String(date.getHours()).padStart(2,"0");
-    const minutes = String(date.getMinutes()).padStart(2,"0");
-    const second = String(date.getSeconds()).padStart(2,"0");//number이기 때문에 padStart 붙일 수 없음. String 변환해주어야한다.
-    const weakday = new Date("'"+year+"-"+month+"-"+day+"'");
+    const hour = String(date.getHours()).padStart(2, "0");
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+    const second = String(date.getSeconds()).padStart(2, "0");//number이기 때문에 padStart 붙일 수 없음. String 변환해주어야한다.
+    const weakday = new Date("'" + year + "-" + month + "-" + day + "'");
     const WEEKDAY = ['일', '월', '화', '수', '목', '금', '토'];
     let week = WEEKDAY[weakday.getDay()];
 
@@ -151,167 +147,345 @@ function ObjectToMap(object) {
 
     return dataMap;
 }
+function createServerSlide() {
+    const slideouter = document.querySelector('.slide.slide_wrap');
+    const slide_items = document.querySelectorAll('.slide_item');
+    const slider_btn = document.querySelectorAll('.slide_button');
+    const left_btn = document.createElement('div')
+    const right_btn = document.createElement('div')
+    for (let i = 0; i < slide_items.length; i++) {
+        slideouter.removeChild(slide_items[i]);
+        if(i < slider_btn.length) {
+            slideouter.removeChild(slider_btn[i]);
+        }
+    }
 
-am5.ready(function () {
-// Create root element
-// https://www.amcharts.com/docs/v5/getting-started/#Root_element
-    let root = am5.Root.new("chartdiv");
+    for(let i = 0; i < serverlist.length; i++) {
+        const create_div = document.createElement('div');
+        create_div.className = 'slide_item'
+        create_div.innerText = serverlist[i];
+        slideouter.appendChild(create_div);
+    }
+    if(serverlist.length > 0) {
+        left_btn.className = 'slide_prev_button slide_button'
+        left_btn.innerText = '◀'
+        right_btn.className = 'slide_next_button slide_button'
+        right_btn.innerText = '▶'
+        slideouter.appendChild(left_btn);
+        slideouter.appendChild(right_btn);
+    }
 
-    let responsive = am5themes_Responsive.newEmpty(root);
+    createSlide();
+}
 
-    responsive.addRule({
-        relevant: function (width, height) {
-            return height < 600;
+function setCanvasSize() {
+    const canvas1 = document.querySelector('#myChart1');
+    const canvas2 = document.querySelector('#myChart2');
+    canvas1.width = canvas1.parentElement.clientWidth;
+    canvas2.width = canvas2.parentElement.clientWidth;
+    canvas1.height = canvas1.parentElement.clientHeight;
+    canvas2.height = canvas2.parentElement.clientHeight;
+}
+
+function createGraphBar(server, cpulist, memorylist, disklist) {
+    console.log("server, cpulist, memorylist, disklist : " + server, cpulist.get(server), memorylist.get(server), disklist.get(server));
+    /* 차트를 새로 만들기 위해 디스트로이 */
+    if (myChartBar !== undefined) {
+        myChartBar.destroy();
+    }
+
+    /* Bar그래프에 활용한 그라데이션 */
+    gradient1 = ctx1.createLinearGradient(0, 0, 600, 600);
+    gradient1.addColorStop(0, 'rgba(238, 255, 217, 1)');
+    gradient1.addColorStop(0.5, 'rgba(199, 238, 165, 1)');
+    gradient2 = ctx1.createLinearGradient(0, 0, 600, 600);
+    gradient2.addColorStop(0, 'rgba(222, 240, 164, 1)');
+    gradient2.addColorStop(0.5, 'rgba(127, 184, 71, 1)');
+    gradient3 = ctx1.createLinearGradient(0, 0, 600, 600);
+    gradient3.addColorStop(0, 'rgba(159, 208, 91, 1)');
+    gradient3.addColorStop(0.5, 'rgba(51, 127, 37, 1)');
+
+    myChartBar = new Chart(ctx1, {
+        plugins: [ChartDataLabels],
+        type   : 'bar',
+        data   : {
+            labels  : ['CPU', 'MEMORY', 'DISK'],
+            datasets: [
+                {
+                    data           : [cpulist.get(server),memorylist.get(server),disklist.get(server)],
+                    backgroundColor: [
+                        gradient1,
+                        gradient2,
+                        gradient3
+                    ],
+                    borderColor    : [
+                        gradient1,
+                        gradient2,
+                        gradient3
+                    ],
+                    borderWidth    : 1
+                }
+            ]
         },
-        applying: function () {
-            legend.setAll({
-                y      : am5.percent(125),
-                centerY: am5.percent(125),
-                x      : am5.percent(50),
-                centerX: am5.percent(50)
-            });
-        },
-        removing: function () {
-            legend.setAll({
-                y      : am5.percent(105),
-                centerY: am5.percent(105),
-                x      : am5.percent(50),
-                centerX: am5.percent(50)
-            });
+        options: {
+            indexAxis : 'y',
+            scales    : {
+                x: {
+                    ticks: {
+                        color: "rgba(255, 255, 255, 1)",
+                        Size : 14
+                    },
+                    grid : {
+                        display: false
+                    },
+                    min: 0,
+                    max: 100
+                },
+                y: {
+                    ticks    : {
+                        beginAtZero: true,
+                        color      : "rgba(255, 255, 255, 1)",
+                        font       : {
+                            size: 12,
+                            weight: "bold"
+                        },
+                        padding    : 10, // x축 값의 상하 패딩을 설정할 수 있어요.
+                    },
+                    grid: {
+                        display: false
+                    }
+                },
+            },
+            responsive: false,
+            plugins   : {
+                legend: { // 범례 사용 안 함
+                    display: false,
+                },
+                tooltip: { // 기존 툴팁 사용 안 함
+                    enabled: true
+                },
+                animation: { // 차트 애니메이션 사용 안 함 (옵션)
+                    duration: 0,
+                },
+                datalabels: { // datalables 플러그인 세팅
+                    formatter: function (value, context) {
+                        let idx = context.dataIndex; // 각 데이터 인덱스
+
+                        // 출력 텍스트
+                        return  context.chart.data.labels[idx] + "\n" + value + '%';
+                    },
+                    font: { // font 설정
+                        weight: 'bold',
+                        size: '12px',
+                    },
+                    color: [gradient1, gradient2, gradient3], // font color,
+                    anchor: 'end',
+                    align: 'right'
+                }
+            }
         }
     });
+}
 
-    const myTheme = am5.Theme.new(root);
+function aniGraphLine() {
+    const totalDuration = 10000;
+    const delayBetweenPoints = totalDuration / trafic[currSlide].trafic_tx.length;
+    const previousY = (ctx) => ctx.index === 0 ? ctx.chart.scales.y.getPixelForValue(100) : ctx.chart.getDatasetMeta(ctx.datasetIndex).data[ctx.index - 1].getProps(['y'], true).y;
+    animation = {
+        x: {
+            type: 'date',
+            // easing: 'linear',
+            duration: delayBetweenPoints,
+            from: NaN, // the point is initially skipped
+            delay(ctx) {
+                if (ctx.type !== 'data' || ctx.xStarted) {
+                    return 0;
+                }
+                ctx.xStarted = true;
+                return ctx.index * delayBetweenPoints;
+            }
+        },
+        y: {
+            type: 'number',
+            // easing: 'linear',
+            duration: delayBetweenPoints,
+            from: previousY,
+            delay(ctx) {
+                if (ctx.type !== 'data' || ctx.yStarted) {
+                    return 0;
+                }
+                ctx.yStarted = true;
+                return ctx.index * delayBetweenPoints;
+            }
+        }
+    };
+}
 
-    myTheme.rule("Label").setAll({
-        fontSize: "20px"
-    })
-
-// Set themes
-// https://www.amcharts.com/docs/v5/concepts/themes/
-    root.setThemes([
-        am5themes_Animated.new(root),
-        am5themes_Dark.new(root),
-        myTheme, responsive
-    ]);
-
-// Create chart
-// https://www.amcharts.com/docs/v5/charts/percent-charts/pie-chart/
-    let chart = root.container.children.push(
-        am5percent.PieChart.new(root, {
-            endAngle   : 270,
-            width      : root.dom.clientWidth,
-            height     : root.dom.clientHeight - 150,
-            innerRadius: am5.percent(50)
-        })
-    );
-
-// Create series
-// https://www.amcharts.com/docs/v5/charts/percent-charts/pie-chart/#Series
-    let series = chart.series.push(
-        am5percent.PieSeries.new(root, {
-            valueField     : "value",
-            categoryField  : "category",
-            endAngle       : 270,
-            alignLabels    : false,
-            legendLabelText: "[{fill}]{category}[/]",
-            legendValueText: "[bold {fill}]{value}[/]"
-        })
-    );
-
-    series.states.create("hidden", {
-        endAngle: -90
+function createGraphLine() {
+    myChartLine = new Chart(ctx2, {
+        type   : 'line',
+        data   : {
+            labels  : ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+            datasets: [
+                {
+                    label          : '트래픽 RX',
+                    lineTension    : 0.3,
+                    data           : [12, 19, 3, 5, 2, 3],
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(255, 206, 86, 0.2)',
+                        'rgba(75, 192, 192, 0.2)',
+                        'rgba(153, 102, 255, 0.2)',
+                        'rgba(255, 159, 64, 0.2)'
+                    ],
+                    borderColor    : [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(255, 159, 64, 1)'
+                    ],
+                    borderWidth    : 1,
+                    fill: true,
+                },
+                {
+                    label          : '트래픽 TX',
+                    lineTension: 0.3,
+                    data           : [10, 20, 9, 6, 11, 3],
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(255, 206, 86, 0.2)',
+                        'rgba(75, 192, 192, 0.2)',
+                        'rgba(153, 102, 255, 0.2)',
+                        'rgba(255, 159, 64, 0.2)'
+                    ],
+                    borderColor    : [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(255, 159, 64, 1)'
+                    ],
+                    borderWidth    : 1,fill: true,
+                }
+            ]
+        },
+        options: {
+            animation,
+            responsive: true,
+            interaction: {
+                intersect: false,
+            },
+            scales    : {
+                x: {
+                    ticks: {
+                        color: "rgba(255, 255, 255, 1)",
+                        Size : 14
+                    },
+                    grid : {
+                        color    : 'rgba(255, 255, 255, 0.5)',
+                        lineWidth: 1
+                    }
+                },
+                y: {
+                    ticks: {
+                        beginAtZero: true,
+                        color      : "rgba(255, 255, 255, 1)",
+                        font       : {
+                            size: 13
+                        },
+                        padding    : 10, // x축 값의 상하 패딩을 설정할 수 있어요.
+                    },
+                    grid : {
+                        color    : 'rgba(255, 255, 255, 0.5)',
+                        lineWidth: 1
+                    }
+                },
+            },
+            plugins   : {
+                legend: {
+                    position: 'top',
+                    labels  : {
+                        color: 'rgba(255, 255, 255, 1)'
+                    }
+                }
+            }
+        },
     });
+}
 
-// Set data
-// https://www.amcharts.com/docs/v5/charts/percent-charts/pie-chart/#Setting_data
-    let data = [{
-        category: "HEMS",
-        value   : 301.9
-    }, {
-        category: "BEMS",
-        value   : 201.9
-    }, {
-        category: "L-BEMS",
-        value   : 501.9
-    }];
-    series.data.setAll(data);
-
-    series.labels.template.setAll({
-        fontSize: 16,
-        text    : "{category}",
-        textType: "radial",
-        radius  : 0,
-        centerX : am5.percent(100),
-        fill    : am5.color(0xffffff)
-    });
-
-    series.ticks.template.set("forceHidden", true);
-
-    // Add legend
-    let legend = chart.children.push(am5.Legend.new(root, {
-        y      : am5.percent(105),
-        centerY: am5.percent(105),
-        x      : am5.percent(50),
-        centerX: am5.percent(50),
-        layout : am5.GridLayout.new(root, {
-            maxColumns    : 2,
-            fixedWidthGrid: true
-        })
-    }));
-    legend.data.setAll(series.dataItems);
-
-    // Add label
-    chart.children.unshift(am5.Label.new(root, {
-        text     : "트래픽(RX/TX)",
-        fontSize : 18,
-        textAlign: "center",
-        x        : am5.percent(50),
-        centerX  : am5.percent(50),
-        y        : am5.percent(50),
-        centerY  : am5.percent(50)
-    }));
-}); // end am5.ready()
-
-function serverList() {
+function getServerInfo() {
+    let httpRequest;
     httpRequest = new XMLHttpRequest();
 
     httpRequest.onreadystatechange = () => {
         popupOpen(null, null, "progress");
         if (httpRequest.readyState === XMLHttpRequest.DONE) {
-            popupClose("progress");
             if (httpRequest.status === 200) {
+                let j = 0;
                 const table_id = document.querySelector('#server_list');
                 const tbody = document.querySelector('.server_content');
+                serverlist = [];
+                cpulist = new Map();
+                memorylist = new Map();
+                disklist = new Map();
                 while (tbody.hasChildNodes()) {
                     tbody.removeChild(tbody.firstChild);
                 }
                 let res = httpRequest.response;
-                let resMap = new Map();
+                let tomcatportlist = [];
 
                 if (res !== null) {
-                    for (let key of Object.keys(res)) {
-                        const value = res[key];
-                        resMap.set(key, value);
-                        console.log(key, value);
+                    for (let i = 0; i < res.length; i++) {
+                        tableCreate(res[i], table_id);
+                        tomcatportlist.push(res[i].tomcat_port);
+                        console.log("j : " + res[j].server_name);
+                        console.log("i : " + res[i].server_name);
+                        console.log(i === res.length - 1 && res[j].server_name === res[i].server_name)
+                        if(i === res.length-1 && res[j].server_name !== res[i].server_name) {
+                            serverlist.push(res[i].server_name);
+                            serverlist.push(res[j].server_name);
+                            iplist.set(res[i].server_name, res[i].ip);
+                            iplist.set(res[j].server_name, res[j].ip);
+                            cpulist.set(res[i].server_name, Number(res[i].cpu.substring(0, res[i].cpu.length - 1)));
+                            cpulist.set(res[j].server_name, Number(res[j].cpu.substring(0, res[j].cpu.length - 1)));
+                            memorylist.set(res[i].server_name, Number(res[i].memory.substring(0, res[i].memory.length - 1)));
+                            memorylist.set(res[j].server_name, Number(res[j].memory.substring(0, res[j].memory.length - 1)));
+                            disklist.set(res[i].server_name, Number(res[i].disk.substring(0, res[i].disk.length - 1)));
+                            disklist.set(res[j].server_name, Number(res[j].disk.substring(0, res[j].disk.length - 1)));
+                            tomcatportlist.splice(tomcatportlist.length - 1);
+                            tomcatportMap.set(res[i].server_name, tomcatportlist);
+                            tomcatportMap.set(res[j].server_name, tomcatportlist);
+                        } else if((res[j].ip !== res[i].ip)||(i === res.length - 1 && res[j].server_name === res[i].server_name)) {
+                            serverlist.push(res[j].server_name);
+                            iplist.set(res[j].server_name, res[j].ip);
+                            cpulist.set(res[j].server_name, Number(res[j].cpu.substring(0, res[j].cpu.length - 1)));
+                            memorylist.set(res[j].server_name, Number(res[j].memory.substring(0, res[j].memory.length - 1)));
+                            disklist.set(res[j].server_name, Number(res[j].disk.substring(0, res[j].disk.length - 1)));
+                            tomcatportlist.splice(tomcatportlist.length - 1);
+                            tomcatportMap.set(res[j].server_name, tomcatportlist);
+
+                            tomcatportlist = [];
+                            tomcatportlist.push(res[i].tomcat_port);
+                        }
+                        j = i;
                     }
-
-                    resMap.get("table").map(function (result) {
-                        tableCreate(result, table_id);
-                    })
-                    resMap.get("ranking_cpu").map(function (result) {
-                        rankCreate(result);
-                    })
-                    resMap.get("ranking_memory").map(function (result) {
-                        rankCreate(result);
-                    })
-                    resMap.get("ranking_disk").map(function (result) {
-                        rankCreate(result);
-                    })
-
+                    /*서버 리스트 테이블을 만드는 함수*/
                     tableRowSpan(table_id);
-                    ranking_create(table_id);
                 }
+                /*서버 선택 슬라이더를 만드는 함수*/
+                createServerSlide();
+                /*그래프를 불러오는 함수*/
+                console.log("serverlist, cpulist, memorylist, disklist(first) : " + serverlist, cpulist, memorylist, disklist);
+                console.log("serverlist, iplist, tomcatport : " + iplist, tomcatportMap);
+                console.log("tomcatportMap : " + tomcatportMap.get(serverlist[currSlide-1]));
+                createGraphBar(serverlist[currSlide-1], cpulist, memorylist, disklist);
+                trapicGraphData();
+                popupClose("progress");
             } else {
                 console.log("request error");
             }
@@ -325,7 +499,42 @@ function serverList() {
     httpRequest.send();
 }
 
-function tableCreate(result, table_id) {
+function trapicGraphData() {
+    let httpRequest;
+    let data = {};
+    httpRequest = new XMLHttpRequest();
+
+    data.server_name = serverlist[currSlide - 1];
+    data.ip = iplist.get(serverlist[currSlide - 1]);
+    data.tomcat_port = tomcatportMap.get(serverlist[currSlide - 1]);
+
+    httpRequest.onreadystatechange = () => {
+        popupOpen(null, null, "progress");
+        if (httpRequest.readyState === XMLHttpRequest.DONE) {
+            if (httpRequest.status === 200) {
+                let res = httpRequest.response;
+                console.log(res);
+                if (res !== null) {
+                    for (let i = 1; i < res.length; i++) {
+
+                    }
+                }
+                // createGraphLine(serverlist[currSlide-1], trapic);
+                popupClose("progress");
+            } else {
+                console.log("request error");
+            }
+        }
+    }
+
+    httpRequest.open('POST', "/trapic_data", true);
+    httpRequest.responseType = "json";
+    httpRequest.setRequestHeader('Content-Type', 'application/json');
+    httpRequest.setRequestHeader(header, token);
+    httpRequest.send(JSON.stringify(data));
+}
+
+function tableCreate(data, table_id) {
     const newRow = table_id.insertRow();
     const newCell1 = newRow.insertCell(0);
     const newCell2 = newRow.insertCell(1);
@@ -339,6 +548,17 @@ function tableCreate(result, table_id) {
     const newCell10 = newRow.insertCell(9);
     const newCell11 = newRow.insertCell(10);
     const newCell12 = newRow.insertCell(11);
+    let system = data.system;
+    let ip = data.ip;
+    let server_name = data.server_name;
+    let port = data.tomcat_port;
+    let cpu = data.cpu;
+    let memory = data.memory;
+    let disk = data.disk;
+    let port_status = data.status;
+    let rx = data.trapic_rx;
+    let tx = data.trapic_tx;
+
     const btn_blue = document.createElement('button');
     const btn_red = document.createElement('button');
     const span1 = document.createElement('span');
@@ -349,20 +569,6 @@ function tableCreate(result, table_id) {
     span2.innerText = "Θ"
     btn_blue.appendChild(span1);
     btn_red.appendChild(span2);
-    let system = result.system;
-    let ip = result.ip;
-    let server_name = result.server_name;
-    let port = result.port;
-    let cpu = result.cpu;
-    let memory = result.memory;
-    let disk = result.disk;
-    let port_status = result.port_status;
-    let rx = result.RX;
-    let tx = result.TX;
-    let cpu_rank = result.cpu_rank;
-    let memory_rank = result.memory_rank;
-    let disk_rank = result.disk_rank;
-    console.log("서버 정보(tablecreate) : " + system, ip, server_name, port, cpu, memory, disk, port_status, rx, tx, cpu_rank, memory_rank, disk_rank);
 
     newCell1.innerText = system;
     newCell2.innerText = ip;
@@ -370,11 +576,11 @@ function tableCreate(result, table_id) {
     newCell4.innerText = port;
     if (port_status === "가동") {
         newCell5.innerText = port_status;
-        newCell5.style.background = "linear-gradient(0deg, rgba(0, 172, 238, 1) 0%, rgba(2, 126, 251, 1) 100%)";
+        newCell5.style.color = "rgba(2, 126, 251, 1)";
         newCell5.style.fontWeight = "bold";
     } else if (port_status === "정지") {
         newCell5.innerText = port_status;
-        newCell5.style.background = "linear-gradient(0deg, rgba(255, 151, 0, 1) 0%, rgba(251, 75, 2, 1) 100%)";
+        newCell5.style.color = "rgba(251, 75, 2, 1)";
         newCell5.style.fontWeight = "bold";
     }
     newCell5.innerText = port_status;
@@ -386,44 +592,25 @@ function tableCreate(result, table_id) {
     newCell11.appendChild(btn_blue);
     newCell12.appendChild(btn_red);
 
-    btn_blue.addEventListener("click", () => popupOpen(result, 'on', 'power'));
-    btn_red.addEventListener("click", () => popupOpen(result, 'off', 'power'));
-}
-
-function rankCreate(result) {
-    let system = result.system;
-    let ip = result.ip;
-    let server_name = result.server_name;
-    let port = result.port;
-    let cpu = result.cpu;
-    let memory = result.memory;
-    let disk = result.disk;
-    let port_status = result.port_status;
-    let rx = result.RX;
-    let tx = result.TX;
-    let cpu_rank = result.cpu_rank;
-    let memory_rank = result.memory_rank;
-    let disk_rank = result.disk_rank;
-    console.log("서버 정보(rankcreate) : " + system, ip, server_name, port, cpu, memory, disk, port_status, rx, tx, cpu_rank, memory_rank, disk_rank);
+    addListener(btn_blue, data, 'on', 'power', 'open');
+    addListener(btn_red, data, 'off', 'power', 'open');
 }
 
 function tableRowSpan(table_id) {
     let rows = table_id.getElementsByTagName("tr");
-    let i = 0;
     let j;
 
     // tr만큼 루프돌면서 컬럼값 접근
     for (j = 1; j < rows.length; j++) {
-        let cells1 = rows[i].getElementsByTagName("td");
+        let i = 1;
+        let cells1 = rows[j - 1].getElementsByTagName("td");
         let cells2 = rows[j].getElementsByTagName("td");
         let ip_span_check = false;
         let name_span_check = false;
 
         for (let r = 0; r < cells1.length; r++) {
             if (r === 0 || r === 1 || r === 2) {
-                i = j;
                 if (cells1[r].innerHTML === cells2[r].innerHTML) {
-                    i = j;
                     cells1[r].rowSpan = i + 1;
                     cells2[r].hidden = true;
                     if (r === 1) {
@@ -444,163 +631,106 @@ function tableRowSpan(table_id) {
                 if (r === 10 || r === 11) {
                     cells1[r].rowSpan = i + 1;
                     cells2[r].hidden = true;
+                    if (r === 11) {
+                        i++;
+                    }
                 }
             }
         }
     }
 }
 
-function ranking_create(table_id) {
-    let rows = table_id.getElementsByTagName("tr");
-    let i = 0;
-    let j = 0;
-
-    // for (j = 1; j < rows.length; j++) {
-    //     let cells1 = rows[i].getElementsByTagName("td");
-    //     let cells2 = rows[j].getElementsByTagName("td");
-    //     console.log(cells1, cells2);
-    //
-    //     for (let r = 0; r < cells1.length; r++) {
-    //         i = j;
-    //         if (r === 7) {
-    //             let cell1 = cells1[r].innerHTML;
-    //             let cell2 = cells2[r].innerHTML;
-    //             cell1 = parseFloat(cell1.substring(cell1.lastIndex - 1));
-    //             cell2 = parseFloat(cell2.substring(cell2.lastIndex - 1));
-    //             if(cell1 >= cell2) {
-    //             }
-    //         } else if(r === 8) {
-    //
-    //         }
-    //     }
-    // }
-}
-
-function popupOpen(data, power, process) {
+function popupOpen(data, action, process) {
     let datamap = new Map();
 
-    if(data !== undefined && data !== null) {
+    if (data !== undefined && data !== null) {
         datamap = ObjectToMap(data);
     }
 
     if (process === 'power') {
         popup.className = open;
 
-        const btn_blue = document.createElement("button");
-        const btn_red = document.createElement("button");
-        const span_blue = document.createElement("span");
-        const span_red = document.createElement("span");
+        const div_btn = document.createElement("div");
+        const div_sep = document.createElement("div");
+        const btn_green = document.createElement('button');
+        const btn_red = document.createElement('button');
+        div_btn.className = "button_box"
+        div_sep.className = "button_separator"
+        btn_green.className = "button button-normal";
+        btn_red.className = "button button-normal";
+        btn_green.innerText = "확인"
+        btn_red.innerText = "취소"
+        div_btn.appendChild(btn_green);
+        div_btn.appendChild(div_sep);
+        div_btn.appendChild(btn_red);
+
 
         popupbody.replaceChildren();
-        h1.style.padding = "0 30px 20px 50px";
-        btn_blue.className = "btn blue";
-        btn_red.className = "btn red";
-        data.power = power;
+        data.power = action;
 
-        if (power === "on") {
+        if (action === "on") {
             h1.textContent = datamap.get("server_name") + "서버를 구동 하시겠습니까?";
-            span_blue.textContent = "확인";
-            span_red.textContent = "취소";
-            btn_blue.appendChild(span_blue);
-            btn_red.appendChild(span_red);
-        } else if (power === "off") {
+        } else if (action === "off") {
             h1.textContent = datamap.get("server_name") + "서버를 종료 하시겠습니까?";
-            span_blue.textContent = "확인";
-            span_red.textContent = "취소";
-            btn_blue.appendChild(span_blue);
-            btn_red.appendChild(span_red);
         }
 
         popupbody.appendChild(h1);
-        popupbody.appendChild(btn_blue);
-        popupbody.appendChild(btn_red);
-        btn_blue.addEventListener("click", () => power_result(data, power));
-        btn_red.addEventListener("click", () => popupClose('power'));
+        popupbody.appendChild(div_btn);
+        addListener(btn_green, data, action, process, 'power_work');
+        addListener(btn_red, data, action, process, 'close');
     } else if (process === 'plus') {
         const popup_wrapper_plus = document.querySelector(".popup_wrapper.plus");
-        const btn_plus_blue = document.querySelector(".popup_body.plus > .btn.blue");
-        const btn_plus_red = document.querySelector(".popup_body.plus > .btn.red");
+        const btn_plus_submit = document.querySelector(".popup_body.plus > .button_box > .btn_submit");
+        const btn_plus_cancel = document.querySelector(".popup_body.plus > .button_box > .btn_cancel");
         popup_wrapper_plus.className = "popup_wrapper open plus";
 
-        btn_plus_blue.addEventListener("click", () => server_management('plus'));
-        btn_plus_red.addEventListener("click", () => popupClose('plus'));
+        addListener(btn_plus_submit, data, action, process, 'server_manage');
+        addListener(btn_plus_cancel, data, action, process, 'close');
     } else if (process === 'delete') {
         const popup_wrapper_delete = document.querySelector(".popup_wrapper.delete");
-        const btn_delete_blue = document.querySelector(".popup_body.delete > .btn.blue");
-        const btn_delete_red = document.querySelector(".popup_body.delete > .btn.red");
+        const btn_delete_submit = document.querySelector(".popup_body.delete > .button_box > .btn_submit");
+        const btn_delete_cancel = document.querySelector(".popup_body.delete > .button_box > .btn_cancel");
         popup_wrapper_delete.className = "popup_wrapper open delete";
 
-        btn_delete_blue.addEventListener("click", () => server_management('delete'));
-        btn_delete_red.addEventListener("click", () => popupClose('delete'));
+        addListener(btn_delete_submit, data, action, process, 'server_manage');
+        addListener(btn_delete_cancel, data, action, process, 'close');
     } else if (process === 'progress') {
         const popup_wrapper_progress = document.querySelector(".popup_progress_back");
         popup_wrapper_progress.className = "popup_progress_back open";
-    } else if (process === 'userlist') {
-        const popup_wrapper_userlist = document.querySelector(".popup_wrapper.userlist");
-        const btn_delete_blue = document.querySelector(".popup_body.userlist > .btn.blue");
-        const btn_delete_red = document.querySelector(".popup_body.userlist > .btn.red");
-        popup_wrapper_userlist.className = "popup_wrapper open userlist";
-
-        const table = document.getElementById('user_list');
-        const rowList = table.rows;
-
-        for (let i = 0; i < rowList.length; i++) {
-            let row = rowList[i];
-            const btnred = row.querySelector('.btn.red');
-            if (btnred !== null) {
-                let tdsNum = row.childElementCount;
-
-                let data = {};
-                for (let j = 0; j < (tdsNum - 1); j++) {
-                    let row_value = row.cells[j].innerHTML;
-                    switch (j) {
-                        case 1 :
-                            data.user_id = row_value;
-                            break;
-                        case 2:
-                            data.user_auth = row_value;
-                            break;
-                        case 3:
-                            data.user_tel = row_value;
-                            break;
-                    }
-                }
-
-                btnred.addEventListener("click", () => popupOpen(data, null, "user_edit"));
-            }
-        }
-        btn_delete_blue.addEventListener("click", () => popupOpen(null, null, "user_plus"));
-        btn_delete_red.addEventListener("click", () => popupClose('userlist'));
+    } else if (process === 'user_list') {
+        getUserList();
     } else if (process === 'user_edit') {
         const popup_wrapper_edit = document.querySelector(".popup_wrapper.user_edit");
-        const btn_edit_blue = document.querySelector(".popup_body.user_edit > .button > .btn.blue");
-        const btn_edit_red = document.querySelector(".popup_body.user_edit > .button > .btn.red");
+        const btn_edit_submit = document.querySelector(".popup_body.user_edit > .button_box > .btn_submit");
+        const btn_edit_cancel = document.querySelector(".popup_body.user_edit > .button_box > .btn_cancel");
         const btn_edit_select = document.getElementById('user_edit_auth');
         const user_id = document.getElementById("user_edit_id");
+        const username = document.getElementById("user_edit_username");
         const user_tel = document.getElementById("user_edit_tel");
-        select_value = data.user_auth;
-        btn_edit_select.textContent = data.user_auth;
-        user_id.value = data.user_id;
-        user_tel.value = data.user_tel;
+        select_value = data.author;
+        btn_edit_select.textContent = data.author;
+        user_id.value = data.id;
+        username.value = data.username;
+        user_tel.value = data.tel;
         popup_wrapper_edit.className = "popup_wrapper open user_edit blur";
         select_function('user_edit');
 
-        btn_edit_blue.addEventListener("click", () => user_management('user_edit'));
-        btn_edit_red.addEventListener("click", () => popupClose('user_edit'));
+        addListener(btn_edit_submit, data, action, process, 'user_manage');
+        addListener(btn_edit_cancel, data, action, process, 'close');
     } else if (process === 'user_plus') {
         const popup_wrapper_user_plus = document.querySelector(".popup_wrapper.user_plus");
-        const btn_user_plus_blue = document.querySelector(".popup_body.user_plus > .btn.blue");
-        const btn_user_plus_red = document.querySelector(".popup_body.user_plus > .btn.red");
+        const btn_user_plus_submit = document.querySelector(".popup_body.user_plus > .button_box > .btn_submit");
+        const btn_user_plus_cancel = document.querySelector(".popup_body.user_plus > .button_box > .btn_cancel");
         const user_plus_id = document.getElementById('user_plus_id');
         const user_plus_pw = document.getElementById('user_plus_password');
+        const user_plus_name = document.getElementById('user_plus_username');
         const user_plus_auth = document.getElementById('user_plus_auth');
         const user_plus_tel = document.getElementById('user_plus_tel');
         popup_wrapper_user_plus.className = "popup_wrapper open user_plus";
         user_plus_auth.innerText = "사용자 권한";
         user_plus_auth.style.color = "#D3D3D3";
         select_function('user_plus');
-        popup_user_plus.style.height = "356px";
-        user_plus_id.style.width = "258px";
+        user_plus_id.style.width = "229px";
         user_plus_id.value = "";
         ok_img.style.display = "none";
         id_check_btn.style.display = "block";
@@ -608,88 +738,136 @@ function popupOpen(data, power, process) {
         pw_check_plus.style.display = "none";
         auth_check_plus.style.display = "none";
         tel_check_plus.style.display = "none";
-        id_check_plus_result = undefined;
+        id_check_result = undefined;
         user_plus_id.disabled = false;
         user_plus_pw.value = "";
+        user_plus_name.value = "";
         user_plus_tel.value = "";
 
-        btn_user_plus_blue.addEventListener("click", () => user_management('user_plus'));
-        btn_user_plus_red.addEventListener("click", () => popupClose('user_plus'));
-    } else if (process === 'result_server_plus') {
+        addListener(btn_user_plus_submit, data, action, process, 'user_manage');
+        addListener(btn_user_plus_cancel, data, action, process, 'close');
+    } else if (process === 'user_delete') {
         popup.className = open;
-
-        const btn_blue = document.createElement("button");
-        const span_blue = document.createElement("span");
-
+        const popup_user_list = document.querySelector('.popup_wrapper.user_list');
+        popup_user_list.style.zIndex = 800;
+        const btn_box = document.createElement("div");
+        const btn_submit = document.createElement("button");
         popupbody.replaceChildren();
-        h1.style.padding = "0px 0px 20px 0px";
-        btn_blue.className = "btn blue";
-        h1.textContent = datamap.get("name") + "서버를 추가하는데 성공했습니다.";
-        span_blue.textContent = "확인";
-        btn_blue.appendChild(span_blue);
-
-        popupbody.appendChild(h1);
-        popupbody.appendChild(btn_blue);
-        btn_blue.addEventListener("click", () => popupClose('power'));
-    } else if (process === 'error_server_plus') {
-        popup.className = open;
-
-        const popup_plus = document.querySelector('.popup_wrapper.plus');
-        const btn_blue = document.createElement("button");
-        const span_blue = document.createElement("span");
-
-        popupbody.replaceChildren();
-        popup_plus.style.zIndex = 800;
-        h1.style.padding = "0px 0px 20px 0px";
-        btn_blue.className = "btn blue";
-
-        if(power === 'detect') {
-            h1.textContent = datamap.get("name") + "서버가 이미 리스트에 존재합니다.";
+        if (action === "empty") {
+            h1.textContent = "체크박스가 비어있습니다. 삭제하고싶은 사용자를 체크하시고 삭제버튼을 눌러주세요."
+            popupbody.appendChild(h1);
         } else {
-            h1.textContent = datamap.get("name") + "서버를 추가하는데 실패했습니다.";
+            for (let i = 0; i < data.length; i++) {
+                const h = document.createElement('h1');
+
+                h.style.padding = "0px 0px 20px 0px";
+                if (action === "ok") {
+                    h.textContent = data[i].toString() + " 사용자를 삭제하는데 성공했습니다.";
+                } else if (action === "nok") {
+                    h.textContent = data[i].toString() + " 사용자를 삭제하는데 실패했습니다.";
+                } else if (action === "error") {
+                    h.textContent = "사용자 삭제중에 오류가 발생했습니다. 다시 시도해주시기 바랍니다.";
+                    break;
+                }
+
+                popupbody.appendChild(h);
+            }
         }
-        span_blue.textContent = "확인";
-        btn_blue.appendChild(span_blue);
-
-        popupbody.appendChild(h1);
-        popupbody.appendChild(btn_blue);
-        btn_blue.addEventListener("click", () => popupClose('power'));
-    } else if (process === 'result_server_delete') {
-        popup.className = open;
-
-        const btn_blue = document.createElement("button");
-        const span_blue = document.createElement("span");
-
-        popupbody.replaceChildren();
-        h1.style.padding = "0px 0px 20px 0px";
-        btn_blue.className = "btn blue";
-        h1.textContent = datamap.get("name") + "서버를 삭제하는데 성공했습니다.";
-        span_blue.textContent = "확인";
-        btn_blue.appendChild(span_blue);
-
-        popupbody.appendChild(h1);
-        popupbody.appendChild(btn_blue);
-        btn_blue.addEventListener("click", () => popupClose('power'));
-    } else if (process === 'error_server_delete') {
-        popup.className = open;
-
-        const popup_plus = document.querySelector('.popup_wrapper.delete');
-        const btn_blue = document.createElement("button");
-        const span_blue = document.createElement("span");
-
-        popupbody.replaceChildren();
-        popup_plus.style.zIndex = 800;
-        h1.style.padding = "0px 0px 20px 0px";
-        btn_blue.className = "btn blue";
-
-        h1.textContent = datamap.get("name") + "서버가 서버리스트에 없습니다.";
-        span_blue.textContent = "확인";
-        btn_blue.appendChild(span_blue);
-
-        popupbody.appendChild(h1);
-        popupbody.appendChild(btn_blue);
-        btn_blue.addEventListener("click", () => popupClose('power'));
+        btn_submit.className = "button button-normal btn_submit";
+        btn_submit.textContent = "확인";
+        btn_box.className = "button_box";
+        btn_box.appendChild(btn_submit);
+        popupbody.appendChild(btn_box);
+        addListener(btn_submit, data, action, 'power', 'close');
     }
+}
+
+function result_popupOpen(data, action, process) {
+    let datamap = new Map();
+
+    if (data !== undefined && data !== null) {
+        datamap = ObjectToMap(data);
+    }
+
+    popup.className = open;
+
+    const popup_user_list = document.querySelector('.popup_wrapper.user_list');
+    const btn_box = document.createElement("div");
+    const btn_submit = document.createElement("button");
+
+    popupbody.replaceChildren();
+    btn_box.className = "button_box"
+    btn_submit.className = "button button-normal btn_submit";
+    if (process === "server_plus") {
+        h1.textContent = datamap.get("server_name") + " 서버를 추가하는데 성공했습니다.";
+    } else if (process === "server_delete") {
+        h1.textContent = datamap.get("server_name") + " 서버를 삭제하는데 성공했습니다.";
+    } else if (process === "user_plus") {
+        popup_user_list.style.zIndex = 800;
+        h1.textContent = datamap.get("id") + " 사용자를 추가하는데 성공했습니다.";
+    } else if (process === "user_edit") {
+        popup_user_list.style.zIndex = 800;
+        popupbody.style.width = "auto";
+        popuphead.style.width = "90%";
+        h1.textContent = datamap.get("id") + " 사용자 정보를 수정하는데 성공했습니다.";
+    }
+
+    btn_submit.textContent = "확인";
+    btn_box.appendChild(btn_submit);
+
+    popupbody.appendChild(h1);
+    popupbody.appendChild(btn_box);
+    addListener(btn_submit, data, action, 'power', 'close');
+}
+
+function error_popupOpen(data, action, process) {
+    let datamap = new Map();
+
+    if (data !== undefined && data !== null) {
+        datamap = ObjectToMap(data);
+    }
+
+    popup.className = open;
+
+    const popup_user_list = document.querySelector('.popup_wrapper.user_list');
+    const popup_plus = document.querySelector('.popup_wrapper.plus');
+    const btn_box = document.createElement("div");
+    const btn_submit = document.createElement("button");
+
+    popupbody.replaceChildren();
+    popup_plus.style.zIndex = 800;
+    btn_box.className = "button_box"
+    btn_submit.className = "button button-normal btn_submit";
+
+    if (process === "server_plus") {
+        const popup_plus = document.querySelector('.popup_wrapper.plus');
+        popup_plus.style.zIndex = 800;
+        if (action === 'detect') {
+            h1.textContent = data.server_name + " 서버가 이미 리스트에 존재합니다.";
+        } else {
+            h1.textContent = data.server_name + " 서버를 추가하는데 실패했습니다.";
+        }
+    } else if (process === "server_delete") {
+        const popup_delete = document.querySelector('.popup_wrapper.delete');
+        popup_delete.style.zIndex = 800;
+        h1.textContent = datamap.get("server_name") + " 서버가 서버리스트에 없습니다.";
+    } else if (process === "user_plus") {
+        const popup_user_plus = document.querySelector('.popup_wrapper.user_plus');
+        popup_user_list.style.zIndex = 700;
+        popup_user_plus.style.zIndex = 800;
+        h1.textContent = datamap.get("id") + " 사용자를 추가하는데 실패했습니다.";
+    } else if (process === "user_edit") {
+        const popup_user_edit = document.querySelector('.popup_wrapper.user_edit');
+        popup_user_list.style.zIndex = 700;
+        popup_user_edit.style.zIndex = 800;
+        h1.textContent = datamap.get("id") + " 사용자 정보를 수정하는데 실패했습니다.";
+    }
+    btn_submit.textContent = "확인";
+    btn_box.appendChild(btn_submit);
+
+    popupbody.appendChild(h1);
+    popupbody.appendChild(btn_box);
+    addListener(btn_submit, data, action, 'power', 'close');
 }
 
 function popupClose(process) {
@@ -705,9 +883,9 @@ function popupClose(process) {
     } else if (process === 'progress') {
         const popup_wrapper_progress = document.querySelector(".popup_progress_back");
         popup_wrapper_progress.className = "popup_progress_back close";
-    } else if (process === 'userlist') {
-        const popup_wrapper_userlist = document.querySelector(".popup_wrapper.userlist");
-        popup_wrapper_userlist.className = "popup_wrapper close userlist";
+    } else if (process === 'user_list') {
+        const popup_wrapper_userlist = document.querySelector(".popup_wrapper.user_list");
+        popup_wrapper_userlist.className = "popup_wrapper close user_list";
     } else if (process === 'user_edit') {
         const popup_wrapper_auth = document.querySelector(".popup_wrapper.user_edit");
         popup_wrapper_auth.className = "popup_wrapper close user_edit";
@@ -719,10 +897,11 @@ function popupClose(process) {
     }
 }
 
-function power_result(data, power) {
+function power_work(data, action) {
+    popupClose('power');
     popupbody.replaceChildren();
-    h1.style.padding = "30px 30px 30px 30px";
     let datamap = new Map();
+    let httpRequest;
     httpRequest = new XMLHttpRequest();
 
     for (let key of Object.keys(data)) {
@@ -733,41 +912,41 @@ function power_result(data, power) {
     httpRequest.onreadystatechange = () => {
         popupOpen(null, null, "progress");
         if (httpRequest.readyState === XMLHttpRequest.DONE) {
+            popupClose("progress");
+            popup.className = open;
             if (httpRequest.status === 200) {
                 let res = httpRequest.response;
+                console.log("res : " + res.result);
                 if (res.result === "ok") {
-                    if (power === "on") {
+                    if (action === "on") {
                         h1.textContent = datamap.get("server_name") + "서버를 구동 하였습니다.";
-                    } else if (power === "off") {
+                    } else if (action === "off") {
                         h1.textContent = datamap.get("server_name") + "서버를 종료 하였습니다.";
                     }
                     popupbody.appendChild(h1);
-                    popupClose("progress");
                 } else if (res.result === "reason") {
-                    if (power === "on") {
+                    if (action === "on") {
                         h1.textContent = datamap.get("server_name") + "서버가 이미 작동중입니다.";
-                    } else if (power === "off") {
+                    } else if (action === "off") {
                         h1.textContent = datamap.get("server_name") + "서버가 이미 종료되있습니다.";
                     }
                     popupbody.appendChild(h1);
-                    popupClose("progress");
                 } else {
-                    if (power === "on") {
+                    if (action === "on") {
                         h1.textContent = datamap.get("server_name") + "서버 구동에 실패했습니다.";
-                    } else if (power === "off") {
+                    } else if (action === "off") {
                         h1.textContent = datamap.get("server_name") + "서버 종료에 실패했습니다.";
                     }
                     popupbody.appendChild(h1);
-                    popupClose("progress");
                 }
+                getServerInfo();
             } else {
-                if (power === "on") {
+                if (action === "on") {
                     h1.textContent = datamap.get("server_name") + "서버 구동에 실패했습니다.";
-                } else if (power === "off") {
+                } else if (action === "off") {
                     h1.textContent = datamap.get("server_name") + "서버 종료에 실패했습니다.";
                 }
                 popupbody.appendChild(h1);
-                popupClose("progress");
                 console.log("request error");
             }
         }
@@ -778,10 +957,6 @@ function power_result(data, power) {
     httpRequest.setRequestHeader('Content-Type', 'application/json');
     httpRequest.setRequestHeader(header, token);
     httpRequest.send(JSON.stringify(data));
-}
-
-function server_Delete() {
-    console.log("Delete");
 }
 
 function select_function(process) {
@@ -860,6 +1035,7 @@ function select_function(process) {
 
 /* 메뉴얼 다운로드 */
 async function manual_download() {
+    btn_manual.removeEventListener('click', () => manual_download());
     const response = await fetch('/resource/manual/manual.docx');
     const file = await response.blob();
     const downloadUrl = window.URL.createObjectURL(file); // 해당 file을 가리키는 url 생성
@@ -873,13 +1049,14 @@ async function manual_download() {
 
     document.body.removeChild(aElement); // cleanup - 쓰임을 다한 a 태그 삭제
     window.URL.revokeObjectURL(downloadUrl); // cleanup - 쓰임을 다한 url 객체 삭제
+    btn_manual.addEventListener('click', () => manual_download());
 }
 
-function id_check() {
-    const put_id = document.getElementById('user_plus_id');
-    let id = put_id.value;
-    console.log(id);
-    if (!isStringValue(id)) {
+function id_duplication_check(process) {
+    const input_id = document.getElementById(process + '_id');
+    let id = input_id.value;
+    let httpRequest;
+    if (isStringValue(id)) {
         let data = {};
         data.id = id;
         httpRequest = new XMLHttpRequest();
@@ -891,7 +1068,6 @@ function id_check() {
                 if (httpRequest.status === 200) {
                     let res = httpRequest.response;
                     let check = res.result;
-                    console.log("check : " + check);
                     if (check === "ok") {
                         id_check_btn.style.display = "none";
                         user_plus_id.style.width = "277px";
@@ -899,21 +1075,19 @@ function id_check() {
                         ok_img.style.display = "block";
                         id_check_plus.style.display = "none";
 
-                        id_check_plus_result = true;
+                        id_check_result = true;
                     } else if (check === "error") {
                         id_check_plus.innerText = "중복된 ID 확인중에 오류가 발생했습니다."
                         id_check_plus.style.display = "block";
-                        popup_user_plus.style.height = "auto";
                         popup_user_plus.style.overflow = 'hidden';
 
-                        id_check_plus_result = false;
+                        id_check_result = false;
                     } else if (check === "nok") {
-                        id_check_plus.style.innerText = "중복된 ID가 존재합니다. 다른 ID를 입력해주세요.";
+                        id_check_plus.innerText = "중복된 ID가 존재합니다. 다른 ID를 입력해주세요.";
                         id_check_plus.style.display = "block";
-                        popup_user_plus.style.height = "auto";
                         popup_user_plus.style.overflow = 'hidden';
 
-                        id_check_plus_result = false;
+                        id_check_result = false;
                     }
                 } else {
                     console.log("request error");
@@ -929,111 +1103,142 @@ function id_check() {
     } else {
         id_check_plus.innerText = "ID가 입력되지 않았습니다."
         id_check_plus.style.display = "block";
-        popup_user_plus.style.height = "auto";
         popup_user_plus.style.overflow = 'hidden';
+    }
+}
 
-        id_check_plus_result = false;
+function id_check(id, process) {
+    if (process === "user_edit") {
+        id_check_result = true;
+        return true;
+    } else if (process === "user_delete") {
+        return true;
+    } else {
+        if (isStringValue(id)) {
+            if (id_check_result === undefined) {
+                id_check_plus.innerText = "ID 중복체크를 하지 않았습니다. ID 중복체크를 해주세요."
+                id_check_plus.style.display = "block";
+                popup_user_plus.style.overflow = 'hidden';
+                return false;
+            } else if (id_check_result === true) {
+                id_check_btn.style.display = "none";
+                user_plus_id.style.width = "277px";
+                user_plus_id.disabled = true;
+                ok_img.style.display = "block";
+                id_check_plus.style.display = "none";
+                return true;
+            } else {
+                id_check_result = undefined;
+                id_check_plus.innerText = "ID 중복체크를 하지 않았습니다. ID 중복체크를 해주세요."
+                id_check_plus.style.display = "block";
+                popup_user_plus.style.overflow = 'hidden';
+                return false;
+            }
+        } else {
+            id_check_plus.innerText = "ID가 입력되지 않았습니다."
+            id_check_plus.style.display = "block";
+            popup_user_plus.style.overflow = 'hidden';
+            return false;
+        }
     }
 }
 
 function pw_check(pw, process) {
-    const popup = document.querySelector(".popup_"+process);
-    const user_id = document.getElementById(process+'_id');
-    const pw_p = document.getElementById('pw_check_'+process);
-    let id = user_id.value;
-    let checkNumber = pw.search(/[0-9]/g);
-    let checkEnglish = pw.search(/[a-z]/ig);
-
-    if (!isStringValue(pw)) {
-        if(!/^(?=.*[a-zA-Z])(?=.*[!@#$%^*+=-])(?=.*[0-9]).{8,20}$/.test(pw)){
-            pw_p.innerText= `숫자+영문자+특수문자 조합으로 8~20자리 사용해야 합니다.`;
-            pw_p.style.display = 'block';
-            popup.style.height = "auto";
-            popup.style.overflow = 'hidden';
-            return false;
-        }else if(checkNumber <0 || checkEnglish <0){
-            pw_p.innerText= "숫자와 영문자를 혼용하여야 합니다.";
-            pw_p.style.display = 'block';
-            popup.style.height = "auto";
-            popup.style.overflow = 'hidden';
-            return false;
-        }else if(/(\w)\1\1\1/.test(pw)){
-            pw_p.innerText= "같은 문자를 4번 이상 사용하실 수 없습니다.";
-            pw_p.style.display = 'block';
-            popup.style.height = "auto";
-            popup.style.overflow = 'hidden';
-            return false;
-        }else if(pw.search(id) > -1){
-            pw_p.innerText= "비밀번호에 아이디가 포함되었습니다.";
-            pw_p.style.display = 'block';
-            popup.style.height = "auto";
-            popup.style.overflow = 'hidden';
-            return false;
-        }else {
-            popup.style.height = "356px";
-            pw_p.style.display = 'none';
-            return true;
-        }
+    if (process === "user_delete") {
+        return true;
     } else {
-        pw_p.innerText = "PW를 입력하지 않았습니다. 패스워드를 입력해주세요.";
-        pw_p.style.display = 'block';
-        popup.style.height = "auto";
-        popup.style.overflow = 'hidden';
-        return false;
+        const popup = document.querySelector(".popup_" + process);
+        const user_id = document.getElementById(process + '_id');
+        const pw_p = document.getElementById('pw_check_' + process);
+        let id = user_id.value;
+        let checkNumber = pw.search(/[0-9]/g);
+        let checkEnglish = pw.search(/[a-z]/ig);
+        if (isStringValue(pw)) {
+            if (!/^(?=.*[a-zA-Z])(?=.*[!@#$%^*+=-])(?=.*[0-9]).{8,20}$/.test(pw)) {
+                pw_p.innerText = `숫자+영문자+특수문자 조합으로 8~20자리 사용해야 합니다.`;
+                pw_p.style.display = 'block';
+                popup.style.overflow = 'hidden';
+                return false;
+            } else if (checkNumber < 0 || checkEnglish < 0) {
+                pw_p.innerText = "숫자와 영문자를 혼용하여야 합니다.";
+                pw_p.style.display = 'block';
+                popup.style.overflow = 'hidden';
+                return false;
+            } else if (/(\w)\1\1\1/.test(pw)) {
+                pw_p.innerText = "같은 문자를 4번 이상 사용하실 수 없습니다.";
+                pw_p.style.display = 'block';
+                popup.style.overflow = 'hidden';
+                return false;
+            } else if (pw.search(id) > -1) {
+                pw_p.innerText = "비밀번호에 아이디가 포함되었습니다.";
+                pw_p.style.display = 'block';
+                popup.style.overflow = 'hidden';
+                return false;
+            } else {
+                pw_p.style.display = 'none';
+                return true;
+            }
+        } else {
+            pw_p.innerText = "PW를 입력하지 않았습니다. 패스워드를 입력해주세요.";
+            pw_p.style.display = 'block';
+            popup.style.overflow = 'hidden';
+            return false;
+        }
     }
 }
 
 function auth_check(auth, process) {
-    const popup = document.querySelector(".popup_"+process);
-    const auth_p = document.getElementById('auth_check_'+process);
-    if (auth === "사용자 권한") {
-        auth_p.style.display = 'block';
-        popup.style.height = "auto";
-        popup.style.overflow = 'hidden';
-
-        return false;
-    } else {
-        auth_p.style.display = 'none';
-        popup.style.height = "356px";
-
+    if (process === "user_delete") {
         return true;
+    } else {
+        const popup = document.querySelector(".popup_" + process);
+        const auth_p = document.getElementById('auth_check_' + process);
+        if (auth === "사용자 권한") {
+            auth_p.style.display = 'block';
+            popup.style.overflow = 'hidden';
+
+            return false;
+        } else {
+            auth_p.style.display = 'none';
+
+            return true;
+        }
     }
 }
 
 function tel_check(tel, process) {
-    let regexTel = /^(6553[0-5]|655[0-2]\d|65[0-4]\d{2}|6[0-4]\d{3}|5\d{4}|[0-9]\d{0,3})$/;
-    const popup = document.querySelector(".popup_"+process);
-    const tel_p = document.getElementById('tel_check_'+process);
+    if (process === "user_delete") {
+        return true;
+    } else {
+        let regexTel = /^[0-9]{3}-[0-9]{4}-[0-9]{4}$/;
+        const popup = document.querySelector(".popup_" + process);
+        const tel_p = document.getElementById('tel_check_' + process);
 
-    if(!isStringValue(tel)) {
-        if (!regexTel.test(tel)) {
-            tel_p.innerText = "전화번호는 숫자만 가능하고, 형식은 000-0000-0000으로\n-를 포함하여 입력해주세요.";
+        if (isStringValue(tel)) {
+            if (regexTel.test(tel)) {
+                tel_p.style.display = 'none';
+                return true;
+            } else {
+                tel_p.innerText = "전화번호는 숫자만 가능하고, 형식은 000-0000-0000으로\n-를 포함하여 입력해주세요.";
+                tel_p.style.display = 'block';
+                popup.style.overflow = 'hidden';
+                return false;
+            }
+        } else {
+            tel_p.innerText = '전화번호를 입력하셔야 됩니다.'
             tel_p.style.display = 'block';
-            popup.style.height = "auto";
             popup.style.overflow = 'hidden';
             return false;
-        } else {
-            tel_p.style.display = 'none';
-            popup.style.height = "356px";
-
-            return true;
         }
-    } else {
-        tel_p.innerText = '전화번호를 입력하셔야 됩니다.'
-        tel_p.style.display = 'block';
-        popup.style.height = "auto";
-        popup.style.overflow = 'hidden';
-
-        return false;
     }
 }
 
 function ip_check(ip, process) {
     let regexIP = /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
-    const popup = document.querySelector(".popup_"+process);
-    const ip_p = document.getElementById('ip_check_'+process);
+    const popup = document.querySelector(".popup_" + process);
+    const ip_p = document.getElementById('ip_check_' + process);
 
-    if(isStringValue(ip)) {
+    if (isStringValue(ip)) {
         if (!regexIP.test(ip)) {
             ip_p.innerText = "IP는 숫자만 사용가능하고\nIP는 000.000.000.000형식으로 작성해야합니다";
             ip_p.style.display = 'block';
@@ -1055,10 +1260,10 @@ function ip_check(ip, process) {
 
 function port_check(port, process, portname) {
     let regexPort = /(6553[0-5]|655[0-2]\d|65[0-4]\d{2}|6[0-4]\d{3}|5\d{4}|[0-9]\d{0,3})/;
-    const popup = document.querySelector(".popup_"+process);
-    const port_p = document.getElementById(portname + '_port_check_'+process);
+    const popup = document.querySelector(".popup_" + process);
+    const port_p = document.getElementById(portname + '_port_check_' + process);
 
-    if(isStringValue(port)) {
+    if (isStringValue(port)) {
         if (!regexPort.test(port)) {
             port_p.innerText = '포트는 65535이하의 숫자로 입력하셔야 됩니다.';
             port_p.style.display = 'block';
@@ -1079,10 +1284,10 @@ function port_check(port, process, portname) {
 }
 
 function system_check(system, process) {
-    const popup = document.querySelector(".popup_"+process);
-    const system_p = document.getElementById('system_check_'+process);
+    const popup = document.querySelector(".popup_" + process);
+    const system_p = document.getElementById('system_check_' + process);
 
-    if(!isStringValue(system)) {
+    if (!isStringValue(system)) {
         system_p.innerText = "시스템이 입력되지 않았습니다."
         system_p.style.display = "block";
         popup.style.overflow = 'hidden';
@@ -1096,30 +1301,36 @@ function system_check(system, process) {
 }
 
 function name_check(name, process, checkname) {
-    const popup = document.querySelector(".popup_" + process);
-    const name_p = document.getElementById(checkname + '_check_' + process);
-
-    if(!isStringValue(name)) {
-        if(checkname === "name") {
-            name_p.innerText = "서버 이름이 입력되지 않았습니다."
-        } else if(checkname === "id") {
-            name_p.innerText = "서버 로그인 ID가 입력되지 않았습니다."
-        } else if(checkname === "pw") {
-            name_p.innerText = "서버 로그인 PW가 입력되지 않았습니다."
-        } else if(checkname === "tomcat_dir") {
-            name_p.innerText = "톰캣 폴더 위치가 입력되지 않았습니다."
-        }
-        name_p.style.display = "block";
-        popup.style.overflow = 'hidden';
-
-        return false;
+    if (process === "user_delete") {
+        return true;
     } else {
-        if(name_p !== null && name_p !== undefined) {
-            name_p.style.display = 'none';
+        const popup = document.querySelector(".popup_" + process);
+        const name_p = document.getElementById(checkname + '_check_' + process);
+
+        if (!isStringValue(name)) {
+            if (checkname === "server_name") {
+                name_p.innerText = "서버 이름이 입력되지 않았습니다."
+            } else if (checkname === "id") {
+                name_p.innerText = "서버 로그인 ID가 입력되지 않았습니다."
+            } else if (checkname === "pw") {
+                name_p.innerText = "서버 로그인 PW가 입력되지 않았습니다."
+            } else if (checkname === "tomcat_dir") {
+                name_p.innerText = "톰캣 폴더 위치가 입력되지 않았습니다."
+            } else if (checkname === "username") {
+                name_p.innerText = "사용자의 이름이 입력되지 않았습니다."
+            }
+            name_p.style.display = "block";
+            popup.style.overflow = 'hidden';
+
+            return false;
         } else {
+            if (name_p !== null && name_p !== undefined) {
+                name_p.style.display = 'none';
+            } else {
+                return true;
+            }
             return true;
         }
-        return true;
     }
 }
 
@@ -1127,55 +1338,136 @@ function user_management(process) {
     const user_id = document.getElementById(process + '_id');
     const user_pw = document.getElementById(process + '_password');
     const user_auth = document.getElementById(process + '_auth');
-    const user_tel = document.getElementById( process +'_tel');
-    let id = user_id.value;
-    let pw = user_pw.value;
-    let auth = user_auth.innerText;
-    let tel = user_tel.value;
-    if (id_check_plus_result && pw_check(pw, process) && auth_check(auth, process) && tel_check(tel, process)) {
+    const user_tel = document.getElementById(process + '_tel');
+    const username = document.getElementById(process + '_username');
+    let checkbox = document.querySelectorAll("input[name=userlist_check]:checked");
+    let pw_check_result = false;
+    let id;
+    let pw;
+    let name;
+    let auth;
+    let tel;
+    let httpRequest;
+    httpRequest = new XMLHttpRequest();
+    if (process !== "user_delete") {
+        id = user_id.value;
+        pw = user_pw.value;
+        name = username.value;
+        auth = user_auth.innerText;
+        tel = user_tel.value;
+    } else {
+        if (checkbox.length <= 0) {
+            popupOpen(null, "empty", process);
+            return;
+        }
+    }
+    if (id_check(id, process)) {
         let data = {}
-        data.id = id;
-        data.pw = pw;
-        data.auth = auth;
-        data.tel = tel;
-
-        httpRequest = new XMLHttpRequest();
-
-        httpRequest.onreadystatechange = () => {
-            popupOpen(null, null, "progress");
-            if (httpRequest.readyState === XMLHttpRequest.DONE) {
-                popupClose("progress");
-                if (httpRequest.status === 200) {
-                    console.log("user_management");
-                } else {
-                    console.log("request error");
-                }
+        let userList = []
+        if (process === "user_edit") {
+            if (isStringValue(pw)) {
+                pw_check_result = pw_check(pw, process);
+                data.password = pw;
+            } else {
+                pw_check_result = true;
+                data.password = null;
+            }
+        } else {
+            pw_check_result = pw_check(pw, process);
+            if (pw_check_result === true) {
+                data.password = pw;
             }
         }
+        if (pw_check_result && name_check(name, process, "username") && auth_check(auth, process)
+            && tel_check(tel, process)) {
+            if (process !== "user_delete") {
+                data.id = id;
+                data.username = name;
+                data.author = auth;
+                data.tel = tel;
+            } else {
+                for (let i = 0; i < checkbox.length; i++) {
+                    data = {};
+                    // checkbox.item(i).parentElement : 테이블 td, checkbox.item(i).parentElement.parentELement : 테이블 tr;
+                    const tds = checkbox.item(i).parentElement.parentElement.children;
+                    data.id = tds.item(1).textContent;
+                    data.username = tds.item(2).textContent;
+                    data.auth = tds.item(3).textContent;
+                    data.tel = tds.item(4).textContent;
+                    userList.push(data);
+                }
+            }
 
-        httpRequest.open('POST', "/user_"+process, true);
-        httpRequest.responseType = "json";
-        httpRequest.setRequestHeader('Content-Type', 'application/json');
-        httpRequest.setRequestHeader(header, token);
-        httpRequest.send(JSON.stringify(data));
-    } else if(id_check_plus_result === undefined) {
-        id_check_plus.innerText = "ID가 입력되지 않았습니다."
-        id_check_plus.style.display = "block";
-        popup_user_plus.style.height = "auto";
-        popup_user_plus.style.overflow = 'hidden';
+            httpRequest.onreadystatechange = () => {
+                popupOpen(null, null, "progress");
+                if (httpRequest.readyState === XMLHttpRequest.DONE) {
+                    popupClose("progress");
+                    if (httpRequest.status === 200) {
+                        let res = httpRequest.response;
+                        let nokcount = 0;
+                        let errorcount = 0;
+                        let okList = [];
+                        let nokList = [];
+                        if (process === "user_delete") {
+                            for (let i = 0; i < res.length; i++) {
+                                let result = res[i].result;
+                                if (result === "ok") {
+                                    okList.push(res[i].id);
+                                } else if (result === "nok") {
+                                    nokcount++;
+                                    nokList.push(res[i].id);
+                                } else if (result === "error") {
+                                    nokcount++;
+                                    errorcount++;
+                                }
+                            }
+                            if (nokcount > 0) {
+                                if (errorcount > 0) {
+                                    popupOpen(nokList, "error", process);
+                                } else {
+                                    popupOpen(nokList, "nok", process);
+                                }
+                            } else {
+                                popupOpen(okList, "ok", process);
+                            }
+                        } else {
+                            let result = res.result;
 
-        id_check_plus_result = false;
+                            if (result === "ok") {
+                                popupClose(process);
+                                result_popupOpen(data, "ok", process);
+                            } else if (result === "nok") {
+                                error_popupOpen(data, "nok", process);
+                            }
+                        }
+                    } else {
+                        console.log("request error");
+                    }
+                    getUserList();
+                }
+            }
+
+            httpRequest.open('POST', "/" + process, true);
+            httpRequest.responseType = "json";
+            httpRequest.setRequestHeader('Content-Type', 'application/json');
+            httpRequest.setRequestHeader(header, token);
+            if (process !== "user_delete") {
+                httpRequest.send(JSON.stringify(data));
+            } else {
+                httpRequest.send(JSON.stringify(userList));
+            }
+        }
     }
 }
 
 function server_management(process) {
-    const server_system = document.getElementById('system_'+process);
-    const server_ip = document.getElementById('ip_'+process);
-    const server_id = document.getElementById('server_id_'+process);
-    const server_pw = document.getElementById('server_pw_'+process);
-    const server_name = document.getElementById('server_name_'+process);
-    const server_port = document.getElementById('server_port_'+process);
-    const tomcat_port = document.getElementById('tomcat_port_'+process);
+    const server_system = document.getElementById('system_' + process);
+    const server_ip = document.getElementById('ip_' + process);
+    const server_id = document.getElementById('server_id_' + process);
+    const server_pw = document.getElementById('server_pw_' + process);
+    const server_name = document.getElementById('server_name_' + process);
+    const server_port = document.getElementById('server_port_' + process);
+    const tomcat_port = document.getElementById('tomcat_port_' + process);
     let tomcat_dir;
     let system = server_system.value;
     let ip = server_ip.value;
@@ -1185,28 +1477,27 @@ function server_management(process) {
     let serverport = server_port.value;
     let tomcatport = tomcat_port.value;
     let tomcatdir;
-    if(process === "plus") {
-        tomcat_dir = document.getElementById('tomcat_dir_'+process);
+    if (process === "plus") {
+        tomcat_dir = document.getElementById('tomcat_dir_' + process);
         tomcatdir = tomcat_dir.value;
-    } else if(process === "delete") {
+    } else if (process === "delete") {
         tomcatdir = "delete";
     }
-    console.log("서버 추가 process : " + process);
-    console.log("서버 정보 : " + system,ip,name,serverport,tomcatport);
 
     if (system_check(system, process) && ip_check(ip, process) && name_check(id, process, "id") && name_check(pw, process, "pw")
-        && name_check(name, process, "name") && port_check(serverport, process, "server") && port_check(tomcatport, process, "tomcat")
+        && name_check(name, process, "server_name") && port_check(serverport, process, "server") && port_check(tomcatport, process, "tomcat")
         && name_check(tomcatdir, process, "tomcat_dir")) {
         let data = {}
         data.system = system;
         data.ip = ip;
         data.id = id;
         data.pw = pw;
-        data.name = name;
-        data.serverport = serverport;
-        data.tomcatport = tomcatport;
-        data.tomcatdir = tomcatdir;
+        data.server_name = name;
+        data.server_port = serverport;
+        data.tomcat_port = tomcatport;
+        data.tomcat_dir = tomcatdir;
 
+        let httpRequest;
         httpRequest = new XMLHttpRequest();
 
         httpRequest.onreadystatechange = () => {
@@ -1215,14 +1506,15 @@ function server_management(process) {
                 popupClose("progress");
                 if (httpRequest.status === 200) {
                     let res = httpRequest.response;
-                    if(res.result === "ok") {
+                    if (res.result === "ok") {
                         popupClose(process);
-                        popupOpen(data, null, "result_server_"+process);
-                    } else if(res.result === "detect") {
-                        popupOpen(data, "detect", "error_server_"+process);
+                        result_popupOpen(data, null, "server_" + process);
+                    } else if (res.result === "detect") {
+                        error_popupOpen(data, "detect", "server_" + process);
                     } else {
-                        popupOpen(data, null, "error_server_"+process);
+                        error_popupOpen(data, null, "server_" + process);
                     }
+                    getServerInfo();
                 } else {
                     console.log("request error");
                 }
@@ -1234,5 +1526,204 @@ function server_management(process) {
         httpRequest.setRequestHeader('Content-Type', 'application/json');
         httpRequest.setRequestHeader(header, token);
         httpRequest.send(JSON.stringify(data));
+    }
+}
+
+function getUserList() {
+    let httpRequest;
+    httpRequest = new XMLHttpRequest();
+
+    httpRequest.onreadystatechange = () => {
+        popupOpen(null, null, "progress");
+        if (httpRequest.readyState === XMLHttpRequest.DONE) {
+            popupClose("progress");
+            if (httpRequest.status === 200) {
+                let userList = httpRequest.response;
+
+                const popup_wrapper_userlist = document.querySelector(".popup_wrapper.user_list");
+                const btn_list_submit = document.querySelector(".popup_body.user_list > .button_box > .btn_submit");
+                const btn_list_cancel = document.querySelector(".popup_body.user_list > .button_box > .btn_cancel");
+                popup_wrapper_userlist.className = "popup_wrapper open user_list";
+
+                const table = document.getElementById('user_list');
+                const tbody = document.querySelector('#user_list > tbody');
+
+                while (tbody.hasChildNodes()) {
+                    tbody.removeChild(tbody.firstChild);
+                }
+
+                for (let i = 0; i < userList.length; i++) {
+                    if (userList[i].author === "ADMIN") {
+                        userList[i].author = "관리자";
+                    } else if (userList[i].author === "USER") {
+                        userList[i].author = "일반 사용자";
+                    }
+                    const newRow = table.insertRow();
+                    const newCell1 = newRow.insertCell(0);
+                    const newCell2 = newRow.insertCell(1);
+                    const newCell3 = newRow.insertCell(2);
+                    const newCell4 = newRow.insertCell(3);
+                    const newCell5 = newRow.insertCell(4);
+                    const newCell6 = newRow.insertCell(5);
+
+                    newCell1.innerHTML = '<input class="userlist_check" type="checkbox" name="userlist_check"/>';
+                    newCell2.innerText = userList[i].id;
+                    newCell3.innerText = userList[i].username;
+                    newCell4.innerText = userList[i].author;
+                    newCell5.innerText = userList[i].tel;
+                    newCell6.innerHTML = '<button class="button button-normal btn_edit">수정</button>';
+
+                    const btn_edit = newRow.querySelector('.btn_edit');
+                    addListener(btn_edit, userList[i], null, "user_edit", "open");
+                }
+                addListener(btn_list_submit, null, null, "user_plus", "open");
+                addListener(btn_list_cancel, null, null, "user_delete", "user_manage");
+                getServerInfo();
+            } else {
+                console.log("request error");
+            }
+        }
+    }
+
+    httpRequest.open('POST', "/user_list", true);
+    httpRequest.responseType = "json";
+    httpRequest.setRequestHeader('Content-Type', 'application/json');
+    httpRequest.setRequestHeader(header, token);
+    httpRequest.send();
+}
+
+// 슬라이더 생성 함수
+function createSlide() {
+    // 슬라이드 전체 크기(width 구하기)
+    const slide = document.querySelector(".slide");
+    let slideWidth = slide.clientWidth;
+    console.log("slideWidth : " + slideWidth);
+
+    // 버튼 엘리먼트 선택하기
+    const prevBtn = document.querySelector(".slide_prev_button");
+    const nextBtn = document.querySelector(".slide_next_button");
+
+    // 슬라이드 전체를 선택해 값을 변경해주기 위해 슬라이드 전체 선택하기
+    let slideItems = document.querySelectorAll(".slide_item")
+
+    if(slideItems.length > 0) {
+        // 현재 슬라이드 위치가 슬라이드 개수를 넘기지 않게 하기 위한 변수
+        const maxSlide = slideItems.length;
+
+        // 무한 슬라이드를 위해 start, end 슬라이드 복사하기
+        const startSlide = slideItems[0];
+        const endSlide = slideItems[slideItems.length - 1];
+        const startElem = document.createElement("div");
+        const endElem = document.createElement("div");
+
+        endSlide.classList.forEach((c) => endElem.classList.add(c));
+        endElem.innerHTML = endSlide.innerHTML;
+
+        startSlide.classList.forEach((c) => startElem.classList.add(c));
+        startElem.innerHTML = startSlide.innerHTML;
+
+        // 각 복제한 엘리먼트 추가하기
+        slideItems[0].before(endElem);
+        slideItems[slideItems.length - 1].after(startElem);
+
+        // 슬라이드 전체를 선택해 값을 변경해주기 위해 슬라이드 전체 선택하기
+        slideItems = document.querySelectorAll(".slide_item");
+        let offset = slideWidth + currSlide
+        slideItems.forEach((i) => {
+            i.setAttribute("style", `left: ${-offset}px`);
+        })
+
+        function nextMove() {
+            currSlide++;
+            //마지막 슬라이드 이상으로 넘어가지 않게 하기 위해서
+            if (currSlide <= maxSlide) {
+                // 슬라이드를 이동시키기 위한 offset 계산
+                const offset = slideWidth * currSlide;
+                // 각 슬라이드 아이템의 left에 offset 적용
+                slideItems.forEach((i) => {
+                    i.setAttribute("style", `left: ${-offset}px`);
+                });
+            } else {
+                // 무한 슬라이드 기능 - currSlide 값만 변경해줘도 되지만 시각적으로 자연스럽게 하기 위해 아래 코드 작성
+                currSlide = 0;
+                let offset = slideWidth * currSlide;
+                slideItems.forEach((i) => {
+                    i.setAttribute("style", `transition: ${0}s; left: ${-offset}px`);
+                });
+                currSlide++;
+                offset = slideWidth * currSlide;
+                // 각 슬라이드 아이템의 left에 offset 적용
+                setTimeout(() => {
+                    // 각 슬라이드 아이템의 left에 offset 적용
+                    slideItems.forEach((i) => {
+                        i.setAttribute("style", `transition: ${0.15}s; left: ${-offset}px`);
+                    })
+                }, 0);
+            }
+
+
+        }
+
+        function prevMove() {
+            currSlide--;
+            // 1번째 슬라이드 이하로 넘어가지 않게 하기 위해서
+            if (currSlide > 0) {
+                const offset = slideWidth * currSlide;
+                // 각 슬라이드 아이템의 left에 offset 적용
+                slideItems.forEach((i) => {
+                    i.setAttribute("style", `left: ${-offset}px`);
+                });
+            } else {
+                // 무한 슬라이드 기능 - currSlide 값만 변경해줘도 되지만 시각적으로 자연스럽게 하기 위해 아래 코드 작성
+                currSlide = maxSlide + 1;
+                let offset = slideWidth * currSlide;
+                slideItems.forEach((i) => {
+                    i.setAttribute("style", `transition: ${0}s; left: ${-offset}px`);
+                });
+                currSlide--;
+                offset = slideWidth + currSlide;
+                setTimeout(() => {
+                    // 각 슬라이드 아이템의 left에 offset 적용
+                    slideItems.forEach((i) => {
+                        i.setAttribute("style", `transition: ${0.15}s; left: ${-offset}px`);
+                    })
+                }, 0);
+            }
+        }
+
+        // 버튼 엘리먼트에 클릭 이벤트 추가하기
+        nextBtn.addEventListener("click", () => {
+            // 이후 버튼 누를 경우 현재 슬라이드를 변경
+            nextMove();
+        })
+        prevBtn.addEventListener("click", () => {
+            // 이전 버튼 누를 경우 현재 슬라이드를 변경
+            prevMove();
+        })
+
+        // 브라우저 화면이 조정될 때 마다 slideWidth를 변경하기 위해
+        window.addEventListener("resize", () => {
+            slideWidth = slide.clientWidth;
+        });
+
+        // 드래그(스와이프) 이벤트를 위한 변수 초기화
+        let startPoint = 0;
+        let endPoint = 0;
+
+        // PC 클릭 이벤트 (드래그)
+        slide.addEventListener("mousedown", (e) => {
+            startPoint = e.pageX; // 마우스 드래그 시작 위치 저장
+        })
+
+        slide.addEventListener("mouseup", (e) => {
+            endPoint = e.pageX; // 마우스 드래그 끝 위치 지정
+            if (startPoint < endPoint) {
+                // 마우스가 오른쪽으로 드래그 된 경우
+                prevMove();
+            } else if (startPoint > endPoint) {
+                // 마우스가 왼쪽으로 드래그 된 경우
+                nextMove();
+            }
+        })
     }
 }

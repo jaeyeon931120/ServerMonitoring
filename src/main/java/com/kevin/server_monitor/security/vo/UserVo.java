@@ -9,9 +9,10 @@ import lombok.ToString;
 @Setter
 @ToString
 public class UserVo {
-    private Long pk;
-    private String name;
+    private String username;
     private String id;
-    private String email;
+    private String tel;
     private String password;
+    private String author;
+    private String memo;
 }

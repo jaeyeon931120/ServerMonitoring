@@ -2,8 +2,6 @@ package com.kevin.server_monitor.security.service;
 
 import com.kevin.server_monitor.security.mapper.UserMapper;
 import com.kevin.server_monitor.security.vo.UserVo;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -13,7 +11,6 @@ import java.util.List;
 @Service
 public class UserService {
 
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
     private final UserMapper userMapper;
 
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
@@ -26,30 +23,38 @@ public class UserService {
         return userMapper.getUserList();
     }
 
-    public UserVo getUserByPK(Long pk) {
-        return userMapper.getUserByPk(pk);
-    }
-
     public UserVo getUserById(String id) {
         return userMapper.getUserById(id);
     }
 
-    public void signup(UserVo userVo) { // 회원 가입
+    public int getIDCheck(String id) { return userMapper.getIDCheck(id); }
+
+    public int signup(UserVo userVo) { // 사용자 추가
+        int result = 0;
         if (!userVo.getId().equals("")) {
             // password는 암호화해서 DB에 저장
             userVo.setPassword(passwordEncoder.encode(userVo.getPassword()));
-            userMapper.insertUser(userVo);
+            result = userMapper.insertUser(userVo);
         }
+        return result;
     }
 
-    public void edit(UserVo userVo) { // 회원 정보 수정
+    public int edit(UserVo userVo) { // 회원 정보 수정
+        int result;
         // password는 암호화해서 DB에 저장
-        userVo.setPassword(passwordEncoder.encode(userVo.getPassword()));
-        userMapper.updateUser(userVo);
+        if(userVo.getPassword() != null) {
+            userVo.setPassword(passwordEncoder.encode(userVo.getPassword()));
+        }
+        result = userMapper.updateUser(userVo);
+
+        return result;
     }
 
-    public void withdraw(Long id) { // 회원 탈퇴
-        userMapper.deleteUser(id);
+    public int withdraw(String id) { // 회원 탈퇴
+        int result = 0;
+        result = userMapper.deleteUser(id);
+
+        return result;
     }
 
     public PasswordEncoder passwordEncoder() {

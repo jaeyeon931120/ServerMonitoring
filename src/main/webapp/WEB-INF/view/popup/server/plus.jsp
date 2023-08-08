@@ -32,7 +32,7 @@
                 </li>
                 <li>
                     <label for="server_pw_plus">서버 PW</label>
-                    <input type="text" id="server_pw_plus" placeholder="서버 PW"/>
+                    <input type="password" id="server_pw_plus" placeholder="서버 PW"/>
                     <p id="pw_check_plus">서버 로그인 비밀번호를 입력하셔야 됩니다.</p>
                 </li>
                 <li>
@@ -56,8 +56,11 @@
                     <p id="tomcat_dir_check_plus">톰캣 폴더 위치를 입력하셔야 됩니다.</p>
                 </li>
             </ul>
-            <button class="btn blue"><span>확인</span></button>
-            <button class="btn red"><span>취소</span></button>
+            <div class="button_box">
+                <button class="button button-normal btn_submit" type="button">확인</button>
+                <div class="button_separator"></div>
+                <button class="button button-normal btn_cancel" type="button">취소</button>
+            </div>
         </div>
     </div>
 </div>

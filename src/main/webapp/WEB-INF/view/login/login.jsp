@@ -6,7 +6,7 @@
   Time: 오후 3:48
   To change this template use File | Settings | File Templates.
 --%>
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page contentType="text/html;charset=UTF-8" %>
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -25,9 +25,16 @@
         <input type="text" id="id" name="id" placeholder="아이디" required="" autofocus="">
         <label for="password"></label>
         <input type="password" id="password" name="password" placeholder="비밀번호" required="">
+        <span>
+            <c:if test="${error}">
+                <p id="danger">${exception}</p>
+            </c:if>
+        </span>
         <button class="loginBtn" type="submit">로그인</button>
     </form>
 </div>
-<p>Copyright 2023 KevinLAB. All rights reserved.</p>
+<div class="login_foot">
+    <p>Copyright 2023 KevinLAB. All rights reserved.</p>
+</div>
 </body>
 </html>

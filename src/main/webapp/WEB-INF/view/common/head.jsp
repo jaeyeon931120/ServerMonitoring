@@ -21,7 +21,7 @@
                         <div class="menu_head setting"></div>
                         <div class="menu_body setting">
                             <ul>
-                                <a onclick="popupOpen(null, null, 'userlist')">
+                                <a onclick="popupOpen(null, null, 'user_list')">
                                     <li>사용자 관리</li>
                                 </a>
                             </ul>
@@ -45,7 +45,7 @@
                         <span>메뉴얼</span>
                     </div>
                 </li>
-                <li><a id="logout" onclick="location.href='signup'">로그아웃</a></li>
+                <li><a id="logout" onclick="location.href='logout'">로그아웃</a></li>
             </ul>
         </div>
     </div>

@@ -1,0 +1,18 @@
+#!/bin/bash
+
+TOMCAT_DIR="$1"
+CONTROOLER="$2"
+
+#톰캣 폴더 이동
+cd "$TOMCAT_DIR" || exit
+
+echo "$TOMCAT_DIR"
+
+#입력된 CONTROLLER여부에 따라 수행
+if [ "$CONTROOLER" = "on" ]; then
+	echo "start"
+    sh start.sh
+elif [ "$CONTROOLER" = "off" ]; then
+	echo "stop"
+    sh stop.sh
+fi

@@ -1,0 +1,102 @@
+@import url("https://fonts.googleapis.com/css?family=Lato:100,300,400");
+@import url("https://fonts.googleapis.com/css?family=Roboto:100");
+.popup_wrapper {
+  backdrop-filter: blur(1px);
+  -webkit-mask: url("https://raw.githubusercontent.com/robin-dela/css-mask-animation/master/img/nature-sprite.png");
+  mask: url("https://raw.githubusercontent.com/robin-dela/css-mask-animation/master/img/nature-sprite.png");
+  -webkit-mask-size: 2300% 100%;
+  mask-size: 2300% 100%;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  -webkit-animation: ani_button2 1s steps(22) forwards;
+  animation: ani_button2 1s steps(22) forwards;
+}
+.popup_wrapper .btn-close {
+  font-size: 28px;
+  display: block;
+  float: right;
+  color: #fff;
+  font-weight: bold;
+  text-decoration-line: none;
+}
+
+.close {
+  opacity: 0;
+  display: none;
+}
+
+.button_box {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+}
+
+.mas {
+  position: absolute;
+  text-align: center;
+  width: 100%;
+  font-family: "Lato", sans-serif;
+  font-size: 13px;
+  overflow: hidden;
+  font-weight: bold;
+}
+.mas.green {
+  color: #36AE7C;
+}
+.mas.red {
+  color: #EB5353;
+}
+
+@-webkit-keyframes ani_button {
+  from {
+    -webkit-mask-position: 0 0;
+    mask-position: 0 0;
+  }
+  to {
+    -webkit-mask-position: 100% 0;
+    mask-position: 100% 0;
+  }
+}
+@keyframes ani_button {
+  from {
+    -webkit-mask-position: 0 0;
+    mask-position: 0 0;
+  }
+  to {
+    -webkit-mask-position: 100% 0;
+    mask-position: 100% 0;
+  }
+}
+@-webkit-keyframes ani_button2 {
+  from {
+    -webkit-mask-position: 100% 0;
+    mask-position: 100% 0;
+  }
+  to {
+    -webkit-mask-position: 0 0;
+    mask-position: 0 0;
+  }
+}
+@keyframes ani_button2 {
+  from {
+    -webkit-mask-position: 100% 0;
+    mask-position: 100% 0;
+  }
+  to {
+    -webkit-mask-position: 0 0;
+    mask-position: 0 0;
+  }
+}
+a {
+  color: #00ff95;
+}
+
+.button_separator {
+  width: 3px;
+  height: 12px;
+  background: #d9d9d9;
+}
+
+/*# sourceMappingURL=animation.css.map */

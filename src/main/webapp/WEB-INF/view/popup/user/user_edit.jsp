@@ -26,24 +26,34 @@
                     <p id="pw_check_user_edit">비밀번호는 영어와 숫자, 특수문자를 포함하여 8자리 이상 20자리 이하로 작성해주세요.</p>
                 </li>
                 <li>
+                    <label for="user_edit_username">사용자 이름</label>
+                    <input type="text" id="user_edit_username" placeholder="사용자 이름"/>
+                    <p id="username_check_user_edit">사용자의 이름을 입력하지 않았습니다.<br>사용자의 이름을 입력해주세요</p>
+                </li>
+                <li>
                     <article class="cont-select">
                         <label for="user_edit_auth">사용자 권한</label>
                         <button class="btn-select" id="user_edit_auth">사용자 권한</button>
                         <ul class="list-member" id="user_edit-member">
-                            <li><button type="button">관리자</button></li>
-                            <li><button type="button">일반</button></li>
+                            <li>
+                                <button type="button">관리자</button>
+                            </li>
+                            <li>
+                                <button type="button">일반 사용자</button>
+                            </li>
                         </ul>
                     </article>
-                    <p id="auth_check_user_edit">사용자 권한을 선택하지 않으셨습니다. 사용자 권한을 선택해주세요.</p>
+                    <p id="auth_check_user_edit">사용자 권한을 선택하지 않으셨습니다.<br>사용자 권한을 선택해주세요.</p>
                 </li>
                 <li>
                     <label for="user_edit_tel">사용자 연락처</label><input type="text" id="user_edit_tel" value="">
                     <p id="tel_check_user_edit">전화번호는 숫자만 가능하고, 형식은 000-0000-0000으로<br/>-를 포함하여 입력해주세요.</p>
                 </li>
             </ul>
-            <div class="button">
-                <button class="btn blue"><span>확인</span></button>
-                <button class="btn red"><span>취소</span></button>
+            <div class="button_box">
+                <button class="button button-normal btn_submit" type="button">확인</button>
+                <div class="button_separator"></div>
+                <button class="button button-normal btn_cancel" type="button">취소</button>
             </div>
         </div>
     </div>

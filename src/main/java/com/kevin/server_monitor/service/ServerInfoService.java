@@ -3,7 +3,7 @@ package com.kevin.server_monitor.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kevin.server_monitor.service.mybatis.InfoDBService;
+import com.kevin.server_monitor.service.mybatis.ServerDBService;
 import com.kevin.server_monitor.util.SSHUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,22 +18,22 @@ public class ServerInfoService {
 
     private final Logger logger = LoggerFactory.getLogger(ServerInfoService.class);
     private final SSHUtils sshUtils = new SSHUtils();
-    private final InfoDBService infoDBService;
+    private final ServerDBService serverDBService;
     private final BatchService batchService;
     private List<Map<String, Object>> serverInfoList = new ArrayList<>();
 
-    public ServerInfoService(InfoDBService infoDBService, BatchService batchService) {
-        this.infoDBService = infoDBService;
+    public ServerInfoService(ServerDBService serverDBService, BatchService batchService) {
+        this.serverDBService = serverDBService;
         this.batchService = batchService;
     }
 
     private void serverinformation(Map<String, Object> map) {
         String result;
         String val_date;
-        Map<String, Object> resultMap;
+        Map<String, Object> resultMap = null;
 
         try {
-            String server_name = map.get("name").toString();
+            String server_name = map.get("server_name").toString();
             String user_id = map.get("id").toString();
             String user_pw = map.get("pw").toString();
             int serverport = Integer.parseInt(map.get("server_port").toString());
@@ -44,9 +44,9 @@ public class ServerInfoService {
 
             String command;
 
-            command = "cd " + infodir + " && ./server_monitoring " + ip + " " + tomcatport;
+            command = "cd " + infodir + " && echo '" + user_pw + "' | sudo -S ./server_monitoring " + tomcatport;
             String finalCommand = command;
-            result = sshUtils.sshCommunication(user_id, user_pw, ip, serverport, finalCommand);
+            result = sshUtils.sshControll(user_id, user_pw, ip, serverport, finalCommand);
 
             if (result.equals("")) {
                 result = null;
@@ -56,6 +56,8 @@ public class ServerInfoService {
             TypeReference<Map<String, Object>> typeReference = new TypeReference<>() {
             };
 
+            logger.info("resultMap : {}", resultMap);
+            
             resultMap = objectMapper.readValue(result, typeReference);
 
             Double memorydouble = Double.parseDouble(resultMap.get("memory").toString());
@@ -73,17 +75,8 @@ public class ServerInfoService {
 
             String rx = resultMap.get("RX").toString();
             String tx = resultMap.get("TX").toString();
-            String rxsubstring = rx.substring(rx.length() - 2);
-            String txsubstring = tx.substring(tx.length() - 2);
-
-            rx = unitchage(rx, rxsubstring);
-            tx = unitchage(tx, txsubstring);
-
-            String serverName = server_name;
-            String name_check = serverName.substring(serverName.length() - 1);
-            if (isInteger(name_check)) {
-                serverName = serverName.substring(0, serverName.length() - 1);
-            }
+            rx = unitchage(rx);
+            tx = unitchage(tx);
 
             SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
             Calendar cal = Calendar.getInstance(Locale.KOREA);
@@ -97,7 +90,7 @@ public class ServerInfoService {
             resultMap.put("memory", memory);
             resultMap.put("disk", disk);
             resultMap.put("status", portstatus);
-            resultMap.put("name", serverName);
+            resultMap.put("server_name", server_name);
             resultMap.put("system", system);
             resultMap.put("ip", ip);
             resultMap.put("tomcat_port", tomcatport);
@@ -117,6 +110,7 @@ public class ServerInfoService {
             if(!serverInfoList.isEmpty()) {
                 batchService.sqlSessionBatch(datalist, "insert");
                 batchService.sqlSessionBatch(datalist, "update");
+                serverInfoList = new ArrayList<>();
             } else {
                 logger.error("서버와 수신중에 오류가 발생하여 데이터가 없어서 DB적제에 실패했습니다.");
             }
@@ -125,8 +119,15 @@ public class ServerInfoService {
         }
     }
 
-    private static String unitchage(String trafic, String traficstring) {
-        if (!traficstring.equals("Kb")) {
+    private static String unitchage(String trafic) {
+        if (trafic.contains("Kb")) {
+            return trafic;
+        } else if (trafic.contains("Mb")) {
+            double txdouble;
+            trafic = trafic.substring(0, trafic.length() - 2);
+            txdouble = Math.round(Double.parseDouble(trafic) * 1000);
+            trafic = txdouble + "Kb";
+        } else {
             double txdouble;
             trafic = trafic.substring(0, trafic.length() - 1);
             txdouble = Math.round((Double.parseDouble(trafic) / 1000) * 100) / 100.0;
@@ -135,12 +136,11 @@ public class ServerInfoService {
         return trafic;
     }
 
-    public void selectServerInfo() {
+    public void serverInfo() {
         List<Map<String, Object>> serverlist;
-        serverInfoList = new ArrayList<>();
 
         try {
-            serverlist = infoDBService.selectServerInfo();
+            serverlist = serverDBService.detectServerList(null);
 
             Stream<Map<String, Object>> parallelStream = serverlist.parallelStream();
             parallelStream.forEach(this::serverinformation);
@@ -150,12 +150,12 @@ public class ServerInfoService {
         }
     }
 
-    private static boolean isInteger(String strValue) {
+    public void partServerInfo(Map<String, Object> map) {
         try {
-            Integer.parseInt(strValue);
-            return true;
-        } catch (NumberFormatException ex) {
-            return false;
+            serverinformation(map);
+            saveServerInfo();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }

@@ -1,38 +1,46 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.kevin.server_monitor.security.mapper.UserMapper">
-    <!-- User 테이블 가져오기 -->
+
     <select id="getUserList" resultType="com.kevin.server_monitor.security.vo.UserVo">
+        /* User 테이블 가져오기 UserMapper.getUserList */
         SELECT * FROM monitoring_db.monitoring_admin
     </select>
 
-    <!-- 회원가입 -->
     <insert id="insertUser">
-        INSERT INTO monitoring_db.monitoring_admin (id, password, name, tel, author, memo)
-        VALUES (#{id}, #{password}, #{name}, #{tel}, #{author}, #{memo})
+        /* 회원가입 UserMapper.insertUser */
+        INSERT INTO monitoring_db.monitoring_admin (ID, PASSWORD, USERNAME, TEL, AUTHOR, MEMO)
+        VALUES (#{id}, #{password}, #{username}, #{tel}, #{author}, #{memo})
     </insert>
 
-    <!-- 회원 정보 가져오기 -->
     <select id="getUserById" resultType="com.kevin.server_monitor.security.vo.UserVo">
+        /* 회원 정보 가져오기 UserMapper.getUserById */
         SELECT *
         FROM monitoring_db.monitoring_admin
-        WHERE id = #{id}
+        WHERE ID = #{id}
     </select>
 
-    <!-- 회원정보 수정 -->
-    <update id="updateUser">
+    <update id="updateUser" parameterType="com.kevin.server_monitor.security.vo.UserVo">
+        /* 회원정보 수정 UserMapper.updateUser */
         UPDATE monitoring_db.monitoring_admin
-        SET name = #{name},
-            memo = #{memo},
-            tel = #{tel},
-            password = #{password},
-            author = #{author},
-            memo = #{memo}
-        WHERE admin_pk = #{admin_pk}
+        SET USERNAME = #{username},
+            TEL = #{tel},
+            AUTHOR = #{author}
+        <if test="password != null">
+            ,PASSWORD = #{password}
+        </if>
+        WHERE ID = #{id}
     </update>
 
-    <!-- 탈퇴 -->
-    <delete id="deleteUser">
-        DELETE FROM monitoring_db.monitoring_admin WHERE admin_pk = #{admin_pk}
+    <delete id="deleteUser" parameterType="string">
+        /* 탈퇴 UserMapper.deleteUser */
+        DELETE FROM monitoring_db.monitoring_admin WHERE ID = #{id}
     </delete>
+
+    <select id="getIDCheck" resultType="int" parameterType="string">
+        SELECT COUNT(*)
+        FROM (
+                 SELECT ID FROM monitoring_db.monitoring_admin WHERE ID = #{id}
+             ) as `A`
+    </select>
 </mapper>

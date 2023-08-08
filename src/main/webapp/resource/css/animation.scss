@@ -1,0 +1,141 @@
+@import url('https://fonts.googleapis.com/css?family=Lato:100,300,400');
+@import url('https://fonts.googleapis.com/css?family=Roboto:100');
+
+@mixin button($bcolor,
+$url,
+$x1,
+$y1,
+$bor,
+$col) {
+  background: $bcolor;
+  -webkit-mask: url($url);
+  mask: url($url);
+  -webkit-mask-size: $x1 $y1;
+  mask-size: $x1 $y1;
+  border: $bor;
+  color: $col;
+}
+
+@mixin div($bcolor,
+$url,
+$x1,
+$y1,
+$bor,
+$col) {
+  backdrop-filter: $bcolor;
+  -webkit-mask: url($url);
+  mask: url($url);
+  -webkit-mask-size: $x1 $y1;
+  mask-size: $x1 $y1;
+  border: $bor;
+  color: $col;
+}
+
+.popup_wrapper {
+  $popup_wrapper: &;
+
+  @include div(blur(1px),
+          "https://raw.githubusercontent.com/robin-dela/css-mask-animation/master/img/nature-sprite.png",
+          2300%,
+          100%,
+          none,
+          #fff);
+  cursor: pointer;
+  -webkit-animation: ani_button2 0.75s steps(22) forwards;
+  animation: ani_button2 0.75s steps(22) forwards;
+
+  .btn-close {
+    font-size: 28px;
+    display: block;
+    float: right;
+    color: #fff;
+    font-weight: bold;
+    text-decoration-line: none;
+  }
+}
+
+.close {
+  opacity: 0;
+  display: none;
+}
+
+.button_box {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+}
+
+.mas {
+  position: absolute;
+  text-align: center;
+  width: 100%;
+  font-family: 'Lato', sans-serif;
+  font-size: 13px;
+  overflow: hidden;
+  font-weight: bold;
+  &.green {
+    color: #36AE7C;
+  }
+  &.red {
+    color: #EB5353;
+  }
+}
+
+@-webkit-keyframes ani_button {
+  from {
+    -webkit-mask-position: 0 0;
+    mask-position: 0 0;
+  }
+
+  to {
+    -webkit-mask-position: 100% 0;
+    mask-position: 100% 0;
+  }
+}
+
+@keyframes ani_button {
+  from {
+    -webkit-mask-position: 0 0;
+    mask-position: 0 0;
+  }
+
+  to {
+    -webkit-mask-position: 100% 0;
+    mask-position: 100% 0;
+  }
+}
+
+@-webkit-keyframes ani_button2 {
+  from {
+    -webkit-mask-position: 100% 0;
+    mask-position: 100% 0;
+  }
+
+  to {
+    -webkit-mask-position: 0 0;
+    mask-position: 0 0;
+  }
+}
+
+@keyframes ani_button2 {
+  from {
+    -webkit-mask-position: 100% 0;
+    mask-position: 100% 0;
+  }
+
+  to {
+    -webkit-mask-position: 0 0;
+    mask-position: 0 0;
+  }
+}
+
+a {
+  color: #00ff95;
+}
+
+.button_separator {
+  width: 3px;
+  height: 12px;
+  background: #d9d9d9;
+}

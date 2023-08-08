@@ -30,6 +30,7 @@ public class AuthProvider implements AuthenticationProvider {
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
+        logger.info("Authentication start!");
         String id = (String) authentication.getPrincipal(); // 로그인 창에 입력한 id
         String password = (String) authentication.getCredentials(); // 로그인 창에 입력한 password
 
@@ -39,7 +40,7 @@ public class AuthProvider implements AuthenticationProvider {
 
         if (userVo != null && passwordEncoder.matches(password, userVo.getPassword())) { // 일치하는 user 정보가 있는지 확인
             List<GrantedAuthority> roles = new ArrayList<>();
-            roles.add(new SimpleGrantedAuthority("ADMIN")); // 권한 부여
+            roles.add(new SimpleGrantedAuthority(userVo.getAuthor())); // 권한 부여
 
             token = new UsernamePasswordAuthenticationToken(userVo.getId(), null, roles);
             // 인증된 user 정보를 담아 SecurityContextHolder에 저장되는 token

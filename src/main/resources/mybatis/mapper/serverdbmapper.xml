@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kevin.server_monitor.mapper.ServerDBMapper">
+
+    <select id="detectServer" resultType="map">
+        /* 서버 센서 검색 ServerDBMapper.detectServer */
+        SELECT
+            `system`,
+            ip,
+            server_name,
+            tomcat_port,
+            val_date,
+            status,
+            id,
+            CONVERT(AES_DECRYPT(pw,SHA2(`key`,512)) USING UTF8) as pw,
+            server_port,
+            info_dir,
+            tomcat_dir,
+            trapic_tx,
+            trapic_rx,
+            cpu,
+            memory,
+            disk
+        FROM
+            monitoring_db.server_info_sensor
+        <if test="ip != null">
+        WHERE
+            ip = #{ip}
+        </if>
+        <if test="server_name != null">
+        AND
+            server_name = #{server_name}
+        </if>
+        <if test="tomcat_port != null">
+        AND
+            tomcat_port = ${tomcat_port}
+        </if>
+        <if test="val_date != null">
+            AND
+            val_date like CONCAT(#{val_date},'%')
+        </if>
+        ORDER BY `system` DESC
+    </select>
+
+    <select id="detectServerList" resultType="map">
+        /* 서버 센서 검색(리스트) ServerDBMapper.detectServerList */
+        SELECT
+            `system`,
+            ip,
+            server_name,
+            tomcat_port,
+            val_date,
+            status,
+            id,
+            CONVERT(AES_DECRYPT(pw,SHA2(`key`,512)) USING UTF8) as pw,
+            server_port,
+            info_dir,
+            tomcat_dir,
+            trapic_tx,
+            trapic_rx,
+            cpu,
+            memory,
+            disk
+        FROM
+            monitoring_db.server_info_sensor
+        <if test="ip != null">
+        WHERE
+            ip = #{ip}
+        </if>
+        <if test="server_name != null">
+        AND
+            server_name = #{server_name}
+        </if>
+        <if test="tomcat_port != null">
+        AND
+            tomcat_port = ${tomcat_port}
+        </if>
+        <if test="val_date != null">
+            AND
+            val_date like CONCAT('%',#{val_date},'%')
+        </if>
+        ORDER BY `system` DESC
+    </select>
+
+    <select id="detectServerRowList" resultType="map">
+        /* 서버 Row 검색(리스트) ServerDBMapper.detectServerRowList */
+        SELECT
+            `system`,
+            ip,
+            server_name,
+            tomcat_port,
+            val_date,
+            status,
+            trapic_tx,
+            trapic_rx,
+            cpu,
+            memory,
+            disk
+        FROM
+            monitoring_db.server_info_raw
+        <if test="ip != null">
+        WHERE
+            ip = #{ip}
+        </if>
+        <if test="server_name != null">
+        AND
+            server_name = #{server_name}
+        </if>
+        <if test="tomcat_port != null">
+        AND
+            tomcat_port = ${tomcat_port}
+        </if>
+        <if test="from_date != null">
+        AND
+            val_date <![CDATA[>=]]> #{from_date}
+        </if>
+        <if test="to_date != null">
+        AND
+            val_date <![CDATA[<=]]> #{to_date}
+        </if>
+        ORDER BY `system` DESC
+    </select>
+
+    <insert id="insertServerInfo"  parameterType="map">
+        /* 서버 정보 추가 ServerDBMapper.insertServerInfo */
+        INSERT monitoring_db.server_info_raw
+            (`system`, ip, server_name, tomcat_port, val_date, status, trapic_tx, trapic_rx, cpu, memory, disk, reg_date)
+        VALUES
+            (#{system}, #{ip}, #{server_name}, ${tomcat_port}, #{val_date}, #{status}, #{trapic_tx}, #{trapic_rx}, #{cpu}, #{memory}, #{disk}, NOW())
+    </insert>
+
+    <update id="updateServerSensor" parameterType="map">
+        /* 서버 정보 업데이트 ServerDBMapper.updateServerSensor */
+        UPDATE
+            monitoring_db.server_info_sensor
+        <set>
+            <if test="system != null">`system` = #{system},</if>
+            <if test="val_date != null">val_date = #{val_date},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="trapic_tx != null">trapic_tx = #{trapic_tx},</if>
+            <if test="trapic_rx != null">trapic_rx = #{trapic_rx},</if>
+            <if test="cpu != null">cpu = #{cpu},</if>
+            <if test="memory != null">memory = #{memory},</if>
+            <if test="disk != null">disk = #{disk}</if>
+        </set>
+        WHERE
+            ip = #{ip}
+          AND
+            server_name = #{server_name}
+        <if test="tomcat_port != null">
+          AND
+            tomcat_port = ${tomcat_port}
+        </if>
+    </update>
+
+    <insert id="insertServerSensor" parameterType="map">
+        /* 서버 센서 추가 ServerDBMapper.insertServerSensor */
+        INSERT IGNORE INTO monitoring_db.server_info_sensor
+        (`system`, ip, server_name, tomcat_port, id, pw, `key`, server_port, info_dir, tomcat_dir, reg_date)
+        VALUES
+        (#{system}, #{ip}, #{server_name}, ${tomcat_port}, #{id}, AES_ENCRYPT(#{pw},SHA2(#{key},512)), #{key}, ${server_port}, #{info_dir}, #{tomcat_dir}, NOW())
+    </insert>
+
+    <delete id="deleteServerSensor" parameterType="map">
+        /* 서버 정보 삭제 ServerDBMapper.deleteServerSensor */
+        DELETE FROM monitoring_db.server_info_sensor WHERE server_name = #{server_name} AND ip = #{ip} AND tomcat_port = ${tomcat_port}
+    </delete>
+</mapper>

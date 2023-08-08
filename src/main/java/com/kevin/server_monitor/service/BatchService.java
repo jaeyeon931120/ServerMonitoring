@@ -94,7 +94,7 @@ public class BatchService {
                     if(process.equals("insert")) {
                         sqlSession.insert("com.kevin.server_monitor.mapper.ServerDBMapper.insertServerInfo", params);
                     } else if(process.equals("update")) {
-                        sqlSession.update("com.kevin.server_monitor.mapper.ServerDBMapper.updateServerInfo", params);
+                        sqlSession.update("com.kevin.server_monitor.mapper.ServerDBMapper.updateServerSensor", params);
                     }
                 }
             }

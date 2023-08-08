@@ -4,17 +4,19 @@ import com.kevin.server_monitor.security.service.UserService;
 import com.kevin.server_monitor.security.vo.UserVo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Controller
 public class UserController {
@@ -36,76 +38,130 @@ public class UserController {
 
         model.addAttribute("user", userVo);
         model.addAttribute("id", id);
-        model.addAttribute("username", userVo.getName());
+        model.addAttribute("username", userVo.getUsername());
 
         return "login/login";
     }
 
     @GetMapping("/login")
-    public String loginPage() { // 로그인되지 않은 상태이면 로그인 페이지를, 로그인된 상태이면 home 페이지를 보여줌
+    public String loginPage(@RequestParam(value = "error", required = false) String error,
+                            @RequestParam(value = "exception", required = false) String exception,
+                            Model model) { // 로그인되지 않은 상태이면 로그인 페이지를, 로그인된 상태이면 home 페이지를 보여줌
+        model.addAttribute("error", error);
+        model.addAttribute("exception", exception);
+
+        logger.info("error : {}", error);
+        logger.info("exception : {}", exception);
+
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication instanceof AnonymousAuthenticationToken)
             return "login/login";
+
         return "redirect:/";
     }
 
     @PostMapping("/auth")
     public String postLogin(HttpSession session, HttpServletRequest request) {
         String id = request.getParameter("id");
-        String user = request.getParameter("user");
         String username = request.getParameter("username");
 
         session.setAttribute("id", id);
-        session.setAttribute("user", user);
         session.setAttribute("username", username);
 
         return "login/login";
     }
 
-    @GetMapping("/signup")
-    public String signupPage() {  // 회원 가입 페이지
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication instanceof AnonymousAuthenticationToken)
-            return "login/signup";
-        return "redirect:/";
-    }
+    @RequestMapping("/user_list")
+    @ResponseBody
+    public List<UserVo> getUserList() {
+        List<UserVo> resultList = new ArrayList<>();
 
-    @PostMapping("/signup")
-    public String signup(UserVo userVo) { // 회원 가입
         try {
-            userService.signup(userVo);
-        } catch (DuplicateKeyException e) {
-            return "redirect:/signup?error_code=-1";
+            resultList = userService.getUserList();
         } catch (Exception e) {
+            logger.error("유저 리스트를 DB에서 가져오는 중에 오류가 발생했습니다.");
             e.printStackTrace();
-            return "redirect:/signup?error_code=-99";
         }
+        return resultList;
+    }
+
+    @RequestMapping("/user_plus")
+    @ResponseBody
+    public Map<String, Object> getUserPlus(@RequestBody UserVo userVo) { // 사용자 추가
+        Map<String, Object> resultMap = new HashMap<>();
+
+        try {
+            logger.info("User_Plus Start!");
+            logger.info("UserVo : {}", userVo);
+            int result = userService.signup(userVo);
+
+            if(result > 0) {
+                resultMap.put("result", "ok");
+            } else {
+                resultMap.put("result", "nok");
+            }
+        } catch (Exception e) {
+            resultMap.put("result", "nok");
+            logger.error("사용자를 추가하는 중에 오류가 발생했습니다.");
+            e.printStackTrace();
+        }
+        return resultMap;
+    }
+
+    @RequestMapping("/user_edit")
+    @ResponseBody
+    public Map<String, Object> getUserEdit(@RequestBody UserVo userVo) { // 사용자 수정
+        Map<String, Object> resultMap = new HashMap<>();
+
+        try {
+            logger.info("User_Edit Start!");
+            logger.info("UserVo : {}", userVo);
+            int result = userService.edit(userVo);
+
+            if(result > 0) {
+                resultMap.put("result", "ok");
+            } else {
+                resultMap.put("result", "nok");
+            }
+        } catch (Exception e) {
+            resultMap.put("result", "nok");
+            logger.error("사용자를 수정하는 중에 오류가 발생했습니다.");
+            e.printStackTrace();
+        }
+        return resultMap;
+    }
+
+    @RequestMapping("/user_delete")
+    @ResponseBody
+    public List<Map<String, Object>> getUserDelete(@RequestBody List<UserVo> userVo) { // 회원 탈퇴
+        List<Map<String, Object>> resultList = new ArrayList<>();
+        Map<String, Object> resultMap = new HashMap<>();
+        try {
+            for(UserVo user : userVo) {
+                resultMap = new HashMap<>();
+                String id = user.getId();
+                int result = userService.withdraw(id);
+
+                if(result > 0) {
+                    resultMap.put("result", "ok");
+                    resultMap.put("id", id);
+                } else {
+                    resultMap.put("result", "nok");
+                    resultMap.put("id", id);
+                }
+                resultList.add(resultMap);
+            }
+        } catch (Exception e) {
+            resultMap.put("result", "error");
+            resultList.add(resultMap);
+            logger.error("사용자를 삭제하는 중에 오류가 발생했습니다.");
+            e.printStackTrace();
+        }
+        return resultList;
+    }
+
+    @GetMapping("/logout")
+    public String userLogout() {
         return "redirect:/login";
-    }
-
-    @GetMapping("/loginupdate")
-    public String editPage(Model model) { // 회원 정보 수정 페이지
-        Long pk = (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        UserVo userVo = userService.getUserByPK(pk);
-        model.addAttribute("user", userVo);
-        return "editPage";
-    }
-
-    @PostMapping("/loginupdate")
-    public String edit(UserVo userVo) { // 회원 정보 수정
-        Long pk = (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        userVo.setPk(pk);
-        userService.edit(userVo);
-        return "redirect:/";
-    }
-
-    @PostMapping("/logindelete")
-    public String withdraw(HttpSession session) { // 회원 탈퇴
-        Long pk = (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (pk != null) {
-            userService.withdraw(pk);
-        }
-        SecurityContextHolder.clearContext(); // SecurityContextHolder에 남아있는 token 삭제
-        return "redirect:/";
     }
 }
