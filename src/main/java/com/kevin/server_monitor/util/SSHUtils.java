@@ -18,9 +18,6 @@ public class SSHUtils {
         ChannelExec channel = null;
         String result = null;
 
-        logger.info("server_info => username : {}, password : {}, ip : {}, port : {}, command : {}",
-                username, password, ip, port, command);
-
         try {
             session = new JSch().getSession(username, ip, port);
             session.setPassword(password);
@@ -53,13 +50,11 @@ public class SSHUtils {
         String currentDirectory = sftpchannel.pwd();
         StringBuilder totPathArray = new StringBuilder();
 
-        logger.info("pwd : {}", currentDirectory);
         for (String s : pathArray) {
 
             totPathArray.append(s).append("/");
             String currentPath = currentDirectory + totPathArray;
             try {
-                logger.info("currentPath : {}", currentPath);
                 sftpchannel.mkdir(currentPath);
                 sftpchannel.cd(currentPath);
             } catch (Exception e) {
@@ -79,8 +74,6 @@ public class SSHUtils {
             {
                 result.append(commandLine).append("\n");
             }
-
-            logger.info("result : {}", result);
         } catch (Exception e) {
             logger.error("서버의 응답정보를 수신중에 오류가 발생했습니다.(실패한 서버 IP : {}, PORT : {})", ip, port);
             e.printStackTrace();
@@ -98,8 +91,6 @@ public class SSHUtils {
         String filedir = System.getProperty("user.dir") + "\\src\\main\\resources\\shellfile";
         String OsFilePath = filedir.replace("/", Matcher.quoteReplacement(File.separator));
         String reverseSlashPath = OsFilePath.replaceAll(Matcher.quoteReplacement(File.separator), "/");
-
-        logger.info("sftp 유저정보 : username: {}, password: {}, ip : {}, port: {}", username, password, ip, port);
 
         File file = new File(reverseSlashPath + slash + fileName);
 
@@ -121,11 +112,7 @@ public class SSHUtils {
                 ArrayList<ChannelSftp.LsEntry> filelist = new ArrayList<>(sftpchannel.ls(infodir));
 
                 if(!filelist.isEmpty()) {
-                    logger.info("filelist1 : {}", filelist);
-                    logger.info("fileName1 : {}", fileName);
                     if(!filelist.toString().contains(fileName)) {
-                        logger.info("filelist2 : {}", filelist);
-                        logger.info("fileName2 : {}", fileName);
                         sftpchannel.put(in, fileName);
                         sftpchannel.chmod(777, infodir + fileName);
                     }

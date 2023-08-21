@@ -32,7 +32,6 @@ public class ServerManageService {
         Map<String, Object> insertMap = new HashMap<>();
         Map<String, Object> resultMap = new HashMap<>();
         Map<String, Object> detectMap;
-        logger.info("ServerInsertService start!");
 
         try {
             int serverport = Integer.parseInt(map.get("server_port").toString());

@@ -717,27 +717,6 @@ a.btn {
     background: #e2525c;
 }
 
-.popup_wrapper {
-    width: 100%;
-    height: 100vh;
-    position: fixed;
-    top: 0;
-    left: 0;
-    backdrop-filter: blur(2px);
-    background: none;
-    display: none;
-    opacity: 0;
-    transition: all 0.25s ease-in-out;
-    z-index: 1000;
-}
-
-.popup_wrapper.open {
-    opacity: 1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
 .popup {
     border-radius: 20px;
     width: auto;
@@ -746,14 +725,9 @@ a.btn {
     margin: 0 auto;
     position: relative;
     background: rgb(42, 51, 64);
-    opacity: 0;
     transition: all 0.5s ease-in-out;
     z-index: 1000;
     border: 3px solid #2B3D57;
-}
-
-.popup_wrapper.open .popup {
-    opacity: 1;
 }
 
 .popup_head {
@@ -853,10 +827,6 @@ a.btn {
 }
 
 /* 서버 추가 팝업 스타일 */
-.popup_wrapper.open.plus .popup_plus {
-    opacity: 1;
-}
-
 .popup_plus, .popup_delete {
     margin: 0 auto;
     border-radius: 20px;
@@ -864,7 +834,6 @@ a.btn {
     display: block;
     position: relative;
     background: rgb(42, 51, 64);
-    opacity: 0;
     transition: all 0.5s ease-in-out;
 }
 
@@ -933,16 +902,7 @@ a.btn {
     text-align: center;
 }
 
-/* 서버 삭제 팝업 스타일 */
-.popup_wrapper.open.delete .popup_delete {
-    opacity: 1;
-}
-
 /* 유저 리스트 팝업 style */
-.popup_wrapper.open.user_list .popup_user_list {
-    opacity: 1;
-}
-
 .popup_user_list {
     margin: 0 auto;
     border-radius: 20px;
@@ -951,7 +911,6 @@ a.btn {
     max-height: 805px;
     position: relative;
     background: #1F252E;
-    opacity: 0;
     transition: all 0.5s ease-in-out;
 }
 
@@ -1067,24 +1026,8 @@ a.btn {
 
 /* 유저 수정 팝업창 */
 .popup_wrapper.user_edit {
-    backdrop-filter: blur(2px);
     background: none;
-    display: none;
-    position: fixed;
-    _position: absolute;
-    width: 100%;
-    height: 100%;
-    z-index: 10000;
-}
-
-.popup_wrapper.open.user_edit {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.popup_wrapper.open.user_edit .popup_user_edit {
-    opacity: 1;
+    backdrop-filter: blur(2px);
 }
 
 .popup_user_edit, .popup_user_plus {
@@ -1095,7 +1038,6 @@ a.btn {
     display: block;
     position: relative;
     background: rgb(42, 51, 64);
-    opacity: 0;
     transition: all 0.5s ease-in-out;
     z-index: 1050;
 }
@@ -1206,10 +1148,6 @@ a.btn {
 .popup_wrapper.user_plus {
     background: none;
     backdrop-filter: blur(2px);
-}
-
-.popup_wrapper.open.user_plus .popup_user_plus {
-    opacity: 1;
 }
 
 .popup_body.user_plus {
@@ -1444,9 +1382,6 @@ a.btn {
 
 .popup_progress_back.open {
     opacity: 0.5;
-    display: flex;
-    justify-content: center;
-    align-items: center;
 }
 
 /* 알람 스타일 */
@@ -1838,7 +1773,6 @@ a.btn {
         display: block;
         position: relative;
         background: #1F252E;
-        opacity: 0;
         transition: all 0.5s ease-in-out;
     }
 

@@ -5,6 +5,8 @@
 $url,
 $x1,
 $y1,
+$display,
+$opacity,
 $bor,
 $col) {
   backdrop-filter: $bcolor;
@@ -12,6 +14,8 @@ $col) {
   mask: url($url);
   -webkit-mask-size: $x1 $y1;
   mask-size: $x1 $y1;
+  display: $display;
+  opacity: $opacity;
   border: $bor;
   color: $col;
 }
@@ -19,15 +23,24 @@ $col) {
 .popup_wrapper {
   $popup_wrapper: &;
 
+  width: 100%;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  background: none;
+  transition: all 0.25s ease-in-out;
+  z-index: 1000;
+
   @include div(blur(1px),
           "https://raw.githubusercontent.com/robin-dela/css-mask-animation/master/img/nature-sprite.png",
           2300%,
           100%,
           none,
+          0,
+          none,
           #fff);
   cursor: pointer;
-  -webkit-animation: ani_button 0.75s steps(22) forwards;
-  animation: ani_button 0.75s steps(22) forwards;
 
   .btn-close {
     font-size: 28px;
@@ -37,6 +50,17 @@ $col) {
     font-weight: bold;
     text-decoration-line: none;
   }
+}
+
+.open {
+  -webkit-animation: fadeIn 0.75s steps(22) forwards;
+  animation: fadeIn 0.75s steps(22) forwards;
+  display: flex;
+  opacity: 1;
+  //-webkit-animation: ani_button 0.75s steps(22) forwards;
+  //animation: ani_button 0.75s steps(22) forwards;
+  justify-content: center;
+  align-items: center;
 }
 
 .button_box {
@@ -64,25 +88,47 @@ $col) {
 
 @-webkit-keyframes ani_button {
   from {
-    -webkit-mask-position: 0 0;
-    mask-position: 0 0;
+    -webkit-mask-position: 100% 0;
+    mask-position: 100% 0;
   }
 
   to {
-    -webkit-mask-position: 100% 0;
-    mask-position: 100% 0;
+    -webkit-mask-position: 0 0;
+    mask-position: 0 0;
   }
 }
 
 @keyframes ani_button {
   from {
-    -webkit-mask-position: 0 0;
-    mask-position: 0 0;
+    -webkit-mask-position: 100% 0;
+    mask-position: 100% 0;
   }
 
   to {
-    -webkit-mask-position: 100% 0;
-    mask-position: 100% 0;
+    -webkit-mask-position: 0 0;
+    mask-position: 0 0;
+  }
+}
+
+@-webkit-keyframes fadeIn {
+  0% {
+    display: none;
+    opacity: 0;
+  }
+  100% {
+    display: flex;
+    opacity: 1;
+  }
+}
+
+@keyframes fadeIn {
+  0% {
+    display: none;
+    opacity: 0;
+  }
+  100% {
+    display: flex;
+    opacity: 1;
   }
 }
 

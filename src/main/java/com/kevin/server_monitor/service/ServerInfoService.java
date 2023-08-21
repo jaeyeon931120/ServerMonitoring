@@ -133,13 +133,7 @@ public class ServerInfoService {
             Calendar cal = Calendar.getInstance(Locale.KOREA);
             val_date = sdf.format(cal.getTime());
 
-            if (result.equals("")) {
-                result = null;
-            }
-
             for(int i = 0; i < returnlist.length; i++) {
-                logger.info("returnlist : {}", returnlist[i]);
-                logger.info("returnlist.length : {}", returnlist.length);
                 resultMap = new HashMap<>();
 
                 resultMap.put("server_name", server_name);
@@ -149,8 +143,6 @@ public class ServerInfoService {
                 resultMap.put("val_date", val_date);
                 resultMap.put("log_idx", i+1);
                 resultMap.put("log", returnlist[i]);
-
-                logger.info("resultMap : {}", resultMap);
 
                 serverLogList.add(resultMap);
             }

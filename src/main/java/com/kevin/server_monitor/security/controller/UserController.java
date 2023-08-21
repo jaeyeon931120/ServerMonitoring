@@ -59,7 +59,6 @@ public class UserController {
     // 로그인되지 않은 상태이면 로그인 페이지를, 로그인된 상태이면 home 페이지를 보여줌
     @GetMapping("/login")
     public String loginPage(HttpServletRequest request, Model model) {
-        logger.info("login start!");
         Map<String, ?> redirectMap = RequestContextUtils.getInputFlashMap(request);
 
         if(redirectMap != null) {
@@ -71,7 +70,6 @@ public class UserController {
         }
 
         if (isAuthenticated()) {
-            logger.info("isAuthenticated start");
             return "redirect:/monitoring";
         }
 
@@ -116,8 +114,6 @@ public class UserController {
         Map<String, Object> resultMap = new HashMap<>();
 
         try {
-            logger.info("User_Plus Start!");
-            logger.info("UserVo : {}", userVo);
             int result = userService.signup(userVo);
 
             if(result > 0) {
@@ -139,8 +135,6 @@ public class UserController {
         Map<String, Object> resultMap = new HashMap<>();
 
         try {
-            logger.info("User_Edit Start!");
-            logger.info("UserVo : {}", userVo);
             int result = userService.edit(userVo);
 
             if(result > 0) {

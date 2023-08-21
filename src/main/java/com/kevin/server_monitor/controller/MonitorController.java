@@ -83,8 +83,6 @@ public class MonitorController {
             // 세션 유지시간 설정(초단위) - 30분
             session.setMaxInactiveInterval(30*60);
 
-            logger.info("Server_Monitoring Start!");
-
             if(author.contains("ADMIN")) {
                 view.addObject("id", id);
                 view.addObject("username", name);
@@ -182,8 +180,6 @@ public class MonitorController {
 
                 return resultMap;
             }
-
-            logger.info("result : {}", result);
             resultMap.put("result", result);
         } catch (Exception e) {
             logger.error("서버를 {}",power+" 하는중에 오류가 발생했습니다.");

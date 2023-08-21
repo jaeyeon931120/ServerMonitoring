@@ -40,7 +40,7 @@ const open = "popup_wrapper open";
 const colorlabel = {
     'red' : 'rgba(255, 99, 132, 1)',
     'blue': ''
-}
+};
 let currSlide = 1;
 
 window.onload = function () {
@@ -64,8 +64,10 @@ window.onload = function () {
     ctx1 = document.getElementById('myChart1').getContext('2d');
     ctx2 = document.getElementById('myChart2').getContext('2d');
     port_select = document.getElementById('port_select');
-    const gear_check = document.getElementById("setting")
-    const menu_button = document.querySelectorAll('.menu_body.setting > ul > a');
+    const gear_check = document.getElementById("setting");
+    const menu_check = document.getElementById("burger-check");
+    const head_menu_button = document.querySelectorAll('.menu_body.setting > ul > a');
+    const menu_button = document.querySelectorAll('.menu_body > ul > a');
     const content = document.getElementsByClassName('tb1-content');
     const content_table = document.querySelectorAll('table');
     const tb1header = document.getElementsByClassName('tb1-header');
@@ -87,13 +89,18 @@ window.onload = function () {
         tb1header.item(i).css('padding-right', scrollwidth)
     }
 
-    btn_manual.addEventListener("click", () => manual_download());
+    for (let i = 0; i < head_menu_button.length; i++) {
+        if (head_menu_button[i].clickHandler) {
+            head_menu_button[i].removeEventListener('click', () => gear_check.checked = false);
+        }
+        head_menu_button[i].addEventListener('click', () => gear_check.checked = false);
+    }
 
     for (let i = 0; i < menu_button.length; i++) {
         if (menu_button[i].clickHandler) {
-            menu_button[i].removeEventListener('click', () => gear_check.checked = false);
+            menu_button[i].removeEventListener('click', () => menu_check.checked = false);
         }
-        menu_button[i].addEventListener('click', () => gear_check.checked = false);
+        menu_button[i].addEventListener('click', () => menu_check.checked = false);
     }
 }
 
@@ -1705,15 +1712,7 @@ function createSlide() {
     let slideWidth = slide.clientWidth;
     /* 슬라이더 미디어 쿼리 */
     if (matchMedia("screen and (width < 1800px)").matches) {
-        if(slideWidth === slide.clientWidth) {
-            console.log("number", slideWidthPlusPx)
-            if (slideWidthPlusPx === 0) {
-                slideWidthPlusPx = 30;
-            } else if (slideWidthPlusPx === 30) {
-                slideWidthPlusPx = 0;
-            }
-            slideWidth = slide.clientWidth+slideWidthPlusPx;
-        }
+        slideWidth = 456.8;
     }
 
     // 버튼 엘리먼트 선택하기
@@ -1915,8 +1914,6 @@ function allServerAlarm() {
         if (httpRequest.readyState === XMLHttpRequest.DONE) {
             if (httpRequest.status === 200) {
                 let res = httpRequest.response;
-
-                console.log("res : ", res);
 
                 if (res !== null && res.length !== 0) {
                     for (let i = 0; i < res.length; i++) {
