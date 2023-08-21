@@ -21,13 +21,11 @@
     <form class="login_form" action="/auth" method="post">
         <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
         <img src="${pageContext.request.contextPath}/resource/image/kevin_logo.jpg" alt=""/>
-        <label for="id"></label>
         <input type="text" id="id" name="id" placeholder="아이디" required="" autofocus="">
-        <label for="password"></label>
         <input type="password" id="password" name="password" placeholder="비밀번호" required="">
-        <span>
+        <span class="error_text">
             <c:if test="${error}">
-                <p id="danger">${exception}</p>
+                <p class="danger">${exception}</p>
             </c:if>
         </span>
         <button class="loginBtn" type="submit">로그인</button>

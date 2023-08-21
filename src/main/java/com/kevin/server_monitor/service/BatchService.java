@@ -74,7 +74,7 @@ public class BatchService {
      * sqlSession 배치 처리
      */
     @Transactional
-    public void sqlSessionBatch(List<Map<String, Object>> listMap, String process) {
+    public void sqlSessionBatch(List<Map<String, Object>> listMap, String process, String type) {
 
         String val_date;
         SqlSession sqlSession = sqlSessionFactory.openSession(ExecutorType.BATCH);
@@ -90,11 +90,14 @@ public class BatchService {
                 for(Map<String, Object> map : listmap) {
                     Map<String, Object> params;
                     params = map;
-                    logger.info("data : {}", params);
-                    if(process.equals("insert")) {
-                        sqlSession.insert("com.kevin.server_monitor.mapper.ServerDBMapper.insertServerInfo", params);
-                    } else if(process.equals("update")) {
-                        sqlSession.update("com.kevin.server_monitor.mapper.ServerDBMapper.updateServerSensor", params);
+                    if(type.equals("data")) {
+                        if (process.equals("insert")) {
+                            sqlSession.insert("com.kevin.server_monitor.mapper.ServerDBMapper.insertServerInfo", params);
+                        } else if (process.equals("update")) {
+                            sqlSession.update("com.kevin.server_monitor.mapper.ServerDBMapper.updateServerSensor", params);
+                        }
+                    } else if(type.equals("log")) {
+                        sqlSession.insert("com.kevin.server_monitor.mapper.ServerDBMapper.insertServerLog", params);
                     }
                 }
             }

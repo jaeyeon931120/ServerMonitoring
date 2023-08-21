@@ -10,9 +10,8 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.Map;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 @Service
 public class ServerManageService {
@@ -46,10 +45,15 @@ public class ServerManageService {
             String ip = map.get("ip").toString();
             String system = map.get("system").toString();
 
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
+            Calendar cal = Calendar.getInstance(Locale.KOREA);
+            String val_date = sdf.format(cal.getTime());
+
             insertMap.put("system", system);
             insertMap.put("ip", ip);
             insertMap.put("server_name", server_name);
             insertMap.put("tomcat_port", tomcatport);
+            insertMap.put("val_date", val_date);
             insertMap.put("id", id);
             insertMap.put("pw", pw);
             insertMap.put("server_port", serverport);
@@ -59,8 +63,10 @@ public class ServerManageService {
 
             String fileName_info = URLEncoder.encode("server_monitoring", StandardCharsets.UTF_8);
             String fileName_power = URLEncoder.encode("power_controller", StandardCharsets.UTF_8);
+            String fileName_log = URLEncoder.encode("log_monitoring", StandardCharsets.UTF_8);
             sshUtils.sftpCommunication(id, pw, ip, serverport, "insert", fileName_info);
             sshUtils.sftpCommunication(id, pw, ip, serverport, "insert", fileName_power);
+            sshUtils.sftpCommunication(id, pw, ip, serverport, "insert", fileName_log);
             result = serverDBService.insertServerSensor(insertMap);
             if(result <= 0) {
                 detectMap = serverDBService.detectServer(insertMap);
@@ -90,38 +96,46 @@ public class ServerManageService {
         Map<String, Object> resultMap = new HashMap<>();
         Map<String, Object> deleteMap = new HashMap<>();
         Map<String, Object> detectMap;
+        Map<String, Object> detectServer;
 
         String system = map.get("system").toString();
         String ip = map.get("ip").toString();
-        String id = map.get("id").toString();
-        String pw = map.get("pw").toString();
-        int serverport = Integer.parseInt(map.get("server_port").toString());
-        int tomcatport = Integer.parseInt(map.get("tomcat_port").toString());
         String server_name = map.get("server_name").toString();
 
-        deleteMap.put("system", system);
-        deleteMap.put("ip", ip);
-        deleteMap.put("id", id);
-        deleteMap.put("pw", pw);
-        deleteMap.put("server_name", server_name);
-        deleteMap.put("tomcat_port", tomcatport);
-        deleteMap.put("server_port", serverport);
+        detectServer = serverDBService.detectServer(map);
 
-        int result = serverDBService.deleteServerSensor(deleteMap);
-        if(result > 0) {
-            resultMap.put("result", "ok");
+        if(detectServer != null) {
+            int tomcatport = Integer.parseInt(detectServer.get("tomcat_port").toString());
+            String id = detectServer.get("id").toString();
+            String pw = detectServer.get("pw").toString();
+            int serverport = Integer.parseInt(detectServer.get("server_port").toString());
+
+            deleteMap.put("system", system);
+            deleteMap.put("ip", ip);
+            deleteMap.put("id", id);
+            deleteMap.put("pw", pw);
+            deleteMap.put("server_name", server_name);
+            deleteMap.put("tomcat_port", tomcatport);
+            deleteMap.put("server_port", serverport);
+
+            int result = serverDBService.deleteServerSensor(deleteMap);
+            if (result > 0) {
+                resultMap.put("result", "ok");
+            } else {
+                resultMap.put("result", "nok");
+            }
+
+            deleteMap.remove("tomcat_port");
+            detectMap = serverDBService.detectServer(deleteMap);
+
+            if (detectMap != null && detectMap.isEmpty()) {
+                String fileName_info = URLEncoder.encode("server_monitoring", StandardCharsets.UTF_8);
+                String fileName_power = URLEncoder.encode("power_controller", StandardCharsets.UTF_8);
+                sshUtils.sftpCommunication(id, pw, ip, serverport, "delete", fileName_info);
+                sshUtils.sftpCommunication(id, pw, ip, serverport, "delete", fileName_power);
+            }
         } else {
-            resultMap.put("result", "nok");
-        }
-
-        deleteMap.remove("tomcat_port");
-        detectMap = serverDBService.detectServer(deleteMap);
-
-        if(detectMap != null && detectMap.isEmpty()) {
-            String fileName_info = URLEncoder.encode("server_monitoring", StandardCharsets.UTF_8);
-            String fileName_power = URLEncoder.encode("power_controller", StandardCharsets.UTF_8);
-            sshUtils.sftpCommunication(id, pw, ip, serverport, "delete", fileName_info);
-            sshUtils.sftpCommunication(id, pw, ip, serverport, "delete", fileName_power);
+            resultMap.put("result", "detect");
         }
 
         return resultMap;

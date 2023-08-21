@@ -120,7 +120,16 @@ public class SSHUtils {
                 sftpchannel.cd(infodir);
                 ArrayList<ChannelSftp.LsEntry> filelist = new ArrayList<>(sftpchannel.ls(infodir));
 
-                if(filelist.isEmpty()) {
+                if(!filelist.isEmpty()) {
+                    logger.info("filelist1 : {}", filelist);
+                    logger.info("fileName1 : {}", fileName);
+                    if(!filelist.toString().contains(fileName)) {
+                        logger.info("filelist2 : {}", filelist);
+                        logger.info("fileName2 : {}", fileName);
+                        sftpchannel.put(in, fileName);
+                        sftpchannel.chmod(777, infodir + fileName);
+                    }
+                } else {
                     sftpchannel.put(in, fileName);
                     sftpchannel.chmod(777, infodir + fileName);
                 }

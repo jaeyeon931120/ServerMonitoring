@@ -1,21 +1,6 @@
 @import url('https://fonts.googleapis.com/css?family=Lato:100,300,400');
 @import url('https://fonts.googleapis.com/css?family=Roboto:100');
 
-@mixin button($bcolor,
-$url,
-$x1,
-$y1,
-$bor,
-$col) {
-  background: $bcolor;
-  -webkit-mask: url($url);
-  mask: url($url);
-  -webkit-mask-size: $x1 $y1;
-  mask-size: $x1 $y1;
-  border: $bor;
-  color: $col;
-}
-
 @mixin div($bcolor,
 $url,
 $x1,
@@ -41,8 +26,8 @@ $col) {
           none,
           #fff);
   cursor: pointer;
-  -webkit-animation: ani_button2 0.75s steps(22) forwards;
-  animation: ani_button2 0.75s steps(22) forwards;
+  -webkit-animation: ani_button 0.75s steps(22) forwards;
+  animation: ani_button 0.75s steps(22) forwards;
 
   .btn-close {
     font-size: 28px;
@@ -52,11 +37,6 @@ $col) {
     font-weight: bold;
     text-decoration-line: none;
   }
-}
-
-.close {
-  opacity: 0;
-  display: none;
 }
 
 .button_box {
@@ -103,30 +83,6 @@ $col) {
   to {
     -webkit-mask-position: 100% 0;
     mask-position: 100% 0;
-  }
-}
-
-@-webkit-keyframes ani_button2 {
-  from {
-    -webkit-mask-position: 100% 0;
-    mask-position: 100% 0;
-  }
-
-  to {
-    -webkit-mask-position: 0 0;
-    mask-position: 0 0;
-  }
-}
-
-@keyframes ani_button2 {
-  from {
-    -webkit-mask-position: 100% 0;
-    mask-position: 100% 0;
-  }
-
-  to {
-    -webkit-mask-position: 0 0;
-    mask-position: 0 0;
   }
 }
 

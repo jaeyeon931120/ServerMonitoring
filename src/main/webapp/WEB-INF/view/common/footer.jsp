@@ -5,7 +5,7 @@
   Time: 오후 4:45
   To change this template use File | Settings | File Templates.
 --%>
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page contentType="text/html;charset=UTF-8" %>
 <footer>
     <div class="footer_wrap">
         <h1>KevinLAB 서버 모니터링 VER 1.0.0</h1>

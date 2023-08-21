@@ -35,10 +35,6 @@
         AND
             tomcat_port = ${tomcat_port}
         </if>
-        <if test="val_date != null">
-            AND
-            val_date like CONCAT(#{val_date},'%')
-        </if>
         ORDER BY `system` DESC
     </select>
 
@@ -60,7 +56,8 @@
             trapic_rx,
             cpu,
             memory,
-            disk
+            disk,
+            end_date
         FROM
             monitoring_db.server_info_sensor
         <if test="ip != null">
@@ -75,9 +72,21 @@
         AND
             tomcat_port = ${tomcat_port}
         </if>
-        <if test="val_date != null">
-            AND
-            val_date like CONCAT('%',#{val_date},'%')
+        <if test="from_date != null and ip != null">
+        AND
+            val_date <![CDATA[>=]]> #{from_date}
+        </if>
+        <if test="from_date != null and ip == null">
+        WHERE
+            val_date <![CDATA[>=]]> #{from_date}
+        </if>
+        <if test="to_date != null">
+        AND
+            val_date <![CDATA[<=]]> #{to_date}
+        </if>
+        <if test="end_date != null">
+        AND
+            end_date <![CDATA[>=]]> #{end_date}
         </if>
         ORDER BY `system` DESC
     </select>
@@ -121,6 +130,78 @@
         ORDER BY `system` DESC
     </select>
 
+    <select id="detectServerLogList" resultType="map">
+        /* 서버 Log 검색(리스트) ServerDBMapper.detectServerLogList */
+        SELECT
+        `system`,
+        ip,
+        server_name,
+        val_date,
+        log_idx,
+        log,
+        reg_date
+        FROM
+        monitoring_db.server_info_log
+        WHERE
+            log_idx <![CDATA[<=]]> 10
+        <if test="ip != null">
+        AND
+            ip = #{ip}
+        </if>
+        <if test="server_name != null">
+        AND
+            server_name = #{server_name}
+        </if>
+        <if test="from_date != null">
+        AND
+            val_date <![CDATA[>=]]> #{from_date}
+        </if>
+        <if test="to_date != null">
+        AND
+            val_date <![CDATA[<=]]> #{to_date}
+        </if>
+        ORDER BY `system`, server_name, log_idx
+    </select>
+
+    <select id="detectTrapicRowList" resultType="map">
+        /* 서버 Trapic 검색(리스트) ServerDBMapper.detectServerRowList */
+        SELECT
+            `system`,
+            ip,
+            server_name,
+            tomcat_port,
+            DATE_FORMAT(val_date, '%H') AS val_date,
+            FORMAT(AVG(trapic_tx), 2) AS trapic_tx,
+            FORMAT(AVG(trapic_rx), 2) AS trapic_rx,
+            cpu,
+            memory,
+            disk
+        FROM
+            monitoring_db.server_info_raw
+        <if test="ip != null">
+        WHERE
+            ip = #{ip}
+        </if>
+        <if test="server_name != null">
+        AND
+            server_name = #{server_name}
+        </if>
+        <if test="tomcat_port != null">
+        AND
+            tomcat_port = ${tomcat_port}
+        </if>
+        <if test="from_date != null">
+        AND
+            val_date <![CDATA[>=]]> #{from_date}
+        </if>
+        <if test="to_date != null">
+        AND
+            val_date <![CDATA[<=]]> #{to_date}
+        </if>
+        GROUP BY DATE_FORMAT(val_date, '%H'), tomcat_port
+        ORDER BY `system`, tomcat_port, val_date
+    </select>
+
     <insert id="insertServerInfo"  parameterType="map">
         /* 서버 정보 추가 ServerDBMapper.insertServerInfo */
         INSERT monitoring_db.server_info_raw
@@ -136,12 +217,13 @@
         <set>
             <if test="system != null">`system` = #{system},</if>
             <if test="val_date != null">val_date = #{val_date},</if>
+            <if test="end_date != null">end_date = #{end_date},</if>
             <if test="status != null">status = #{status},</if>
             <if test="trapic_tx != null">trapic_tx = #{trapic_tx},</if>
             <if test="trapic_rx != null">trapic_rx = #{trapic_rx},</if>
             <if test="cpu != null">cpu = #{cpu},</if>
             <if test="memory != null">memory = #{memory},</if>
-            <if test="disk != null">disk = #{disk}</if>
+            <if test="disk != null">disk = #{disk},</if>
         </set>
         WHERE
             ip = #{ip}
@@ -155,10 +237,34 @@
 
     <insert id="insertServerSensor" parameterType="map">
         /* 서버 센서 추가 ServerDBMapper.insertServerSensor */
-        INSERT IGNORE INTO monitoring_db.server_info_sensor
-        (`system`, ip, server_name, tomcat_port, id, pw, `key`, server_port, info_dir, tomcat_dir, reg_date)
+        INSERT INTO monitoring_db.server_info_sensor
+            (`system`, ip, server_name, tomcat_port, val_date, id, pw, `key`, server_port, info_dir, tomcat_dir, reg_date)
         VALUES
-        (#{system}, #{ip}, #{server_name}, ${tomcat_port}, #{id}, AES_ENCRYPT(#{pw},SHA2(#{key},512)), #{key}, ${server_port}, #{info_dir}, #{tomcat_dir}, NOW())
+            (#{system}, #{ip}, #{server_name}, ${tomcat_port}, #{val_date}, #{id}, AES_ENCRYPT(#{pw},SHA2(#{key},512)), #{key}, ${server_port}, #{info_dir}, #{tomcat_dir}, NOW())
+        ON DUPLICATE KEY UPDATE
+                             `system` = #{system},
+                             `server_name` = #{server_name},
+                             `tomcat_port` = ${tomcat_port},
+                             `val_date` = #{val_date},
+                             `id` = #{id},
+                             `pw` = AES_ENCRYPT(#{pw},SHA2(#{key},512)),
+                             `key` = #{key},
+                             server_port = ${server_port},
+                             info_dir = #{info_dir},
+                             tomcat_dir = #{tomcat_dir}
+    </insert>
+
+    <insert id="insertServerLog" parameterType="map">
+        /* 서버 센서 추가 ServerDBMapper.insertServerLog */
+        INSERT INTO monitoring_db.server_info_log
+        (`system`, ip, server_name, val_date, log_idx, log, reg_date)
+        VALUES
+            (#{system}, #{ip}, #{server_name}, #{val_date}, ${log_idx}, #{log}, NOW())
+        ON DUPLICATE KEY UPDATE
+                             `system` = #{system},
+                             `server_name` = #{server_name},
+                             `val_date` = #{val_date},
+                             `log` = #{log}
     </insert>
 
     <delete id="deleteServerSensor" parameterType="map">

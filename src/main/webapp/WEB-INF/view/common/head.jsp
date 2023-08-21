@@ -12,6 +12,7 @@
         <a href="/monitoring"><img src="${pageContext.request.contextPath}/resource/image/logo.png" id="logo" alt="4st BEMS"></a>
         <div class="headerlist">
             <ul>
+                <c:if test="${author eq 'ADMIN'}">
                 <li>
                     <label for="setting" id="setting_label">
                         <img src="${pageContext.request.contextPath}/resource/image/gear_icon.png" alt="gear_icon"/>
@@ -28,17 +29,9 @@
                         </div>
                     </div>
                 </li>
-                <li><p id="user">${username}님 환영합니다.</p></li>
+                </c:if>
+                <li><p id="username">${username}님 환영합니다.</p></li>
                 <li><p id="clock">2023-05-31(화) 22:01:31</p></li>
-                <%--                <li>--%>
-                <%--                    <div class="hd-alarm-icon">--%>
-                <%--                        <img src="${pageContext.request.contextPath}/resource/image/alim_icon.png" id="hd-alarm" alt="alarm">--%>
-                <%--                        <div class="hd-alarm-num">--%>
-                <%--                            <p>1</p>--%>
-                <%--                        </div>--%>
-                <%--                    </div>--%>
-                <%--                    <jsp:include page="${pageContext.request.contextPath}/WEB-INF/view/alarm.jsp"/>--%>
-                <%--                </li>--%>
                 <li>
                     <div class="btn_manual_download">
                         <img src="${pageContext.request.contextPath}/resource/image/download.png" alt=""/>

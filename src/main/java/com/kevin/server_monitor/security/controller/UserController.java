@@ -10,8 +10,12 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.servlet.support.RequestContextUtils;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,6 +32,15 @@ public class UserController {
         this.userService = userService;
     }
 
+    private boolean isAuthenticated() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || AnonymousAuthenticationToken.class.
+                isAssignableFrom(authentication.getClass())) {
+            return false;
+        }
+        return authentication.isAuthenticated();
+    }
+
     @GetMapping("/")
     public String home(Model model) { // 인증된 사용자의 정보를 보여줌
         String id = (String)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -40,35 +53,47 @@ public class UserController {
         model.addAttribute("id", id);
         model.addAttribute("username", userVo.getUsername());
 
-        return "login/login";
+        return "redirect:/login";
     }
 
+    // 로그인되지 않은 상태이면 로그인 페이지를, 로그인된 상태이면 home 페이지를 보여줌
     @GetMapping("/login")
-    public String loginPage(@RequestParam(value = "error", required = false) String error,
-                            @RequestParam(value = "exception", required = false) String exception,
-                            Model model) { // 로그인되지 않은 상태이면 로그인 페이지를, 로그인된 상태이면 home 페이지를 보여줌
-        model.addAttribute("error", error);
-        model.addAttribute("exception", exception);
+    public String loginPage(HttpServletRequest request, Model model) {
+        logger.info("login start!");
+        Map<String, ?> redirectMap = RequestContextUtils.getInputFlashMap(request);
 
-        logger.info("error : {}", error);
-        logger.info("exception : {}", exception);
+        if(redirectMap != null) {
+            String error = (String)redirectMap.get("error");
+            String exception = (String)redirectMap.get("exception");
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication instanceof AnonymousAuthenticationToken)
-            return "login/login";
+            model.addAttribute("error", error);
+            model.addAttribute("exception", exception);
+        }
 
-        return "redirect:/";
+        if (isAuthenticated()) {
+            logger.info("isAuthenticated start");
+            return "redirect:/monitoring";
+        }
+
+        return "/login/login";
     }
 
     @PostMapping("/auth")
-    public String postLogin(HttpSession session, HttpServletRequest request) {
+    public String postLogin(HttpSession session, HttpServletRequest request,
+                            @RequestParam(value = "error", required = false) String error,
+                            RedirectAttributes redirectAttr) {
+        String exception = request.getAttribute("exception").toString();
+
+        redirectAttr.addFlashAttribute("error", error);
+        redirectAttr.addFlashAttribute("exception", exception);
+
         String id = request.getParameter("id");
         String username = request.getParameter("username");
 
         session.setAttribute("id", id);
         session.setAttribute("username", username);
 
-        return "login/login";
+        return "redirect:/login";
     }
 
     @RequestMapping("/user_list")
@@ -161,7 +186,15 @@ public class UserController {
     }
 
     @GetMapping("/logout")
-    public String userLogout() {
+    public String userLogout(HttpServletRequest request, HttpServletResponse response) {
+
+        for (Cookie cookie : request.getCookies()) {
+            String cookieName = cookie.getName();
+            Cookie cookieToDelete = new Cookie(cookieName, null);
+            cookieToDelete.setMaxAge(0);
+            response.addCookie(cookieToDelete);
+        }
+
         return "redirect:/login";
     }
 }

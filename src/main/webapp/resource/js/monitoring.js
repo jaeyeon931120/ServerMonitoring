@@ -31,9 +31,11 @@ let cpulist = new Map();
 let memorylist = new Map();
 let disklist = new Map();
 let trapic = new Map();
-let trapic_tx = new Map();
-let trapic_rx = new Map();
+let trapic_length;
 let animation;
+let port_label;
+let port_select;
+let slideWidthPlusPx = 0;
 const open = "popup_wrapper open";
 const colorlabel = {
     'red' : 'rgba(255, 99, 132, 1)',
@@ -61,6 +63,7 @@ window.onload = function () {
     clock = document.getElementById('clock');
     ctx1 = document.getElementById('myChart1').getContext('2d');
     ctx2 = document.getElementById('myChart2').getContext('2d');
+    port_select = document.getElementById('port_select');
     const gear_check = document.getElementById("setting")
     const menu_button = document.querySelectorAll('.menu_body.setting > ul > a');
     const content = document.getElementsByClassName('tb1-content');
@@ -74,7 +77,7 @@ window.onload = function () {
 
     /*메인데이터를 불러오는 함수*/
     getServerInfo();
-    createGraphLine();
+
     for (let i = 0; i < content.length; i++) {
         if (content_table.item(i) !== undefined) {
             scrollwidth = content.item(i).width - content_table.item(i).clientWidth;
@@ -115,7 +118,15 @@ function addListener(btn, data, action, process, work) {
             power_work(data, action);
         }
     }
+
     btn.addEventListener("click", btn.clickHandler);
+}
+
+function changePort() {
+    let port = port_select.options[port_select.selectedIndex].value;
+
+    aniGraphLine();
+    createGraphLine(port);
 }
 
 function getClock() {
@@ -147,6 +158,17 @@ function ObjectToMap(object) {
 
     return dataMap;
 }
+
+function date_parse(str) {
+    let y = str.substring(0, 4);
+    let m = str.substring(4, 6);
+    let d = str.substring(6, 8);
+    let hh = str.substring(8, 10);
+    let mm = str.substring(10, 12);
+    let ss = str.substring(12, 14);
+    return y + '-' + m + '-' + d + " " + hh + ":" + mm + ":" + ss;
+}
+
 function createServerSlide() {
     const slideouter = document.querySelector('.slide.slide_wrap');
     const slide_items = document.querySelectorAll('.slide_item');
@@ -155,18 +177,18 @@ function createServerSlide() {
     const right_btn = document.createElement('div')
     for (let i = 0; i < slide_items.length; i++) {
         slideouter.removeChild(slide_items[i]);
-        if(i < slider_btn.length) {
+        if (i < slider_btn.length) {
             slideouter.removeChild(slider_btn[i]);
         }
     }
 
-    for(let i = 0; i < serverlist.length; i++) {
+    for (let i = 0; i < serverlist.length; i++) {
         const create_div = document.createElement('div');
         create_div.className = 'slide_item'
         create_div.innerText = serverlist[i];
         slideouter.appendChild(create_div);
     }
-    if(serverlist.length > 0) {
+    if (serverlist.length > 0) {
         left_btn.className = 'slide_prev_button slide_button'
         left_btn.innerText = '◀'
         right_btn.className = 'slide_next_button slide_button'
@@ -188,7 +210,6 @@ function setCanvasSize() {
 }
 
 function createGraphBar(server, cpulist, memorylist, disklist) {
-    console.log("server, cpulist, memorylist, disklist : " + server, cpulist.get(server), memorylist.get(server), disklist.get(server));
     /* 차트를 새로 만들기 위해 디스트로이 */
     if (myChartBar !== undefined) {
         myChartBar.destroy();
@@ -197,13 +218,13 @@ function createGraphBar(server, cpulist, memorylist, disklist) {
     /* Bar그래프에 활용한 그라데이션 */
     gradient1 = ctx1.createLinearGradient(0, 0, 600, 600);
     gradient1.addColorStop(0, 'rgba(238, 255, 217, 1)');
-    gradient1.addColorStop(0.5, 'rgba(199, 238, 165, 1)');
+    gradient1.addColorStop(0.25, 'rgba(199, 238, 165, 1)');
     gradient2 = ctx1.createLinearGradient(0, 0, 600, 600);
     gradient2.addColorStop(0, 'rgba(222, 240, 164, 1)');
-    gradient2.addColorStop(0.5, 'rgba(127, 184, 71, 1)');
+    gradient2.addColorStop(0.25, 'rgba(127, 184, 71, 1)');
     gradient3 = ctx1.createLinearGradient(0, 0, 600, 600);
     gradient3.addColorStop(0, 'rgba(159, 208, 91, 1)');
-    gradient3.addColorStop(0.5, 'rgba(51, 127, 37, 1)');
+    gradient3.addColorStop(0.25, 'rgba(51, 127, 37, 1)');
 
     myChartBar = new Chart(ctx1, {
         plugins: [ChartDataLabels],
@@ -212,7 +233,7 @@ function createGraphBar(server, cpulist, memorylist, disklist) {
             labels  : ['CPU', 'MEMORY', 'DISK'],
             datasets: [
                 {
-                    data           : [cpulist.get(server),memorylist.get(server),disklist.get(server)],
+                    data           : [cpulist.get(server), memorylist.get(server), disklist.get(server)],
                     backgroundColor: [
                         gradient1,
                         gradient2,
@@ -238,49 +259,46 @@ function createGraphBar(server, cpulist, memorylist, disklist) {
                     grid : {
                         display: false
                     },
-                    min: 0,
-                    max: 100
+                    min  : 0,
+                    max  : 100,
                 },
                 y: {
-                    ticks    : {
+                    ticks: {
                         beginAtZero: true,
                         color      : "rgba(255, 255, 255, 1)",
                         font       : {
-                            size: 12,
+                            size  : 12,
                             weight: "bold"
                         },
                         padding    : 10, // x축 값의 상하 패딩을 설정할 수 있어요.
                     },
-                    grid: {
+                    grid : {
                         display: false
                     }
                 },
             },
             responsive: false,
             plugins   : {
-                legend: { // 범례 사용 안 함
+                legend    : { // 범례 사용 안 함
                     display: false,
                 },
-                tooltip: { // 기존 툴팁 사용 안 함
+                tooltip   : { // 기존 툴팁 사용 안 함
                     enabled: true
-                },
-                animation: { // 차트 애니메이션 사용 안 함 (옵션)
-                    duration: 0,
                 },
                 datalabels: { // datalables 플러그인 세팅
                     formatter: function (value, context) {
                         let idx = context.dataIndex; // 각 데이터 인덱스
 
                         // 출력 텍스트
-                        return  context.chart.data.labels[idx] + "\n" + value + '%';
+                        return context.chart.data.labels[idx] + "\n" + value + '%';
                     },
-                    font: { // font 설정
+                    font     : { // font 설정
                         weight: 'bold',
-                        size: '12px',
+                        size  : '12px',
                     },
-                    color: [gradient1, gradient2, gradient3], // font color,
-                    anchor: 'end',
-                    align: 'right'
+                    color    : [gradient1, gradient2, gradient3], // font color,
+                    anchor   : 'end',
+                    align    : 'right'
                 }
             }
         }
@@ -288,134 +306,165 @@ function createGraphBar(server, cpulist, memorylist, disklist) {
 }
 
 function aniGraphLine() {
-    const totalDuration = 10000;
-    const delayBetweenPoints = totalDuration / trafic[currSlide].trafic_tx.length;
-    const previousY = (ctx) => ctx.index === 0 ? ctx.chart.scales.y.getPixelForValue(100) : ctx.chart.getDatasetMeta(ctx.datasetIndex).data[ctx.index - 1].getProps(['y'], true).y;
+    const totalDuration = 1100;
+    const delayBetweenPoints = totalDuration / trapic_length;
+    let previousY;
+    if(ctx2.chart !== undefined) {
+        previousY = (ctx2) => ctx2.index === 0 ? ctx2.chart.scales.y.getPixelForValue(100) : ctx2.chart.getDatasetMeta(ctx2.datasetIndex).data[ctx2.index - 1].getProps(['y'], true).y;
+    }
     animation = {
         x: {
-            type: 'date',
-            // easing: 'linear',
+            easing  : 'linear',
             duration: delayBetweenPoints,
-            from: NaN, // the point is initially skipped
-            delay(ctx) {
-                if (ctx.type !== 'data' || ctx.xStarted) {
+            from    : NaN, // the point is initially skipped
+            delay(ctx2) {
+                if (ctx2.type !== 'data' || ctx2.xStarted) {
                     return 0;
                 }
-                ctx.xStarted = true;
-                return ctx.index * delayBetweenPoints;
+                ctx2.xStarted = true;
+                return ctx2.index * delayBetweenPoints;
             }
         },
         y: {
-            type: 'number',
-            // easing: 'linear',
+            easing  : 'linear',
             duration: delayBetweenPoints,
-            from: previousY,
-            delay(ctx) {
-                if (ctx.type !== 'data' || ctx.yStarted) {
+            from    : previousY,
+            delay(ctx2) {
+                if (ctx2.type !== 'data' || ctx2.yStarted) {
                     return 0;
                 }
-                ctx.yStarted = true;
-                return ctx.index * delayBetweenPoints;
+                ctx2.yStarted = true;
+                return ctx2.index * delayBetweenPoints;
             }
         }
     };
 }
 
-function createGraphLine() {
-    myChartLine = new Chart(ctx2, {
+function createGraphLine(port) {
+    if (myChartLine !== undefined) {
+        myChartLine.destroy();
+    }
+
+    port_label = tomcatportMap.get(serverlist[currSlide - 1]);
+    let config = {
         type   : 'line',
         data   : {
-            labels  : ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
-            datasets: [
-                {
-                    label          : '트래픽 RX',
-                    lineTension    : 0.3,
-                    data           : [12, 19, 3, 5, 2, 3],
-                    backgroundColor: [
-                        'rgba(255, 99, 132, 0.2)',
-                        'rgba(54, 162, 235, 0.2)',
-                        'rgba(255, 206, 86, 0.2)',
-                        'rgba(75, 192, 192, 0.2)',
-                        'rgba(153, 102, 255, 0.2)',
-                        'rgba(255, 159, 64, 0.2)'
-                    ],
-                    borderColor    : [
-                        'rgba(255, 99, 132, 1)',
-                        'rgba(54, 162, 235, 1)',
-                        'rgba(255, 206, 86, 1)',
-                        'rgba(75, 192, 192, 1)',
-                        'rgba(153, 102, 255, 1)',
-                        'rgba(255, 159, 64, 1)'
-                    ],
-                    borderWidth    : 1,
-                    fill: true,
-                },
-                {
-                    label          : '트래픽 TX',
-                    lineTension: 0.3,
-                    data           : [10, 20, 9, 6, 11, 3],
-                    backgroundColor: [
-                        'rgba(255, 99, 132, 0.2)',
-                        'rgba(54, 162, 235, 0.2)',
-                        'rgba(255, 206, 86, 0.2)',
-                        'rgba(75, 192, 192, 0.2)',
-                        'rgba(153, 102, 255, 0.2)',
-                        'rgba(255, 159, 64, 0.2)'
-                    ],
-                    borderColor    : [
-                        'rgba(255, 99, 132, 1)',
-                        'rgba(54, 162, 235, 1)',
-                        'rgba(255, 206, 86, 1)',
-                        'rgba(75, 192, 192, 1)',
-                        'rgba(153, 102, 255, 1)',
-                        'rgba(255, 159, 64, 1)'
-                    ],
-                    borderWidth    : 1,fill: true,
-                }
-            ]
+            labels  : ['00', '01', '02', '03', '04', '05', '06', '07', '08',
+                '09', '10', '11', '12', '13', '14', '15', '16',
+                '17', '18', '19', '20', '21', '22', '23', '24'],
+            datasets: [],
         },
         options: {
+            responsive: false,
             animation,
-            responsive: true,
             interaction: {
                 intersect: false,
             },
-            scales    : {
+            scales     : {
                 x: {
                     ticks: {
-                        color: "rgba(255, 255, 255, 1)",
-                        Size : 14
+                        color: "rgba(255, 255, 255, 0.5)",
+                        font : {
+                            size: 13
+                        },
                     },
                     grid : {
-                        color    : 'rgba(255, 255, 255, 0.5)',
+                        color    : 'rgba(255, 255, 255, 0.1)',
                         lineWidth: 1
-                    }
+                    },
                 },
                 y: {
                     ticks: {
-                        beginAtZero: true,
-                        color      : "rgba(255, 255, 255, 1)",
+                        beginAtZero: false,
+                        color      : "rgba(255, 255, 255, 0.5)",
                         font       : {
                             size: 13
                         },
-                        padding    : 10, // x축 값의 상하 패딩을 설정할 수 있어요.
                     },
                     grid : {
-                        color    : 'rgba(255, 255, 255, 0.5)',
+                        color    : 'rgba(255, 255, 255, 0.1)',
                         lineWidth: 1
-                    }
+                    },
                 },
             },
-            plugins   : {
-                legend: {
+            plugins    : {
+                legend : {
                     position: 'top',
                     labels  : {
                         color: 'rgba(255, 255, 255, 1)'
                     }
-                }
+                },
+                tooltip: {
+                    enabled  : true,
+                    mode     : 'index',
+                    axis     : 'x',
+                    position : 'nearest',
+                    intersect: false,
+                    callbacks: {
+                        title: function (tooltipItem) {
+                            let label;
+                            for (let i = 0; i < tooltipItem.length; i++) {
+                                label = tooltipItem[i].label + ":00";
+                            }
+                            return label;
+                        },
+                        label: function (tooltipItem) {
+                            return " " + tooltipItem.dataset.label + " : " + tooltipItem.formattedValue + " (Kb)";
+                        },
+                    }
+                },
             }
         },
-    });
+    }
+
+    lineGraphDataSet(config, port);
+}
+
+function lineGraphDataSet(config, port) {
+    let colorindex = 0;
+    let colorNames = [
+        'rgba(255, 99, 132, 1)',
+        'rgba(54, 162, 235, 1)',
+        'rgba(255, 206, 86, 1)',
+        'rgba(75, 192, 192, 1)',
+        'rgba(153, 102, 255, 1)',
+        'rgba(255, 159, 64, 1)'
+    ]
+    let backNames = [
+        'rgba(255, 99, 132, 0.1)',
+        'rgba(54, 162, 235, 0.1)',
+        'rgba(255, 206, 86, 0.1)',
+        'rgba(75, 192, 192, 0.1)',
+        'rgba(153, 102, 255, 0.1)',
+        'rgba(255, 159, 64, 0.1)'
+    ]
+    let sort_trapic = ["_RX", "_TX"];
+
+    for (let j = 0; j < sort_trapic.length; j++) {
+        let newDataset = {
+            label          : "트래픽" + sort_trapic[j].replace("_", " "),
+            borderColor    : colorNames[colorindex],
+            backgroundColor: backNames[colorindex],
+            borderWidth    : 2,
+            radius         : 2,
+            data           : [],
+            fill           : true
+        }
+
+        for (let i = 0; i < trapic.get(port + sort_trapic[j]).length; i++) {
+            let data = trapic.get(port + sort_trapic[j])[i];
+            let xy_data = {
+                x: data.get("date"),
+                y: data.get("value")
+            };
+            newDataset.data.push(xy_data);
+        }
+        // 데이터 반영
+        config.data.datasets.push(newDataset);
+        colorindex++;
+    }
+    // 라인 차트 업데이트
+    myChartLine = new Chart(ctx2, config);
 }
 
 function getServerInfo() {
@@ -439,52 +488,58 @@ function getServerInfo() {
                 let res = httpRequest.response;
                 let tomcatportlist = [];
 
-                if (res !== null) {
-                    for (let i = 0; i < res.length; i++) {
-                        tableCreate(res[i], table_id);
-                        tomcatportlist.push(res[i].tomcat_port);
-                        console.log("j : " + res[j].server_name);
-                        console.log("i : " + res[i].server_name);
-                        console.log(i === res.length - 1 && res[j].server_name === res[i].server_name)
-                        if(i === res.length-1 && res[j].server_name !== res[i].server_name) {
-                            serverlist.push(res[i].server_name);
-                            serverlist.push(res[j].server_name);
-                            iplist.set(res[i].server_name, res[i].ip);
-                            iplist.set(res[j].server_name, res[j].ip);
-                            cpulist.set(res[i].server_name, Number(res[i].cpu.substring(0, res[i].cpu.length - 1)));
-                            cpulist.set(res[j].server_name, Number(res[j].cpu.substring(0, res[j].cpu.length - 1)));
-                            memorylist.set(res[i].server_name, Number(res[i].memory.substring(0, res[i].memory.length - 1)));
-                            memorylist.set(res[j].server_name, Number(res[j].memory.substring(0, res[j].memory.length - 1)));
-                            disklist.set(res[i].server_name, Number(res[i].disk.substring(0, res[i].disk.length - 1)));
-                            disklist.set(res[j].server_name, Number(res[j].disk.substring(0, res[j].disk.length - 1)));
+                if (res !== null && res.length !== 0) {
+                    let author = res.author;
+                    let res_list = res.server_list;
+                    for (let i = 0; i < res_list.length; i++) {
+                        tableCreate(res_list[i], table_id, author);
+                        tomcatportlist.push(res_list[i].tomcat_port);
+                        if (i === res_list.length - 1 && res_list[j].server_name !== res_list[i].server_name) {
+                            serverlist.push(res_list[j].server_name);
+                            serverlist.push(res_list[i].server_name);
+                            iplist.set(res_list[j].server_name, res_list[j].ip);
+                            iplist.set(res_list[i].server_name, res_list[i].ip);
+                            cpulist.set(res_list[j].server_name, Number(res_list[j].cpu.substring(0, res_list[j].cpu.length - 1)));
+                            cpulist.set(res_list[i].server_name, Number(res_list[i].cpu.substring(0, res_list[i].cpu.length - 1)));
+                            memorylist.set(res_list[j].server_name, Number(res_list[j].memory.substring(0, res_list[j].memory.length - 1)));
+                            memorylist.set(res_list[i].server_name, Number(res_list[i].memory.substring(0, res_list[i].memory.length - 1)));
+                            disklist.set(res_list[j].server_name, Number(res_list[j].disk.substring(0, res_list[j].disk.length - 1)));
+                            disklist.set(res_list[i].server_name, Number(res_list[i].disk.substring(0, res_list[i].disk.length - 1)));
                             tomcatportlist.splice(tomcatportlist.length - 1);
-                            tomcatportMap.set(res[i].server_name, tomcatportlist);
-                            tomcatportMap.set(res[j].server_name, tomcatportlist);
-                        } else if((res[j].ip !== res[i].ip)||(i === res.length - 1 && res[j].server_name === res[i].server_name)) {
-                            serverlist.push(res[j].server_name);
-                            iplist.set(res[j].server_name, res[j].ip);
-                            cpulist.set(res[j].server_name, Number(res[j].cpu.substring(0, res[j].cpu.length - 1)));
-                            memorylist.set(res[j].server_name, Number(res[j].memory.substring(0, res[j].memory.length - 1)));
-                            disklist.set(res[j].server_name, Number(res[j].disk.substring(0, res[j].disk.length - 1)));
+                            tomcatportMap.set(res_list[j].server_name, tomcatportlist);
+                            tomcatportlist = [];
+                            tomcatportlist.push(res_list[i].tomcat_port);
+                            tomcatportMap.set(res_list[i].server_name, tomcatportlist);
+                        } else if ((res_list[j].ip !== res_list[i].ip) || (i === res_list.length - 1 && res_list[j].server_name === res_list[i].server_name)) {
+                            serverlist.push(res_list[j].server_name);
+                            iplist.set(res_list[j].server_name, res_list[j].ip);
+                            cpulist.set(res_list[j].server_name, Number(res_list[j].cpu.substring(0, res_list[j].cpu.length - 1)));
+                            memorylist.set(res_list[j].server_name, Number(res_list[j].memory.substring(0, res_list[j].memory.length - 1)));
+                            disklist.set(res_list[j].server_name, Number(res_list[j].disk.substring(0, res_list[j].disk.length - 1)));
                             tomcatportlist.splice(tomcatportlist.length - 1);
-                            tomcatportMap.set(res[j].server_name, tomcatportlist);
+                            if (i === res_list.length - 1) {
+                                tomcatportlist.push(res_list[i].tomcat_port);
+                            }
+                            tomcatportMap.set(res_list[j].server_name, tomcatportlist);
 
                             tomcatportlist = [];
-                            tomcatportlist.push(res[i].tomcat_port);
+                            tomcatportlist.push(res_list[i].tomcat_port);
                         }
                         j = i;
                     }
                     /*서버 리스트 테이블을 만드는 함수*/
                     tableRowSpan(table_id);
                 }
-                /*서버 선택 슬라이더를 만드는 함수*/
+                /* 서버 선택 슬라이더를 만드는 함수 */
                 createServerSlide();
-                /*그래프를 불러오는 함수*/
-                console.log("serverlist, cpulist, memorylist, disklist(first) : " + serverlist, cpulist, memorylist, disklist);
-                console.log("serverlist, iplist, tomcatport : " + iplist, tomcatportMap);
-                console.log("tomcatportMap : " + tomcatportMap.get(serverlist[currSlide-1]));
-                createGraphBar(serverlist[currSlide-1], cpulist, memorylist, disklist);
+                /* Bar그래프를 불러오는 함수 */
+                createGraphBar(serverlist[currSlide - 1], cpulist, memorylist, disklist);
+                /* Line그래프를 불러오는 함수 */
                 trapicGraphData();
+                /* LogData를 불러오는 함수 */
+                getLogDataList();
+                /* 전체 서버 종료된 날짜 확인 */
+                allServerAlarm();
                 popupClose("progress");
             } else {
                 console.log("request error");
@@ -513,13 +568,45 @@ function trapicGraphData() {
         if (httpRequest.readyState === XMLHttpRequest.DONE) {
             if (httpRequest.status === 200) {
                 let res = httpRequest.response;
-                console.log(res);
-                if (res !== null) {
-                    for (let i = 1; i < res.length; i++) {
+                let port_label = tomcatportMap.get(serverlist[currSlide - 1]);
+                trapic = new Map();
 
+                if (res !== null) {
+                    for (let i = 0; i < port_label.length; i++) {
+                        let tx_list = [];
+                        let rx_list = [];
+                        let port_length = 0;
+                        for (let j = 0; j < res.length; j++) {
+                            let tx_Map = new Map();
+                            let rx_Map = new Map();
+                            if (res[j].tomcat_port === port_label[i]) {
+                                port_length++;
+                                tx_Map.set('date', res[j].val_date);
+                                tx_Map.set('value', res[j].trapic_tx);
+                                rx_Map.set('date', res[j].val_date);
+                                rx_Map.set('value', res[j].trapic_rx);
+                                tx_list.push(tx_Map);
+                                rx_list.push(rx_Map);
+                            }
+                        }
+                        trapic_length = port_length;
+                        trapic.set(port_label[i] + "_TX", tx_list);
+                        trapic.set(port_label[i] + "_RX", rx_list);
                     }
                 }
-                // createGraphLine(serverlist[currSlide-1], trapic);
+
+                /* 셀렉트 박스 다시 만들기 위해 삭제 */
+                port_select.options.length = 0;
+
+                /* PORT 셀렉트 박스 생성 */
+                for (let i = 0; i < port_label.length; i++) {
+                    let option = document.createElement('option');
+                    option.value = port_label[i];
+                    option.textContent = serverlist[currSlide - 1] + " (" + port_label[i] + ")";
+                    port_select.appendChild(option);
+                }
+
+                changePort();
                 popupClose("progress");
             } else {
                 console.log("request error");
@@ -534,7 +621,7 @@ function trapicGraphData() {
     httpRequest.send(JSON.stringify(data));
 }
 
-function tableCreate(data, table_id) {
+function tableCreate(data, table_id, author) {
     const newRow = table_id.insertRow();
     const newCell1 = newRow.insertCell(0);
     const newCell2 = newRow.insertCell(1);
@@ -546,8 +633,6 @@ function tableCreate(data, table_id) {
     const newCell8 = newRow.insertCell(7);
     const newCell9 = newRow.insertCell(8);
     const newCell10 = newRow.insertCell(9);
-    const newCell11 = newRow.insertCell(10);
-    const newCell12 = newRow.insertCell(11);
     let system = data.system;
     let ip = data.ip;
     let server_name = data.server_name;
@@ -589,11 +674,17 @@ function tableCreate(data, table_id) {
     newCell8.innerText = cpu;
     newCell9.innerText = memory;
     newCell10.innerText = disk;
-    newCell11.appendChild(btn_blue);
-    newCell12.appendChild(btn_red);
+    if(author === "ADMIN") {
+        const newCell11 = newRow.insertCell(10);
+        const newCell12 = newRow.insertCell(11);
 
-    addListener(btn_blue, data, 'on', 'power', 'open');
-    addListener(btn_red, data, 'off', 'power', 'open');
+        newCell11.appendChild(btn_blue);
+        newCell12.appendChild(btn_red);
+
+        addListener(btn_blue, data, 'on', 'power', 'open');
+        addListener(btn_red, data, 'off', 'power', 'open');
+
+    }
 }
 
 function tableRowSpan(table_id) {
@@ -818,6 +909,10 @@ function result_popupOpen(data, action, process) {
     popupbody.appendChild(h1);
     popupbody.appendChild(btn_box);
     addListener(btn_submit, data, action, 'power', 'close');
+
+    if(process.indexOf('user') >= 0) {
+        getUserList();
+    }
 }
 
 function error_popupOpen(data, action, process) {
@@ -850,7 +945,7 @@ function error_popupOpen(data, action, process) {
     } else if (process === "server_delete") {
         const popup_delete = document.querySelector('.popup_wrapper.delete');
         popup_delete.style.zIndex = 800;
-        h1.textContent = datamap.get("server_name") + " 서버가 서버리스트에 없습니다.";
+        h1.textContent = "입력하신 정보의 " + datamap.get("server_name") + "가 서버리스트에 없습니다.";
     } else if (process === "user_plus") {
         const popup_user_plus = document.querySelector('.popup_wrapper.user_plus');
         popup_user_list.style.zIndex = 700;
@@ -862,12 +957,17 @@ function error_popupOpen(data, action, process) {
         popup_user_edit.style.zIndex = 800;
         h1.textContent = datamap.get("id") + " 사용자 정보를 수정하는데 실패했습니다.";
     }
+
     btn_submit.textContent = "확인";
     btn_box.appendChild(btn_submit);
 
     popupbody.appendChild(h1);
     popupbody.appendChild(btn_box);
     addListener(btn_submit, data, action, 'power', 'close');
+
+    if(process.indexOf('user') >= 0) {
+        getUserList();
+    }
 }
 
 function popupClose(process) {
@@ -916,7 +1016,6 @@ function power_work(data, action) {
             popup.className = open;
             if (httpRequest.status === 200) {
                 let res = httpRequest.response;
-                console.log("res : " + res.result);
                 if (res.result === "ok") {
                     if (action === "on") {
                         h1.textContent = datamap.get("server_name") + "서버를 구동 하였습니다.";
@@ -1443,7 +1542,6 @@ function user_management(process) {
                     } else {
                         console.log("request error");
                     }
-                    getUserList();
                 }
             }
 
@@ -1471,20 +1569,29 @@ function server_management(process) {
     let tomcat_dir;
     let system = server_system.value;
     let ip = server_ip.value;
-    let id = server_id.value;
-    let pw = server_pw.value;
+    let id;
+    let pw;
     let name = server_name.value;
     let serverport = server_port.value;
     let tomcatport = tomcat_port.value;
     let tomcatdir;
+    let id_check_result = false;
+    let pw_check_result = false;
     if (process === "plus") {
+        id = server_id.value;
+        pw = server_pw.value;
+
         tomcat_dir = document.getElementById('tomcat_dir_' + process);
         tomcatdir = tomcat_dir.value;
     } else if (process === "delete") {
+        id_check_result = true;
+        pw_check_result = true;
         tomcatdir = "delete";
     }
 
-    if (system_check(system, process) && ip_check(ip, process) && name_check(id, process, "id") && name_check(pw, process, "pw")
+    if (system_check(system, process) && ip_check(ip, process)
+        && (id_check_result || name_check(id, process, "id"))
+        && (pw_check_result || name_check(pw, process, "pw"))
         && name_check(name, process, "server_name") && port_check(serverport, process, "server") && port_check(tomcatport, process, "tomcat")
         && name_check(tomcatdir, process, "tomcat_dir")) {
         let data = {}
@@ -1578,7 +1685,6 @@ function getUserList() {
                 }
                 addListener(btn_list_submit, null, null, "user_plus", "open");
                 addListener(btn_list_cancel, null, null, "user_delete", "user_manage");
-                getServerInfo();
             } else {
                 console.log("request error");
             }
@@ -1595,9 +1701,20 @@ function getUserList() {
 // 슬라이더 생성 함수
 function createSlide() {
     // 슬라이드 전체 크기(width 구하기)
-    const slide = document.querySelector(".slide");
+    const slide = document.querySelector(".slide_wrap");
     let slideWidth = slide.clientWidth;
-    console.log("slideWidth : " + slideWidth);
+    /* 슬라이더 미디어 쿼리 */
+    if (matchMedia("screen and (width < 1800px)").matches) {
+        if(slideWidth === slide.clientWidth) {
+            console.log("number", slideWidthPlusPx)
+            if (slideWidthPlusPx === 0) {
+                slideWidthPlusPx = 30;
+            } else if (slideWidthPlusPx === 30) {
+                slideWidthPlusPx = 0;
+            }
+            slideWidth = slide.clientWidth+slideWidthPlusPx;
+        }
+    }
 
     // 버튼 엘리먼트 선택하기
     const prevBtn = document.querySelector(".slide_prev_button");
@@ -1606,7 +1723,7 @@ function createSlide() {
     // 슬라이드 전체를 선택해 값을 변경해주기 위해 슬라이드 전체 선택하기
     let slideItems = document.querySelectorAll(".slide_item")
 
-    if(slideItems.length > 0) {
+    if (slideItems.length > 0) {
         // 현재 슬라이드 위치가 슬라이드 개수를 넘기지 않게 하기 위한 변수
         const maxSlide = slideItems.length;
 
@@ -1660,8 +1777,9 @@ function createSlide() {
                     })
                 }, 0);
             }
-
-
+            createGraphBar(serverlist[currSlide - 1], cpulist, memorylist, disklist);
+            trapicGraphData();
+            getLogDataList();
         }
 
         function prevMove() {
@@ -1689,6 +1807,9 @@ function createSlide() {
                     })
                 }, 0);
             }
+            createGraphBar(serverlist[currSlide - 1], cpulist, memorylist, disklist);
+            trapicGraphData();
+            getLogDataList();
         }
 
         // 버튼 엘리먼트에 클릭 이벤트 추가하기
@@ -1726,4 +1847,113 @@ function createSlide() {
             }
         })
     }
+}
+
+function getLogDataList() {
+    let httpRequest;
+    let data = {};
+    httpRequest = new XMLHttpRequest();
+    const serverlog_body = document.querySelector('.alarm_list_body.server');
+    const serverlog_ul = document.createElement('ul');
+    serverlog_ul.className = 'alarm_content server';
+
+    serverlog_body.replaceChildren();
+
+    data.server_name = serverlist[currSlide - 1];
+    data.ip = iplist.get(serverlist[currSlide - 1]);
+
+    httpRequest.onreadystatechange = () => {
+        popupOpen(null, null, "progress");
+        if (httpRequest.readyState === XMLHttpRequest.DONE) {
+            if (httpRequest.status === 200) {
+                let res = httpRequest.response;
+
+                if (res !== null && res !== undefined) {
+                    for (let i = 0; i < res.length; i++) {
+                        const li = document.createElement("li");
+
+                        if(res[i].log_idx === (i+1)) {
+                            li.textContent = res[i].log;
+                        }
+
+                        serverlog_body.appendChild(serverlog_ul);
+                        serverlog_ul.appendChild(li);
+                    }
+                } else {
+                    const p = document.createElement('p');
+                    p.textContent = "해당 서버의 최근에 기록된 로그가 없습니다."
+
+                    serverlog_body.appendChild(p);
+                }
+
+                popupClose("progress");
+            } else {
+                console.log("request error");
+            }
+        }
+    }
+
+    httpRequest.open('POST', "/log_data", true);
+    httpRequest.responseType = "json";
+    httpRequest.setRequestHeader('Content-Type', 'application/json');
+    httpRequest.setRequestHeader(header, token);
+    httpRequest.send(JSON.stringify(data));
+}
+
+function allServerAlarm() {
+    let httpRequest;
+    let data = {};
+    httpRequest = new XMLHttpRequest();
+    const alarm_body = document.querySelector(".alarm_list_body.all");
+    const alarm_ul = document.createElement('ul');
+    alarm_ul.className = "alarm_content all"
+
+    alarm_body.replaceChildren();
+
+    httpRequest.onreadystatechange = () => {
+        popupOpen(null, null, "progress");
+        if (httpRequest.readyState === XMLHttpRequest.DONE) {
+            if (httpRequest.status === 200) {
+                let res = httpRequest.response;
+
+                console.log("res : ", res);
+
+                if (res !== null && res.length !== 0) {
+                    for (let i = 0; i < res.length; i++) {
+                        const li_name = document.createElement("li");
+                        const li_location = document.createElement("li");
+                        const li_tomcatport = document.createElement("li");
+                        const li_enddate = document.createElement("li");
+
+                        li_name.textContent = res[i].server_name;
+                        li_location.textContent = "위치 : " + res[i].system + "/" + res[i].ip + "/" + res[i].server_name;
+                        li_tomcatport.textContent = "포트번호 : " + res[i].tomcat_port;
+                        li_enddate.textContent = "발생 시간 : " + date_parse(res[i].end_date);
+
+                        alarm_body.appendChild(alarm_ul);
+                        alarm_ul.appendChild(li_name);
+                        alarm_ul.appendChild(li_location);
+                        alarm_ul.appendChild(li_tomcatport);
+                        alarm_ul.appendChild(li_enddate);
+                    }
+                } else {
+                    const p = document.createElement("p");
+
+                    p.textContent = "최근 일주일 동안 발생한 알람이 없습니다."
+
+                    alarm_body.appendChild(p);
+                }
+
+                popupClose("progress");
+            } else {
+                console.log("request error");
+            }
+        }
+    }
+
+    httpRequest.open('POST', "/alarm_data", true);
+    httpRequest.responseType = "json";
+    httpRequest.setRequestHeader('Content-Type', 'application/json');
+    httpRequest.setRequestHeader(header, token);
+    httpRequest.send(JSON.stringify(data));
 }

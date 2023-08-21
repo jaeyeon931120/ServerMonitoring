@@ -21,13 +21,14 @@ public class ServerInfoService {
     private final ServerDBService serverDBService;
     private final BatchService batchService;
     private List<Map<String, Object>> serverInfoList = new ArrayList<>();
+    private List<Map<String, Object>> serverLogList = new ArrayList<>();
 
     public ServerInfoService(ServerDBService serverDBService, BatchService batchService) {
         this.serverDBService = serverDBService;
         this.batchService = batchService;
     }
 
-    private void serverinformation(Map<String, Object> map) {
+    private void serverInformation(Map<String, Object> map) {
         String result;
         String val_date;
         Map<String, Object> resultMap = null;
@@ -65,11 +66,17 @@ public class ServerInfoService {
             String memory = String.format("%.2f", memorydouble) + "%";
             String disk = String.format("%.2f", diskdouble) + "%";
             String cpu = resultMap.get("cpu").toString() + "%";
+            String end_date = null;
+
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
+            Calendar cal = Calendar.getInstance(Locale.KOREA);
+            val_date = sdf.format(cal.getTime());
 
             String portstatus = resultMap.get("port_status").toString();
             if (portstatus.equals("0")) {
                 portstatus = "가동";
             } else if (portstatus.equals("1")) {
+                end_date = val_date;
                 portstatus = "정지";
             }
 
@@ -77,10 +84,6 @@ public class ServerInfoService {
             String tx = resultMap.get("TX").toString();
             rx = unitchage(rx);
             tx = unitchage(tx);
-
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
-            Calendar cal = Calendar.getInstance(Locale.KOREA);
-            val_date = sdf.format(cal.getTime());
 
             resultMap = new HashMap<>();
 
@@ -95,8 +98,62 @@ public class ServerInfoService {
             resultMap.put("ip", ip);
             resultMap.put("tomcat_port", tomcatport);
             resultMap.put("val_date", val_date);
+            resultMap.put("end_date", end_date);
 
             serverInfoList.add(resultMap);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void serverLog(Map<String, Object> map) {
+        String result;
+        String val_date;
+        Map<String, Object> resultMap;
+
+        try {
+            String server_name = map.get("server_name").toString();
+            String user_id = map.get("id").toString();
+            String user_pw = map.get("pw").toString();
+            int serverport = Integer.parseInt(map.get("server_port").toString());
+            int tomcatport = Integer.parseInt(map.get("tomcat_port").toString());
+            String infodir = map.get("info_dir").toString();
+            String ip = map.get("ip").toString();
+            String system = map.get("system").toString();
+
+            String command;
+
+            command = "cd " + infodir + " && echo '" + user_pw + "' | sudo -S ./log_monitoring " + tomcatport;
+            String finalCommand = command;
+            result = sshUtils.sshControll(user_id, user_pw, ip, serverport, finalCommand);
+
+            String[] returnlist = result.split("\n");
+
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
+            Calendar cal = Calendar.getInstance(Locale.KOREA);
+            val_date = sdf.format(cal.getTime());
+
+            if (result.equals("")) {
+                result = null;
+            }
+
+            for(int i = 0; i < returnlist.length; i++) {
+                logger.info("returnlist : {}", returnlist[i]);
+                logger.info("returnlist.length : {}", returnlist.length);
+                resultMap = new HashMap<>();
+
+                resultMap.put("server_name", server_name);
+                resultMap.put("system", system);
+                resultMap.put("ip", ip);
+                resultMap.put("tomcat_port", tomcatport);
+                resultMap.put("val_date", val_date);
+                resultMap.put("log_idx", i+1);
+                resultMap.put("log", returnlist[i]);
+
+                logger.info("resultMap : {}", resultMap);
+
+                serverLogList.add(resultMap);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -108,11 +165,20 @@ public class ServerInfoService {
             datalist = serverInfoList;
 
             if(!serverInfoList.isEmpty()) {
-                batchService.sqlSessionBatch(datalist, "insert");
-                batchService.sqlSessionBatch(datalist, "update");
+                batchService.sqlSessionBatch(datalist, "insert", "data");
+                batchService.sqlSessionBatch(datalist, "update", "data");
                 serverInfoList = new ArrayList<>();
             } else {
                 logger.error("서버와 수신중에 오류가 발생하여 데이터가 없어서 DB적제에 실패했습니다.");
+            }
+
+            datalist = serverLogList;
+
+            if(!serverLogList.isEmpty()) {
+                batchService.sqlSessionBatch(datalist, "insert", "log");
+                serverLogList = new ArrayList<>();
+            } else {
+                logger.error("서버와 수신중에 오류가 발생하여 기록할 로그가 없어서 DB적제에 실패했습니다.");
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -125,12 +191,12 @@ public class ServerInfoService {
         } else if (trafic.contains("Mb")) {
             double txdouble;
             trafic = trafic.substring(0, trafic.length() - 2);
-            txdouble = Math.round(Double.parseDouble(trafic) * 1000);
+            txdouble = Math.round(Double.parseDouble(trafic) * 1024);
             trafic = txdouble + "Kb";
         } else {
             double txdouble;
             trafic = trafic.substring(0, trafic.length() - 1);
-            txdouble = Math.round((Double.parseDouble(trafic) / 1000) * 100) / 100.0;
+            txdouble = Math.round((Double.parseDouble(trafic) / 1024) * 100) / 100.0;
             trafic = txdouble + "Kb";
         }
         return trafic;
@@ -142,8 +208,10 @@ public class ServerInfoService {
         try {
             serverlist = serverDBService.detectServerList(null);
 
-            Stream<Map<String, Object>> parallelStream = serverlist.parallelStream();
-            parallelStream.forEach(this::serverinformation);
+            Stream<Map<String, Object>> parallelStream_information = serverlist.parallelStream();
+            parallelStream_information.forEach(this::serverInformation);
+            Stream<Map<String, Object>> parallelStream_log = serverlist.parallelStream();
+            parallelStream_log.forEach(this::serverLog);
             saveServerInfo();
         } catch (Exception e) {
             e.printStackTrace();
@@ -152,7 +220,8 @@ public class ServerInfoService {
 
     public void partServerInfo(Map<String, Object> map) {
         try {
-            serverinformation(map);
+            serverInformation(map);
+            serverLog(map);
             saveServerInfo();
         } catch (Exception e) {
             e.printStackTrace();

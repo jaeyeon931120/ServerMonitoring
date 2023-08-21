@@ -22,6 +22,14 @@ public class ServerDBService {
         return serverDBMapper.detectServerRowList(map);
     }
 
+    public List<Map<String, Object>> detectTrapicRowList(Map<String, Object> map) {
+        return serverDBMapper.detectTrapicRowList(map);
+    }
+
+    public List<Map<String, Object>> detectServerLogList(Map<String, Object> map) {
+        return serverDBMapper.detectServerLogList(map);
+    }
+
     public Map<String, Object> detectServer(Map<String, Object> map) {
         return serverDBMapper.detectServer(map);
     }

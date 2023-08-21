@@ -40,13 +40,14 @@ public class MonitorController {
 
     @RequestMapping("/server_list")
     @ResponseBody
-    public List<Map<String, Object>> getServerlist() {
-        List<Map<String, Object>> returnList = new ArrayList<>();
+    public Map<String, Object> getServerlist(HttpServletRequest request) {
+        List<Map<String, Object>> returnList;
+        Map<String, Object> returnMap = new HashMap<>();
 
         try {
-            returnList = serverDBService.detectServerList(null);
+            HttpSession session = request.getSession();
 
-            logger.info("serverList : {}", returnList);
+            returnList = serverDBService.detectServerList(null);
 
             returnList.sort(
                     Comparator.comparing((Map<String, Object> map) -> (String)map.get("system"))
@@ -54,12 +55,15 @@ public class MonitorController {
                             .thenComparing((Map<String, Object> map) -> (String)map.get("server_name"))
                             .thenComparing((Map<String, Object> map) -> (Integer)map.get("tomcat_port"))
             );
+
+            returnMap.put("author", session.getAttribute("author"));
+            returnMap.put("server_list", returnList);
         } catch (Exception e) {
             logger.error("서버 정보 리스트를 불러오는 중에 오류가 발생했습니다.");
             e.printStackTrace();
         }
 
-        return returnList;
+        return returnMap;
     }
 
     @RequestMapping("/monitoring")
@@ -70,16 +74,28 @@ public class MonitorController {
             String id = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             UserVo userVo = userService.getUserById(id);
             String name = userVo.getUsername();
+            String author = userVo.getAuthor();
 
             HttpSession session = request.getSession();
             session.setAttribute("id", id);
             session.setAttribute("username", name);
+            session.setAttribute("author", author);
+            // 세션 유지시간 설정(초단위) - 30분
+            session.setMaxInactiveInterval(30*60);
 
             logger.info("Server_Monitoring Start!");
 
-            view.addObject("id", id);
-            view.addObject("username", name);
-            view.setViewName("/monitoring");
+            if(author.contains("ADMIN")) {
+                view.addObject("id", id);
+                view.addObject("username", name);
+                view.addObject("author", author);
+                view.setViewName("monitoring_admin");
+            } else if(author.contains("USER")) {
+                view.addObject("id", id);
+                view.addObject("username", name);
+                view.addObject("author", author);
+                view.setViewName("monitoring_user");
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -98,7 +114,6 @@ public class MonitorController {
         String power = null;
 
         try {
-            logger.info("파워(가동, 정지) req : {}", req);
             power = req.get("power").toString();
 
             Map<String, Object> detectMap = new HashMap<>();
@@ -114,19 +129,18 @@ public class MonitorController {
             detectMap.remove("tomcat_port");
 
             String tomcat_dir = serverMap.get("tomcat_dir").toString();
-            String[] dir = tomcat_dir.split("/");
-            String dir_name = dir[dir.length - 1];
-            logger.info("dir_name : {}", dir_name);
             String id = serverMap.get("id").toString();
             String pw = serverMap.get("pw").toString();
             int server_port = Integer.parseInt(serverMap.get("server_port").toString());
+
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
+            Calendar cal = Calendar.getInstance(Locale.KOREA);
+            String val_date = sdf.format(cal.getTime());
 
             String command = "echo '" + pw + "' | sudo -S sh check_server_info/power_controller " + tomcat_dir;
 
             inputMap.put("ip", ip);
             inputMap.put("server_name", server_name);
-
-            logger.info("insertMap : {}", inputMap);
 
             if (power.equals("on")) {
                 command = command + " on";
@@ -150,6 +164,7 @@ public class MonitorController {
 
                 if (resultStr.contains("Tomcat stopped") || resultStr.contains("The Tomcat process has been killed")) {
                     inputMap.put("status", "정지");
+                    inputMap.put("end_date", val_date);
                     result = "ok";
                     updateresult = serverDBService.updateServerSensor(inputMap);
 
@@ -243,24 +258,64 @@ public class MonitorController {
             String from_date;
             String to_date;
             req.remove("tomcat_port");
-            returnList = serverDBService.detectServerRowList(req);
 
             SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
             Calendar cal = Calendar.getInstance(Locale.KOREA);
             val_date = sdf.format(cal.getTime());
-            val_date = "20230807";
             from_date = val_date + "000000";
             to_date = val_date + "235959";
             req.put("from_date", from_date);
             req.put("to_date", to_date);
 
-            returnList = serverDBService.detectServerRowList(req);
-
-            returnList.sort(
-                    Comparator.comparing((Map<String, Object> map) -> (Integer)map.get("tomcat_port"))
-            );
+            returnList = serverDBService.detectTrapicRowList(req);
         } catch (Exception e) {
             logger.error("서버 정보 리스트를 불러오는 중에 오류가 발생했습니다.");
+            e.printStackTrace();
+        }
+        return returnList;
+    }
+
+    @RequestMapping("/log_data")
+    @ResponseBody
+    public List<Map<String, Object>> getLogDatalist(@RequestBody Map<String, Object> req) {
+        List<Map<String, Object>> returnList = new ArrayList<>();
+
+        try {
+            returnList = serverDBService.detectServerLogList(req);
+        } catch (Exception e) {
+            logger.error("서버 로그 리스트를 불러오는 중에 오류가 발생했습니다.");
+            e.printStackTrace();
+        }
+        return returnList;
+    }
+
+    @RequestMapping("/alarm_data")
+    @ResponseBody
+    public List<Map<String, Object>> getAlarmDatalist(@RequestBody Map<String, Object> req) {
+        List<Map<String, Object>> returnList = new ArrayList<>();
+
+        try {
+            String val_date;
+            String from_date;
+            String end_from_date;
+            String to_date;
+
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+            Calendar cal = Calendar.getInstance(Locale.KOREA);
+            val_date = sdf.format(cal.getTime());
+            to_date = val_date + "235959";
+
+            cal.add(Calendar.DATE, -7); // 최근 일주일안의 종료된 시간만 검색
+            from_date = val_date + "000000";
+            end_from_date = val_date + "000000";
+
+            req.put("end_date", end_from_date);
+            req.put("from_date", from_date);
+            req.put("to_date", to_date);
+
+            returnList = serverDBService.detectServerList(req);
+        } catch (Exception e) {
+            logger.error("서버 로그 리스트를 불러오는 중에 오류가 발생했습니다.");
             e.printStackTrace();
         }
         return returnList;

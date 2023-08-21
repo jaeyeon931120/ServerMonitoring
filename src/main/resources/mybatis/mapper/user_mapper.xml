@@ -4,7 +4,8 @@
 
     <select id="getUserList" resultType="com.kevin.server_monitor.security.vo.UserVo">
         /* User 테이블 가져오기 UserMapper.getUserList */
-        SELECT * FROM monitoring_db.monitoring_admin
+        SELECT *
+        FROM monitoring_db.monitoring_admin
     </select>
 
     <insert id="insertUser">
@@ -24,8 +25,8 @@
         /* 회원정보 수정 UserMapper.updateUser */
         UPDATE monitoring_db.monitoring_admin
         SET USERNAME = #{username},
-            TEL = #{tel},
-            AUTHOR = #{author}
+        TEL = #{tel},
+        AUTHOR = #{author}
         <if test="password != null">
             ,PASSWORD = #{password}
         </if>
@@ -34,13 +35,24 @@
 
     <delete id="deleteUser" parameterType="string">
         /* 탈퇴 UserMapper.deleteUser */
-        DELETE FROM monitoring_db.monitoring_admin WHERE ID = #{id}
+        DELETE
+        FROM monitoring_db.monitoring_admin
+        WHERE ID = #{id}
     </delete>
 
     <select id="getIDCheck" resultType="int" parameterType="string">
+        /* ID중복체크 UserMapper.getIDCheck */
         SELECT COUNT(*)
-        FROM (
-                 SELECT ID FROM monitoring_db.monitoring_admin WHERE ID = #{id}
-             ) as `A`
+        FROM (SELECT ID
+              FROM monitoring_db.monitoring_admin
+              WHERE ID = #{id}) as `A`
+    </select>
+
+    <select id="getUserDetails" resultType="com.kevin.server_monitor.security.vo.CustomUserDetails">
+        /* 계정존재여부확인 UserMapper.getUserDetails */
+        SELECT id,
+               password
+        FROM monitoring_db.monitoring_admin
+        WHERE id = #{id}
     </select>
 </mapper>

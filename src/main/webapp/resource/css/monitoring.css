@@ -6,23 +6,71 @@
 @import "reset.css";
 
 @keyframes rotate-gear {
-    0%  {transform: rotate(0deg);-ms-transform: rotate(0deg); -webkit-transform: rotate(0deg); -o-transform: rotate(0deg); -moz-transform: rotate(0deg);}
-    100% {transform: rotate(360deg);-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); -o-transform: rotate(360deg); -moz-transform: rotate(360deg);}
+    0% {
+        transform: rotate(0deg);
+        -ms-transform: rotate(0deg);
+        -webkit-transform: rotate(0deg);
+        -o-transform: rotate(0deg);
+        -moz-transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+        -ms-transform: rotate(360deg);
+        -webkit-transform: rotate(360deg);
+        -o-transform: rotate(360deg);
+        -moz-transform: rotate(360deg);
+    }
 }
 
 @-moz-keyframes rotate-gear {
-    0%  {transform: rotate(0deg);-ms-transform: rotate(0deg); -webkit-transform: rotate(0deg); -o-transform: rotate(0deg); -moz-transform: rotate(0deg);}
-    100% {transform: rotate(360deg);-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); -o-transform: rotate(360deg); -moz-transform: rotate(360deg);}
+    0% {
+        transform: rotate(0deg);
+        -ms-transform: rotate(0deg);
+        -webkit-transform: rotate(0deg);
+        -o-transform: rotate(0deg);
+        -moz-transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+        -ms-transform: rotate(360deg);
+        -webkit-transform: rotate(360deg);
+        -o-transform: rotate(360deg);
+        -moz-transform: rotate(360deg);
+    }
 }
 
 @-webkit-keyframes rotate-gear {
-    0%  {transform: rotate(0deg);-ms-transform: rotate(0deg); -webkit-transform: rotate(0deg); -o-transform: rotate(0deg); -moz-transform: rotate(0deg);}
-    100% {transform: rotate(360deg);-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); -o-transform: rotate(360deg); -moz-transform: rotate(360deg);}
+    0% {
+        transform: rotate(0deg);
+        -ms-transform: rotate(0deg);
+        -webkit-transform: rotate(0deg);
+        -o-transform: rotate(0deg);
+        -moz-transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+        -ms-transform: rotate(360deg);
+        -webkit-transform: rotate(360deg);
+        -o-transform: rotate(360deg);
+        -moz-transform: rotate(360deg);
+    }
 }
 
 @-o-keyframes rotate-gear {
-    0%  {transform: rotate(0deg);-ms-transform: rotate(0deg); -webkit-transform: rotate(0deg); -o-transform: rotate(0deg); -moz-transform: rotate(0deg);}
-    100% {transform: rotate(360deg);-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); -o-transform: rotate(360deg); -moz-transform: rotate(360deg);}
+    0% {
+        transform: rotate(0deg);
+        -ms-transform: rotate(0deg);
+        -webkit-transform: rotate(0deg);
+        -o-transform: rotate(0deg);
+        -moz-transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+        -ms-transform: rotate(360deg);
+        -webkit-transform: rotate(360deg);
+        -o-transform: rotate(360deg);
+        -moz-transform: rotate(360deg);
+    }
 }
 
 /* 공통 CSS */
@@ -31,10 +79,17 @@ body {
     background: #1F252E;
     font-family: 'Roboto', sans-serif;
     text-rendering: optimizeLegibility;
+    height: 100vh;
 }
 
 a {
     cursor: pointer;
+}
+
+.wrap {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
 }
 
 .right-content {
@@ -214,7 +269,7 @@ header > div {
     color: #fff;
 }
 
-#user {
+#username {
     margin-top: 0;
     font-size: 0.773em;
     font-weight: bold;
@@ -226,11 +281,13 @@ header > div {
     justify-content: center;
     align-items: center;
 }
+
 .btn_manual_download span {
     margin-left: 5px;
     font-size: 0.773em;
     font-weight: bold;
 }
+
 .btn_manual_download img {
     width: 20px;
     height: 20px;
@@ -240,21 +297,25 @@ header > div {
 footer {
     overflow: hidden;
     width: 100%;
-    height: 59px;
+    height: 60px;
     border-top: 1px solid #dadada;
     text-align: center;
-    padding: 18px;
+    padding: 10px;
     box-sizing: border-box;
     font-size: .7875rem;
     letter-spacing: -.33px;
     line-height: 1.5;
     color: #666;
+    display: flex;
+    align-items: center;
 }
 
 .footer_wrap {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    width: 100%;
+    height: 100%;
 }
 
 footer h1 {
@@ -263,29 +324,17 @@ footer h1 {
 
 footer ul li {
     display: inline-block;
-    margin-right: 0.5em;
-    margin-bottom: 0.4em;
-}
-
-footer ul li:last-child {
-    margin-right: 0;
-}
-
-footer span {
-    display: inline-block;
-    font-size: 0.9rem;
-    font-weight: bold;
-    margin-right: 0.4em;
 }
 
 footer h1 {
     display: inline-block;
     font-size: 0.9rem;
-    margin-bottom: 0.4em;
 }
 
-.footer_content {
-    display: inline-block;
+.footer_content ul {
+    gap: 15px;
+    display: flex;
+    align-items: center;
 }
 
 /* 그래프 스타일 */
@@ -300,6 +349,7 @@ footer h1 {
     margin-left: 10px;
     gap: 10px;
 }
+
 .graph_bar {
     height: 100%;
     width: 100%;
@@ -308,6 +358,7 @@ footer h1 {
     align-items: center;
     margin-top: -30px;
 }
+
 .graph_line {
     flex: 1 auto;
     height: 100%;
@@ -317,18 +368,26 @@ footer h1 {
     flex-direction: column;
     align-items: center;
 }
+
 .graph_content {
     flex: 1 auto;
-    height: calc(100% - 25px);
+    height: 100%;
     width: 100%;
 }
 
 /* SERVER LIST 테이블 CSS */
+.right_top_content {
+    display: flex;
+    flex-direction: column;
+    height: 60%;
+    width: 100%;
+}
+
 .server_list_head {
     margin-top: 20px;
-    width: -webkit-calc(100% - 11px);
-    width: -moz-calc(100% - 11px);
-    width: calc(100% - 11px);
+    width: -webkit-calc(100% - 12px);
+    width: -moz-calc(100% - 12px);
+    width: calc(100% - 12px);
 }
 
 .server_list_body {
@@ -386,6 +445,10 @@ footer h1 {
     background-color: #242C37;
 }
 
+.server_content.user > tr:nth-child(2n) > td:nth-child(n+3) ~ td:nth-last-child(n+3) {
+    background-color: #242C37;
+}
+
 .server_content > tr > td:nth-last-child(-n+2) {
     padding: 0;
 }
@@ -396,7 +459,7 @@ footer h1 {
     symbols: "\2460" "\2461" "\2462" "\2463" "\2464" "\2465" "\2466" "\2467" "\2468" "\2469";
 }
 
-.bottom_content {
+.right_bottom_content {
     gap: 20px;
     text-align: left;
     height: 40%;
@@ -421,12 +484,16 @@ footer h1 {
 
 .alarm_list.server {
     width: 100%;
-    height: 35%;
+    height: 35vh;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     flex-wrap: nowrap;
+}
+
+.main_box.flex_box.server {
+    height: 40vh;
 }
 
 .graph_line > h1, .alarm_list > h1 {
@@ -445,19 +512,31 @@ footer h1 {
 
 .alarm_list_body {
     width: 100%;
-    height: 81.5%;
+    height: 100%;
     overflow-y: auto;
     overflow-x: hidden;
     flex: 1 auto;
-    padding-top: 5px;
-}
-
-.alarm_content.server {
     display: flex;
     flex-direction: column;
     flex-wrap: nowrap;
-    justify-content: center;
-    align-items: center;
+}
+
+.alarm_list_body > p {
+    color: white;
+    border-radius: 3px;
+    border-collapse: collapse;
+    font-size: 16px;
+    margin: auto;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+}
+
+.alarm_list_body.server {
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
+    overflow-x: auto;
+    flex: 1 auto;
+    padding-top: 5px;
 }
 
 .alarm_content.server li::before {
@@ -481,15 +560,14 @@ footer h1 {
     border-radius: 3px;
     border-collapse: collapse;
     margin: auto;
-    height: 100%;
     font-size: 16px;
-    width: 100%;
     padding: 5px 10px 5px 10px;
     text-align: left;
     vertical-align: middle;
     box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
     list-style: none;
-    text-indent: 1.7em;
+    text-indent: 5px;
+    white-space: nowrap;
 }
 
 .alarm_content.all li:first-child, .alarm_content.all li:nth-child(4n+1) {
@@ -499,11 +577,9 @@ footer h1 {
     border-collapse: collapse;
     font-size: 16px;
     margin: auto;
-    height: 100%;
     padding: 5px 10px 5px 10px;
     text-align: left;
     vertical-align: middle;
-    width: 100%;
     box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
 }
 
@@ -512,9 +588,7 @@ footer h1 {
     border-radius: 3px;
     border-collapse: collapse;
     margin: auto;
-    height: 100%;
     font-size: 13px;
-    width: 100%;
     padding: 5px 10px 5px 10px;
     text-align: left;
     vertical-align: middle;
@@ -551,13 +625,18 @@ footer h1 {
     background: #29313c;
 }
 
-/* colgroup CSS */
+.alarm_list_body::-webkit-scrollbar-corner {
+    width: 0;
+    height: 0;
+}
+
+    /* colgroup CSS */
 .server_table col:nth-child(1) {
     width: 8%;
 }
 
 .server_table col:nth-child(2) {
-    width: 12%;
+    width: 11%;
 }
 
 .server_table col:nth-child(3) {
@@ -565,7 +644,7 @@ footer h1 {
 }
 
 .server_table col:nth-child(4) {
-    width: 7%;
+    width: 8%;
 }
 
 .server_table col:nth-child(5) {
@@ -619,172 +698,6 @@ footer h1 {
     4px 4px 5px 0 rgba(0, 0, 0, .1);
     outline: none;
 }
-
-/*.blue {*/
-/*    background: linear-gradient(0deg, rgba(0, 172, 238, 1) 0%, rgba(2, 126, 251, 1) 100%);*/
-/*    line-height: 42px;*/
-/*    padding: 0;*/
-/*    border: none;*/
-/*}*/
-
-/*.blue span {*/
-/*    position: relative;*/
-/*    display: block;*/
-/*    width: 100%;*/
-/*    height: 100%;*/
-/*}*/
-
-/*.blue:before,*/
-/*.blue:after {*/
-/*    position: absolute;*/
-/*    content: "";*/
-/*    right: 0;*/
-/*    bottom: 0;*/
-/*    background: rgb(0, 172, 238);*/
-/*    box-shadow: -7px -7px 20px 0 rgba(255, 255, 255, .9),*/
-/*    -4px -4px 5px 0 rgba(255, 255, 255, .9),*/
-/*    7px 7px 20px 0 rgba(0, 0, 0, .2),*/
-/*    4px 4px 5px 0 rgba(0, 0, 0, .3);*/
-/*    transition: all 0.3s ease;*/
-/*}*/
-
-/*.blue:before {*/
-/*    height: 0;*/
-/*    width: 2px;*/
-/*}*/
-
-/*.blue:after {*/
-/*    width: 0;*/
-/*    height: 2px;*/
-/*}*/
-
-/*.blue:hover {*/
-/*    color: rgb(0, 172, 238);*/
-/*    background: transparent;*/
-/*}*/
-
-/*.blue:hover:before {*/
-/*    height: 100%;*/
-/*}*/
-
-/*.blue:hover:after {*/
-/*    width: 100%;*/
-/*}*/
-
-/*.blue span:before,*/
-/*.blue span:after {*/
-/*    position: absolute;*/
-/*    content: "";*/
-/*    left: 0;*/
-/*    top: 0;*/
-/*    background: rgb(0, 172, 238);*/
-/*    box-shadow: -7px -7px 20px 0 rgba(255, 255, 255, .9),*/
-/*    -4px -4px 5px 0 rgba(255, 255, 255, .9),*/
-/*    7px 7px 20px 0 rgba(0, 0, 0, .2),*/
-/*    4px 4px 5px 0 rgba(0, 0, 0, .3);*/
-/*    transition: all 0.3s ease;*/
-/*}*/
-
-/*.blue span:before {*/
-/*    width: 2px;*/
-/*    height: 0;*/
-/*}*/
-
-/*.blue span:after {*/
-/*    height: 2px;*/
-/*    width: 0;*/
-/*}*/
-
-/*.blue span:hover:before {*/
-/*    height: 100%;*/
-/*}*/
-
-/*.blue span:hover:after {*/
-/*    width: 100%;*/
-/*}*/
-
-/*.red {*/
-/*    background: linear-gradient(0deg, rgba(255, 151, 0, 1) 0%, rgba(251, 75, 2, 1) 100%);*/
-/*    line-height: 42px;*/
-/*    padding: 0;*/
-/*    border: none;*/
-/*}*/
-
-/*.red span {*/
-/*    position: relative;*/
-/*    display: block;*/
-/*    width: 100%;*/
-/*    height: 100%;*/
-/*}*/
-
-/*.red:before,*/
-/*.red:after {*/
-/*    position: absolute;*/
-/*    content: "";*/
-/*    right: 0;*/
-/*    bottom: 0;*/
-/*    background: rgba(251, 75, 2, 1);*/
-/*    box-shadow: -7px -7px 20px 0 rgba(255, 255, 255, .9),*/
-/*    -4px -4px 5px 0 rgba(255, 255, 255, .9),*/
-/*    7px 7px 20px 0 rgba(0, 0, 0, .2),*/
-/*    4px 4px 5px 0 rgba(0, 0, 0, .3);*/
-/*    transition: all 0.3s ease;*/
-/*}*/
-
-/*.red:before {*/
-/*    height: 0;*/
-/*    width: 2px;*/
-/*}*/
-
-/*.red:after {*/
-/*    width: 0;*/
-/*    height: 2px;*/
-/*}*/
-
-/*.red:hover {*/
-/*    color: rgba(251, 75, 2, 1);*/
-/*    background: transparent;*/
-/*}*/
-
-/*.red:hover:before {*/
-/*    height: 100%;*/
-/*}*/
-
-/*.red:hover:after {*/
-/*    width: 100%;*/
-/*}*/
-
-/*.red span:before,*/
-/*.red span:after {*/
-/*    position: absolute;*/
-/*    content: "";*/
-/*    left: 0;*/
-/*    top: 0;*/
-/*    background: rgba(251, 75, 2, 1);*/
-/*    box-shadow: -7px -7px 20px 0 rgba(255, 255, 255, .9),*/
-/*    -4px -4px 5px 0 rgba(255, 255, 255, .9),*/
-/*    7px 7px 20px 0 rgba(0, 0, 0, .2),*/
-/*    4px 4px 5px 0 rgba(0, 0, 0, .3);*/
-/*    transition: all 0.3s ease;*/
-/*}*/
-
-/*.red span:before {*/
-/*    width: 2px;*/
-/*    height: 0;*/
-/*}*/
-
-/*.red span:after {*/
-/*    height: 2px;*/
-/*    width: 0;*/
-/*}*/
-
-/*.red span:hover:before {*/
-/*    height: 100%;*/
-/*}*/
-
-/*.red span:hover:after {*/
-/*    width: 100%;*/
-/*}*/
 
 /* 팝업 스타일 */
 a.btn {
@@ -1082,10 +995,10 @@ a.btn {
 }
 
 .user_list_table_head {
-    width: calc(100% - 11px);
+    width: calc(100% - 12px);
     height: 53px;
     position: sticky;
-    margin-right: 11px;
+    margin-right: 12px;
 }
 
 .user_list_table_body {
@@ -1126,18 +1039,23 @@ a.btn {
 .user_list_table > colgroup > col:nth-child(1) {
     width: 10%;
 }
+
 .user_list_table > colgroup > col:nth-child(2) {
     width: 15%;
 }
+
 .user_list_table > colgroup > col:nth-child(3) {
     width: 15%;
 }
+
 .user_list_table > colgroup > col:nth-child(4) {
     width: 15%;
 }
+
 .user_list_table > colgroup > col:nth-child(5) {
     width: 15%;
 }
+
 .user_list_table > colgroup > col:nth-child(6) {
     width: 15%;
 }
@@ -1153,16 +1071,18 @@ a.btn {
     background: none;
     display: none;
     position: fixed;
-    _position:absolute;
+    _position: absolute;
     width: 100%;
     height: 100%;
     z-index: 10000;
 }
+
 .popup_wrapper.open.user_edit {
     display: flex;
     justify-content: center;
     align-items: center;
 }
+
 .popup_wrapper.open.user_edit .popup_user_edit {
     opacity: 1;
 }
@@ -1397,8 +1317,8 @@ a.btn {
 .menu {
     position: absolute;
     padding: 0 14px 5px 14px;
-    left: 40rem;
-    top: 9%;
+    left: 36rem;
+    top: 10%;
     display: none;
     max-width: 0;
     transition: 0.5s ease;
@@ -1424,6 +1344,7 @@ a.btn {
     margin-left: -12px;
     margin-top: 5px;
 }
+
 .menu a {
     text-decoration-line: none;
 }
@@ -1445,8 +1366,8 @@ a.btn {
     position: absolute;
     z-index: 2;
     padding: 8px 0;
-    left: 40rem;
-    top: 9%;
+    left: 36rem;
+    top: 10%;
     user-select: none;
     width: auto;
 }
@@ -1532,63 +1453,77 @@ a.btn {
 /* 알림 창 */
 .hd-alarm-icon {
     position: relative;
-    margin-top:6px;
+    margin-top: 6px;
     cursor: pointer;
 }
+
 .hd-alarm-num {
     position: absolute;
-    left:13px; top:0;
-    width:18px; height:18px;
+    left: 13px;
+    top: 0;
+    width: 18px;
+    height: 18px;
     background: #95add7;
     border-radius: 50%;
 }
+
 .hd-alarm-num > p {
     font-size: 12px;
     color: #fff;
     text-align: center;
     line-height: 18px;
 }
+
 .hd-alarm {
     position: absolute;
-    right: 0; top: 70px;
+    right: 0;
+    top: 70px;
     width: 260px;
 }
+
 .hd-alarm-box {
     width: 200px;
     margin-left: 40px;
     background: #fff;
-    border:1px solid #333;
+    border: 1px solid #333;
     border-radius: 4px;
     overflow: hidden;
 }
+
 .hd-alarm-list {
     width: 100%;
     padding: 10px 0;
 }
+
 .hd-alarm-list > li > a {
-    padding:5px 20px;
+    padding: 5px 20px;
     line-height: 18px;
 }
+
 .hd-alarm-btn {
-    padding:10px 20px;
+    padding: 10px 20px;
     background: #edf1f9;
 }
 
 /* 알림 경고 창 */
 .popup_alarm {
     position: relative;
-    width: 100%; height: 110px;
+    width: 100%;
+    height: 110px;
     margin-top: 20px;
-    padding:23px 30px;
+    padding: 23px 30px;
     background: #ed8a8c;
     border-radius: 4px;
 }
+
 .popup_alarm > p {
     color: #fff;
 }
+
 .popup_alarm > a {
     position: absolute;
-    right: 20px; top: 15px;
+    right: 20px;
+    top: 15px;
 }
 
 /* 셀렉트 박스 커스텀 */
@@ -1637,7 +1572,7 @@ a.btn {
     padding: 15px 15px 0 15px;
 }
 
-.btn-select.on+.list-member {
+.btn-select.on + .list-member {
     display: block;
 }
 
@@ -1674,7 +1609,7 @@ a.btn {
 }
 
 /* 로그인 창 스타일 */
-.login_bg{
+.login_bg {
     width: 100%;
     height: 100vh;
     background: url(../image/login_bg.jpg) no-repeat fixed top left;
@@ -1682,44 +1617,49 @@ a.btn {
     display: flex;
     justify-content: center;
     align-items: center;
+    flex-direction: column;
+    gap: 20px;
 }
+
 .login_box {
-    position: absolute;
     width: 800px;
     height: 400px;
-    margin: 0 auto;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
     background-color: #ffffff;
     box-shadow: 5px 5px 20px #6f8190;
 }
-.login_box > img{
+
+.login_box > img {
     width: 400px;
     height: 400px;
-    float: left;
 }
+
 .login_form {
-    width: 300px;
-    padding: 0 50px;
-    height: 400px;
-    float: right;
+    padding-right: 20px;
+    width: 100%;
+    height: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
     flex-direction: column;
+    gap: 20px;
 }
-#danger {
+
+.danger {
     font-size: 14px;
     text-align: center;
     font-weight: bold;
     color: red;
-    margin-top: 15px;
 }
-.login_form > img {
-    margin: 0 20px 40px;
-}
+
 .login_form > input {
     display: inline-block;
     padding: 0 10px;
-    width: 100%;
+    width: 85%;
     height: 30px;
     line-height: 28px;
     box-sizing: border-box;
@@ -1729,34 +1669,23 @@ a.btn {
     font-size: 15px;
     border-radius: 3px;
 }
-#password {
-    margin-top: 15px;
-}
+
 .loginBtn {
-    margin-top: 25px;
-    width: 100%;
+    width: 85%;
     height: 38px;
     background-color: #384057;
     color: white;
     font-weight: bold;
     font-size: 14px;
 }
-.login_foot {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
+
 .login_foot > p {
-    top: 75%;
-    position: absolute;
-    width: 800px;
     color: white;
     text-align: center;
 }
 
 /* 각 항목별 타이틀 디자인 */
 .h1_box {
-    width: 100%;
     text-align: center;
     padding: 10px;
 }
@@ -1791,11 +1720,43 @@ a.btn {
     animation: movebg 20s cubic-bezier(0.57, 0.32, 0.43, 0.7) infinite alternate;
 }
 
+/* PORT 셀렉트 박스 설정 */
+#port_select {
+    width: 200px;
+    font-size: 15px;
+    text-align: center;
+    background-color: #2a2b38;
+    color: yellowgreen;
+    border: none;
+    vertical-align: middle;
+    margin-left: auto;
+    margin-right: 20px;
+}
+
+#port_select:active {
+    border: none;
+}
+
+.h1_box.flex_box {
+    text-align: right;
+    height: auto;
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: nowrap;
+    justify-content: center;
+    gap: 50px;
+}
+
+.h1_box.flex_box > .title {
+    position: absolute;
+    flex-grow: 1;
+}
+
 @keyframes movebg {
     0% {
         background-position: 0 0;
     }
-    50%{
+    50% {
         background-position: 0 75%;
     }
     100% {
@@ -1805,21 +1766,6 @@ a.btn {
 
 /* 노트북 반응형 화면 */
 @media screen and (width < 1800px) {
-    .login_box {
-        position: absolute;
-        width: 800px;
-        height: 400px;
-        margin: 0 auto;
-        background-color: #ffffff;
-        box-shadow: 5px 5px 20px #6f8190;
-    }
-    .login_foot > p {
-        top: 82%;
-        position: absolute;
-        width: 800px;
-        color: white;
-        text-align: center;
-    }
     .burger-icon {
         background: #2B3D57;
         cursor: pointer;
@@ -1829,14 +1775,15 @@ a.btn {
         padding: 8px 0;
         user-select: none;
         width: auto;
-        left: 31.9rem;
-        top: 11.6%;
+        left: 29.3em;
+        top: 11.5%;
     }
+
     .menu {
         position: absolute;
         padding: 0 14px 5px 14px;
-        left: 31.9rem;
-        top: 11.6%;
+        left: 29.3em;
+        top: 11.5%;
         display: none;
         max-width: 0;
         transition: 0.5s ease;
@@ -1844,12 +1791,14 @@ a.btn {
         background-color: rgb(42, 51, 64);
         border: 2px solid #2B3D57;
     }
+
     .menu > .menu_head {
         height: 1em;
         margin-left: -15px;
         width: calc(100% + 15px);
         background-color: #2B3D57;
     }
+
     .right-content {
         float: right;
         width: 75%;
@@ -1857,22 +1806,29 @@ a.btn {
         display: flex;
         flex-direction: column;
     }
+
+    .right_top_content {
+        height: 56.5%;
+    }
+
     .left-content {
         display: flex;
         flex-direction: column;
         flex-wrap: nowrap;
         align-items: center;
         justify-content: space-between;
-        width: 32%;
+        width: 30%;
         height: 100%;
         margin-left: 10px;
     }
+
     .graph_line {
         flex: 1 auto;
         display: flex;
         flex-wrap: nowrap;
         justify-content: center;
     }
+
     .popup_userlist {
         margin: 0 auto;
         border-radius: 20px;
@@ -1885,11 +1841,13 @@ a.btn {
         opacity: 0;
         transition: all 0.5s ease-in-out;
     }
+
     .cont-select > label {
         margin-left: 14px;
     }
+
     .alarm_list {
-        width: 33%;
+        width: 35%;
         height: 100%;
         table-layout: fixed;
         box-sizing: border-box;
@@ -1898,5 +1856,93 @@ a.btn {
         display: flex;
         flex-direction: column;
         align-items: center;
+    }
+
+    header {
+        height: 50px;
+    }
+
+    footer {
+        height: 50px;
+    }
+
+    .app {
+        height: calc(100VH - 130px);
+    }
+
+    .alarm_list.server {
+        height: 30vh;
+    }
+
+    .main_box.flex_box.server {
+        height: 39vh;
+    }
+}
+
+@media screen and (min-height:710px) and (max-height:864px) {
+    .burger-icon {
+        background: #2B3D57;
+        cursor: pointer;
+        display: inline-block;
+        position: absolute;
+        z-index: 2;
+        padding: 8px 0;
+        user-select: none;
+        width: auto;
+        left: 29.3em;
+        top: 9.4%;
+    }
+
+    .menu {
+        position: absolute;
+        padding: 0 14px 5px 14px;
+        left: 29.3em;
+        top: 9.4%;
+        display: none;
+        max-width: 0;
+        transition: 0.5s ease;
+        z-index: 1;
+        background-color: rgb(42, 51, 64);
+        border: 2px solid #2B3D57;
+    }
+
+    .alarm_list.server {
+        height: 35vh;
+    }
+
+    .main_box.flex_box.server {
+        height: 40vh;
+    }
+}
+
+@media screen and (min-height:1000px) and (min-width:1900px) {
+    .main_box.flex_box.server {
+        height: 45vh;
+    }
+
+    .burger-icon {
+        background: #2B3D57;
+        cursor: pointer;
+        display: inline-block;
+        position: absolute;
+        z-index: 2;
+        padding: 8px 0;
+        user-select: none;
+        width: auto;
+        left: 36em;
+        top: 8.5%;
+    }
+
+    .menu {
+        position: absolute;
+        padding: 0 14px 5px 14px;
+        left: 36em;
+        top: 8.5%;
+        display: none;
+        max-width: 0;
+        transition: 0.5s ease;
+        z-index: 1;
+        background-color: rgb(42, 51, 64);
+        border: 2px solid #2B3D57;
     }
 }

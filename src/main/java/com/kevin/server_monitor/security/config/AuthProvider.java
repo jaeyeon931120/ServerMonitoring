@@ -11,6 +11,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
@@ -38,6 +39,8 @@ public class AuthProvider implements AuthenticationProvider {
         UsernamePasswordAuthenticationToken token;
         UserVo userVo = userService.getUserById(id);
 
+        logger.info("userVo : {}", userVo);
+
         if (userVo != null && passwordEncoder.matches(password, userVo.getPassword())) { // 일치하는 user 정보가 있는지 확인
             List<GrantedAuthority> roles = new ArrayList<>();
             roles.add(new SimpleGrantedAuthority(userVo.getAuthor())); // 권한 부여
@@ -46,6 +49,8 @@ public class AuthProvider implements AuthenticationProvider {
             // 인증된 user 정보를 담아 SecurityContextHolder에 저장되는 token
 
             return token;
+        } else if (userVo == null) {
+            throw new UsernameNotFoundException("계정이 존재하지 않습니다.\n회원가입 진행 후 로그인 해주세요.");
         }
 
         throw new BadCredentialsException("No such user or wrong password.");

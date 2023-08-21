@@ -10,6 +10,8 @@ public interface ServerDBMapper {
 
     List<Map<String, Object>> detectServerList(Map<String, Object> map);
     List<Map<String, Object>> detectServerRowList(Map<String, Object> map);
+    List<Map<String, Object>> detectTrapicRowList(Map<String, Object> map);
+    List<Map<String, Object>> detectServerLogList(Map<String, Object> map);
     Map<String, Object> detectServer(Map<String, Object> map);
     int insertServerSensor(Map<String, Object> map);
     int updateServerSensor(Map<String, Object> map);
