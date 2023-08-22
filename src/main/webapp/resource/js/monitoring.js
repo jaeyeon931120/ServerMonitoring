@@ -167,6 +167,7 @@ function ObjectToMap(object) {
 }
 
 function date_parse(str) {
+    console.log("str : ", str);
     let y = str.substring(0, 4);
     let m = str.substring(4, 6);
     let d = str.substring(6, 8);
@@ -1915,23 +1916,27 @@ function allServerAlarm() {
             if (httpRequest.status === 200) {
                 let res = httpRequest.response;
 
+                console.log(res);
+
                 if (res !== null && res.length !== 0) {
                     for (let i = 0; i < res.length; i++) {
-                        const li_name = document.createElement("li");
-                        const li_location = document.createElement("li");
-                        const li_tomcatport = document.createElement("li");
-                        const li_enddate = document.createElement("li");
+                        if(res[i].end_date != null) {
+                            const li_name = document.createElement("li");
+                            const li_location = document.createElement("li");
+                            const li_tomcatport = document.createElement("li");
+                            const li_enddate = document.createElement("li");
 
-                        li_name.textContent = res[i].server_name;
-                        li_location.textContent = "위치 : " + res[i].system + "/" + res[i].ip + "/" + res[i].server_name;
-                        li_tomcatport.textContent = "포트번호 : " + res[i].tomcat_port;
-                        li_enddate.textContent = "발생 시간 : " + date_parse(res[i].end_date);
+                            li_name.textContent = res[i].server_name;
+                            li_location.textContent = "위치 : " + res[i].system + "/" + res[i].ip + "/" + res[i].server_name;
+                            li_tomcatport.textContent = "포트번호 : " + res[i].tomcat_port;
+                            li_enddate.textContent = "발생 시간 : " + date_parse(res[i].end_date);
 
-                        alarm_body.appendChild(alarm_ul);
-                        alarm_ul.appendChild(li_name);
-                        alarm_ul.appendChild(li_location);
-                        alarm_ul.appendChild(li_tomcatport);
-                        alarm_ul.appendChild(li_enddate);
+                            alarm_body.appendChild(alarm_ul);
+                            alarm_ul.appendChild(li_name);
+                            alarm_ul.appendChild(li_location);
+                            alarm_ul.appendChild(li_tomcatport);
+                            alarm_ul.appendChild(li_enddate);
+                        }
                     }
                 } else {
                     const p = document.createElement("p");

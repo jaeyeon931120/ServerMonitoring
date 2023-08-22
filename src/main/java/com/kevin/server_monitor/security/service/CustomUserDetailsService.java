@@ -2,8 +2,6 @@ package com.kevin.server_monitor.security.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -14,8 +12,6 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class CustomUserDetailsService implements UserDetailsService {
     private UserService userService;
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
-
     public CustomUserDetailsService(UserService userService) {
         this.userService = userService;
     }

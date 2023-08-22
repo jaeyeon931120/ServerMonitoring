@@ -93,6 +93,16 @@
     margin: 0 !important;
 }
 
+.btn_error_home {
+    width: 180px !important;
+    height: 60px !important;
+    text-decoration: none !important;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 30px;
+}
+
 
 .blue {
     background: linear-gradient(0deg, rgba(0, 172, 238, 1) 0%, rgba(2, 126, 251, 1) 100%);

@@ -52,10 +52,10 @@ mybatis:
 #log 설정
 logging:
 #  level:
-#    root: info
+#    root: error
 #    com:
 #      kevin:
-#        server_monitor: info
+#        server_monitor: error
 #  logback:
 #    rollingpolicy:
 #      max-file-size: 100MB

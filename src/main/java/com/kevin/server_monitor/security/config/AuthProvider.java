@@ -2,8 +2,6 @@ package com.kevin.server_monitor.security.config;
 
 import com.kevin.server_monitor.security.service.UserService;
 import com.kevin.server_monitor.security.vo.UserVo;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -21,8 +19,6 @@ import java.util.List;
 @Component
 public class AuthProvider implements AuthenticationProvider {
 
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
-
     private final UserService userService;
 
     public AuthProvider(UserService userService) {
@@ -31,7 +27,6 @@ public class AuthProvider implements AuthenticationProvider {
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-        logger.info("Authentication start!");
         String id = (String) authentication.getPrincipal(); // 로그인 창에 입력한 id
         String password = (String) authentication.getCredentials(); // 로그인 창에 입력한 password
 

@@ -94,7 +94,7 @@ public class UserController {
         return "redirect:/login";
     }
 
-    @RequestMapping("/user_list")
+    @PostMapping("/user_list")
     @ResponseBody
     public List<UserVo> getUserList() {
         List<UserVo> resultList = new ArrayList<>();
@@ -108,7 +108,7 @@ public class UserController {
         return resultList;
     }
 
-    @RequestMapping("/user_plus")
+    @PostMapping("/user_plus")
     @ResponseBody
     public Map<String, Object> getUserPlus(@RequestBody UserVo userVo) { // 사용자 추가
         Map<String, Object> resultMap = new HashMap<>();
@@ -129,7 +129,7 @@ public class UserController {
         return resultMap;
     }
 
-    @RequestMapping("/user_edit")
+    @PostMapping("/user_edit")
     @ResponseBody
     public Map<String, Object> getUserEdit(@RequestBody UserVo userVo) { // 사용자 수정
         Map<String, Object> resultMap = new HashMap<>();
@@ -150,7 +150,7 @@ public class UserController {
         return resultMap;
     }
 
-    @RequestMapping("/user_delete")
+    @PostMapping("/user_delete")
     @ResponseBody
     public List<Map<String, Object>> getUserDelete(@RequestBody List<UserVo> userVo) { // 회원 탈퇴
         List<Map<String, Object>> resultList = new ArrayList<>();

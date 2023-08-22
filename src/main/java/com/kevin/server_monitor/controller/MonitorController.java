@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -38,7 +39,7 @@ public class MonitorController {
         this.serverManageService = serverManageService;
     }
 
-    @RequestMapping("/server_list")
+    @PostMapping("/server_list")
     @ResponseBody
     public Map<String, Object> getServerlist(HttpServletRequest request) {
         List<Map<String, Object>> returnList;
@@ -101,7 +102,7 @@ public class MonitorController {
         return view;
     }
 
-    @RequestMapping("/power")
+    @PostMapping("/power")
     @ResponseBody
     public Map<String, Object> getPower(@RequestBody Map<String, Object> req) {
         Map<String, Object> resultMap = new HashMap<>();
@@ -189,7 +190,7 @@ public class MonitorController {
         return resultMap;
     }
 
-    @RequestMapping("/id_check")
+    @PostMapping("/id_check")
     @ResponseBody
     public Map<String, Object> getIDCheck(@RequestBody Map<String, Object> req) {
         Map<String, Object> resultMap = new HashMap<>();
@@ -213,7 +214,7 @@ public class MonitorController {
         return resultMap;
     }
 
-    @RequestMapping("/server_plus")
+    @PostMapping("/server_plus")
     @ResponseBody
     public Map<String, Object> getServerPlus(@RequestBody Map<String, Object> req) {
         Map<String, Object> resultMap = new HashMap<>();
@@ -229,7 +230,7 @@ public class MonitorController {
         return resultMap;
     }
 
-    @RequestMapping("/server_delete")
+    @PostMapping("/server_delete")
     @ResponseBody
     public Map<String, Object> getServerDelete(@RequestBody Map<String, Object> req) {
         Map<String, Object> resultMap = new HashMap<>();
@@ -244,7 +245,7 @@ public class MonitorController {
         return resultMap;
     }
 
-    @RequestMapping("/trapic_data")
+    @PostMapping("/trapic_data")
     @ResponseBody
     public List<Map<String, Object>> getTrapicDatalist(@RequestBody Map<String, Object> req) {
         List<Map<String, Object>> returnList = new ArrayList<>();
@@ -271,7 +272,7 @@ public class MonitorController {
         return returnList;
     }
 
-    @RequestMapping("/log_data")
+    @PostMapping("/log_data")
     @ResponseBody
     public List<Map<String, Object>> getLogDatalist(@RequestBody Map<String, Object> req) {
         List<Map<String, Object>> returnList = new ArrayList<>();
@@ -285,7 +286,7 @@ public class MonitorController {
         return returnList;
     }
 
-    @RequestMapping("/alarm_data")
+    @PostMapping("/alarm_data")
     @ResponseBody
     public List<Map<String, Object>> getAlarmDatalist(@RequestBody Map<String, Object> req) {
         List<Map<String, Object>> returnList = new ArrayList<>();
@@ -293,7 +294,6 @@ public class MonitorController {
         try {
             String val_date;
             String from_date;
-            String end_from_date;
             String to_date;
 
             SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
@@ -302,14 +302,18 @@ public class MonitorController {
             to_date = val_date + "235959";
 
             cal.add(Calendar.DATE, -7); // 최근 일주일안의 종료된 시간만 검색
+            val_date = sdf.format(cal.getTime());
             from_date = val_date + "000000";
-            end_from_date = val_date + "000000";
 
-            req.put("end_date", end_from_date);
+            logger.info("alarm_from_date: {}", from_date);
+            logger.info("alarm_to_date: {}", to_date);
+
             req.put("from_date", from_date);
             req.put("to_date", to_date);
 
             returnList = serverDBService.detectServerList(req);
+
+            logger.info("alarm_serverList : {}", returnList);
         } catch (Exception e) {
             logger.error("서버 로그 리스트를 불러오는 중에 오류가 발생했습니다.");
             e.printStackTrace();

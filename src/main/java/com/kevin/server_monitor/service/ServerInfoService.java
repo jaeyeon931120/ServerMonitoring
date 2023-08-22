@@ -31,7 +31,7 @@ public class ServerInfoService {
     private void serverInformation(Map<String, Object> map) {
         String result;
         String val_date;
-        Map<String, Object> resultMap = null;
+        Map<String, Object> resultMap;
 
         try {
             String server_name = map.get("server_name").toString();
@@ -56,8 +56,6 @@ public class ServerInfoService {
             ObjectMapper objectMapper = new ObjectMapper();
             TypeReference<Map<String, Object>> typeReference = new TypeReference<>() {
             };
-
-            logger.info("resultMap : {}", resultMap);
             
             resultMap = objectMapper.readValue(result, typeReference);
 
@@ -153,21 +151,22 @@ public class ServerInfoService {
 
     private void saveServerInfo() {
         try {
-            List<Map<String, Object>> datalist;
-            datalist = serverInfoList;
+            List<Map<String, Object>> dataList;
+            List<Map<String, Object>> logList;
+            dataList = serverInfoList;
 
             if(!serverInfoList.isEmpty()) {
-                batchService.sqlSessionBatch(datalist, "insert", "data");
-                batchService.sqlSessionBatch(datalist, "update", "data");
+                batchService.sqlSessionBatch(dataList, "insert", "data");
+                batchService.sqlSessionBatch(dataList, "update", "data");
                 serverInfoList = new ArrayList<>();
             } else {
                 logger.error("서버와 수신중에 오류가 발생하여 데이터가 없어서 DB적제에 실패했습니다.");
             }
 
-            datalist = serverLogList;
+            logList = serverLogList;
 
             if(!serverLogList.isEmpty()) {
-                batchService.sqlSessionBatch(datalist, "insert", "log");
+                batchService.sqlSessionBatch(logList, "insert", "log");
                 serverLogList = new ArrayList<>();
             } else {
                 logger.error("서버와 수신중에 오류가 발생하여 기록할 로그가 없어서 DB적제에 실패했습니다.");
