@@ -18,12 +18,10 @@ public class HttpInterceptor implements HandlerInterceptor {
         // 요청 URL
         String url = request.getRequestURI();
         // 아래 URL이 아니라면 로그인 체크
-        if (!url.equals("login") && (id == null || id.equals(""))) {
+        if(!(url.equals("login") || url.equals("auth") || url.equals("logout")) && (id == null || id.equals(""))){
             response.sendRedirect("/login");
             return false;
-
         }
-
         return HandlerInterceptor.super.preHandle(request, response, handler);
     }
 }
