@@ -305,15 +305,11 @@ public class MonitorController {
             val_date = sdf.format(cal.getTime());
             from_date = val_date + "000000";
 
-            logger.info("alarm_from_date: {}", from_date);
-            logger.info("alarm_to_date: {}", to_date);
-
             req.put("from_date", from_date);
             req.put("to_date", to_date);
+            req.put("end_date", to_date);
 
             returnList = serverDBService.detectServerList(req);
-
-            logger.info("alarm_serverList : {}", returnList);
         } catch (Exception e) {
             logger.error("서버 로그 리스트를 불러오는 중에 오류가 발생했습니다.");
             e.printStackTrace();

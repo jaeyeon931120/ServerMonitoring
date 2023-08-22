@@ -34,6 +34,6 @@ public class MonitorScheduled {
      */
     @Scheduled(cron = "0 0/1 * * * ?") // 매 1분마다 한번씩 실행
     public void insertServerInfoScheduled() {
-//        serverInfoService.serverInfo();
+        serverInfoService.serverInfo();
     }
 }
