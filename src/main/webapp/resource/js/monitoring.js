@@ -104,6 +104,9 @@ window.onload = function () {
     }
 }
 
+window.setTimeout(() => getServerInfo(), 60000); // 60초마다 서버 데이터 리프레쉬
+window.setTimeout(() => getUserList(), 60000); // 60초마다 유저 데이터 리프레쉬
+
 function addListener(btn, data, action, process, work) {
     if (btn.clickHandler) {
         btn.removeEventListener("click", btn.clickHandler);
@@ -167,7 +170,6 @@ function ObjectToMap(object) {
 }
 
 function date_parse(str) {
-    console.log("str : ", str);
     let y = str.substring(0, 4);
     let m = str.substring(4, 6);
     let d = str.substring(6, 8);
@@ -496,6 +498,7 @@ function getServerInfo() {
                 let res = httpRequest.response;
                 let tomcatportlist = [];
 
+                /* 서버 슬라이드 및 관련 그래프를 만드는데 필요한 데이터 분류 */
                 if (res !== null && res.length !== 0) {
                     let author = res.author;
                     let res_list = res.server_list;
@@ -1915,8 +1918,6 @@ function allServerAlarm() {
         if (httpRequest.readyState === XMLHttpRequest.DONE) {
             if (httpRequest.status === 200) {
                 let res = httpRequest.response;
-
-                console.log(res);
 
                 if (res !== null && res.length !== 0) {
                     for (let i = 0; i < res.length; i++) {
