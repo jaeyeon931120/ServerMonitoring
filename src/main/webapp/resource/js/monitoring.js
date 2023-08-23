@@ -861,7 +861,6 @@ function popupOpen(data, action, process) {
             for (let i = 0; i < data.length; i++) {
                 const h = document.createElement('h1');
 
-                h.style.padding = "0px 0px 20px 0px";
                 if (action === "ok") {
                     h.textContent = data[i].toString() + " 사용자를 삭제하는데 성공했습니다.";
                 } else if (action === "nok") {
@@ -880,6 +879,7 @@ function popupOpen(data, action, process) {
         btn_box.appendChild(btn_submit);
         popupbody.appendChild(btn_box);
         addListener(btn_submit, data, action, 'power', 'close');
+        getUserList();
     }
 }
 
@@ -920,7 +920,9 @@ function result_popupOpen(data, action, process) {
     popupbody.appendChild(btn_box);
     addListener(btn_submit, data, action, 'power', 'close');
 
+    console.log("process : ", process);
     if(process.indexOf('user') >= 0) {
+        console.log('user ok');
         getUserList();
     }
 }
