@@ -105,7 +105,6 @@ window.onload = function () {
 }
 
 window.setTimeout(() => getServerInfo(), 60000); // 60초마다 서버 데이터 리프레쉬
-window.setTimeout(() => getUserList(), 60000); // 60초마다 유저 데이터 리프레쉬
 
 function addListener(btn, data, action, process, work) {
     if (btn.clickHandler) {
