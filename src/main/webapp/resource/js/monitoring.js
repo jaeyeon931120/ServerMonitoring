@@ -1931,7 +1931,7 @@ function allServerAlarm() {
                             li_name.textContent = res[i].server_name;
                             li_location.textContent = "위치 : " + res[i].system + "/" + res[i].ip + "/" + res[i].server_name;
                             li_tomcatport.textContent = "포트번호 : " + res[i].tomcat_port;
-                            li_enddate.textContent = "발생 시간 : " + date_parse(res[i].end_date);
+                            li_enddate.textContent = "종료 시간 : " + date_parse(res[i].end_date);
 
                             alarm_body.appendChild(alarm_ul);
                             alarm_ul.appendChild(li_name);
