@@ -180,16 +180,19 @@ function date_parse(str) {
 
 function createServerSlide() {
     const slideouter = document.querySelector('.slide.slide_wrap');
-    const slide_items = document.querySelectorAll('.slide_item');
-    const slider_btn = document.querySelectorAll('.slide_button');
     const left_btn = document.createElement('div')
     const right_btn = document.createElement('div')
-    for (let i = 0; i < slide_items.length; i++) {
-        slideouter.removeChild(slide_items[i]);
-        if (i < slider_btn.length) {
-            slideouter.removeChild(slider_btn[i]);
-        }
-    }
+    const left_span = document.createElement('span');
+    const right_span = document.createElement('span');
+    const top_span = document.createElement('span');
+    const bottom_span = document.createElement('span');
+
+    slideouter.replaceChildren();
+
+    slideouter.appendChild(left_span);
+    slideouter.appendChild(right_span);
+    slideouter.appendChild(top_span);
+    slideouter.appendChild(bottom_span);
 
     for (let i = 0; i < serverlist.length; i++) {
         const create_div = document.createElement('div');
@@ -920,9 +923,7 @@ function result_popupOpen(data, action, process) {
     popupbody.appendChild(btn_box);
     addListener(btn_submit, data, action, 'power', 'close');
 
-    console.log("process : ", process);
     if(process.indexOf('user') >= 0) {
-        console.log('user ok');
         getUserList();
     }
 }
@@ -1803,7 +1804,7 @@ function createSlide() {
                     i.setAttribute("style", `transition: ${0}s; left: ${-offset}px`);
                 });
                 currSlide--;
-                offset = slideWidth + currSlide;
+                offset = slideWidth * currSlide;
                 setTimeout(() => {
                     // 각 슬라이드 아이템의 left에 offset 적용
                     slideItems.forEach((i) => {
