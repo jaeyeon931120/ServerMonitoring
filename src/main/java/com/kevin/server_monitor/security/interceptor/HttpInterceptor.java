@@ -1,4 +1,4 @@
-package com.kevin.server_monitor.interceptor;
+package com.kevin.server_monitor.security.interceptor;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.SecurityContextHolder;

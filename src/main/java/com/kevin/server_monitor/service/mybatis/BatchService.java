@@ -1,4 +1,4 @@
-package com.kevin.server_monitor.service;
+package com.kevin.server_monitor.service.mybatis;
 
 import org.apache.ibatis.session.ExecutorType;
 import org.apache.ibatis.session.SqlSession;

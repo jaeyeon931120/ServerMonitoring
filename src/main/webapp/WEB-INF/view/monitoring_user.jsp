@@ -15,7 +15,7 @@
     <title>Sever Monitoring</title>
     <link href='${pageContext.request.contextPath}/resource/css/monitoring.css' rel='stylesheet'/>
     <link href='${pageContext.request.contextPath}/resource/css/progress.css' rel='stylesheet'/>
-    <link href='${pageContext.request.contextPath}/resource/css/slider.css' rel='stylesheet'/>
+    <link href='${pageContext.request.contextPath}/resource/css/select.css' rel='stylesheet'/>
     <link href='${pageContext.request.contextPath}/resource/css/animation.css' rel='stylesheet'/>
     <link href='${pageContext.request.contextPath}/resource/css/button.css' rel='stylesheet'/>
 </head>
@@ -31,6 +31,7 @@
     </div>
     <jsp:include page="${pageContext.request.contextPath}/WEB-INF/view/common/head.jsp"/>
     <jsp:include page="${pageContext.request.contextPath}/WEB-INF/view/popup/popup.jsp"/>
+    <jsp:include page="${pageContext.request.contextPath}/WEB-INF/view/popup/popup_log.jsp"/>
     <jsp:include page="${pageContext.request.contextPath}/WEB-INF/view/popup/server/plus.jsp"/>
     <jsp:include page="${pageContext.request.contextPath}/WEB-INF/view/popup/server/delete.jsp"/>
     <jsp:include page="${pageContext.request.contextPath}/WEB-INF/view/popup/progress.jsp"/>
@@ -39,14 +40,22 @@
     <jsp:include page="${pageContext.request.contextPath}/WEB-INF/view/popup/user/user_plus.jsp"/>
     <div class="app">
         <div class="left-content">
-            <div class="slide slide_wrap main_box">
+            <div class="server_select_div main_box">
                 <span></span>
                 <span></span>
                 <span></span>
                 <span></span>
+                <div class="select_div">
+                    <label for="select_server"></label>
+                    <select class="select_box" id="select_server" onchange="changeServer()"></select>
+                    <button class="select_button" onclick="clickSelectServer(this)">▼</button>
+                </div>
             </div>
             <div class="alarm_list server main_box">
-                <div class="h1_box"><h1 class="title">서버 로그 (최근 10개)</h1></div>
+                <div class="title_box">
+                    <h1 class="title log">서버 로그 (최근 10개)</h1>
+                    <a class="log_icon" onclick="popupOpen(null, null, 'server_log')"></a>
+                </div>
                 <div class="alarm_list_body server">
                     <ul class="alarm_content server">
                     </ul>
@@ -112,10 +121,15 @@
             </div>
             <div class="right_bottom_content">
                 <div class="graph_line main_box">
-                    <div class="h1_box flex_box">
-                        <h1 class="title">시간별 서버 트래픽 사용량</h1>
-                        <select id="port_select" name="port_selectbox" onchange="changePort()">
-                        </select>
+                    <div class="title_box flex_box">
+                        <div class="h1_box">
+                            <h1 class="title">시간별 서버 트래픽 사용량</h1>
+                        </div>
+                        <div class="select_div select_port">
+                            <label for="port_select"></label>
+                            <select class="select_box" id="port_select" name="port_selectbox" onchange="changePort()"></select>
+                            <button class="select_button" onclick="clickSelectServer(this)">▼</button>
+                        </div>
                     </div>
                     <div class="graph_content">
                         <canvas id="myChart2"></canvas>

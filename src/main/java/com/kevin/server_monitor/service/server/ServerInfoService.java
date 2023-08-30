@@ -1,8 +1,9 @@
-package com.kevin.server_monitor.service;
+package com.kevin.server_monitor.service.server;
 
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kevin.server_monitor.service.mybatis.BatchService;
 import com.kevin.server_monitor.service.mybatis.ServerDBService;
 import com.kevin.server_monitor.util.SSHUtils;
 import org.slf4j.Logger;
@@ -49,7 +50,7 @@ public class ServerInfoService {
             String finalCommand = command;
             result = sshUtils.sshControll(user_id, user_pw, ip, serverport, finalCommand);
 
-            if (result.equals("")) {
+            if (result.isEmpty()) {
                 result = null;
             }
 
@@ -106,7 +107,6 @@ public class ServerInfoService {
 
     private void serverLog(Map<String, Object> map) {
         String result;
-        String val_date;
         Map<String, Object> resultMap;
 
         try {
@@ -119,19 +119,67 @@ public class ServerInfoService {
             String ip = map.get("ip").toString();
             String system = map.get("system").toString();
 
+            SimpleDateFormat sdf_month = new SimpleDateFormat("MMM", Locale.ENGLISH);
+            SimpleDateFormat sdf_hour = new SimpleDateFormat("HH");
+            SimpleDateFormat sdf_minute = new SimpleDateFormat("mm");
+            Calendar cal = Calendar.getInstance(Locale.KOREA);
+            int minute = cal.get(Calendar.MINUTE);
+
+            if (minute == 0) {
+                cal.add(Calendar.MINUTE, -1);
+            }
+
+            String val_month = sdf_month.format(cal.getTime());
+            String val_day = Integer.toString(cal.get(Calendar.DATE));
+            String val_hour = sdf_hour.format(cal.getTime());
+
+            String val_minute = sdf_minute.format(cal.getTime());
+            String first_minute = val_minute.substring(0, 1);
+            int second_minute = Integer.parseInt(val_minute.substring(1, 2));
+            if(second_minute == 0) {
+                cal.add(Calendar.MINUTE, -1);
+
+                val_month = sdf_month.format(cal.getTime());
+                val_day = Integer.toString(cal.get(Calendar.DATE));
+                val_hour = sdf_hour.format(cal.getTime());
+                val_minute = sdf_minute.format(cal.getTime());
+                first_minute = val_minute.substring(0, 1);
+                second_minute = Integer.parseInt(val_minute.substring(1, 2));
+            }
+            int third_minute = second_minute - 1;
+
+            String cmd_minute = first_minute + "["+ third_minute + "-" + second_minute + "]";
+
             String command;
 
-            command = "cd " + infodir + " && echo '" + user_pw + "' | sudo -S ./log_monitoring " + tomcatport;
+            command = "cd " + infodir + " && echo '" + user_pw + "' | sudo -S ./log_monitoring " + val_month + " " + val_day
+                    + " " + val_hour + " " + cmd_minute;
+
             String finalCommand = command;
             result = sshUtils.sshControll(user_id, user_pw, ip, serverport, finalCommand);
 
             String[] returnlist = result.split("\n");
 
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
-            Calendar cal = Calendar.getInstance(Locale.KOREA);
-            val_date = sdf.format(cal.getTime());
+            for(String all_log : returnlist) {
+                String[] log_units = all_log.split(" ");
 
-            for(int i = 0; i < returnlist.length; i++) {
+                String val_date = log_units[2];
+                StringBuilder end_log = new StringBuilder();
+
+                for(int i = 4; i < log_units.length; i++) {
+                    if (i != log_units.length - 1) {
+                        end_log.append(log_units[i]).append(" ");
+                    } else {
+                        end_log.append(log_units[i]);
+                    }
+                }
+
+                String log = end_log.toString();
+
+                logger.info("log : {}", all_log);
+                logger.info("val_date : {}", val_date);
+                logger.info("log_tail : {}", end_log);
+
                 resultMap = new HashMap<>();
 
                 resultMap.put("server_name", server_name);
@@ -139,8 +187,7 @@ public class ServerInfoService {
                 resultMap.put("ip", ip);
                 resultMap.put("tomcat_port", tomcatport);
                 resultMap.put("val_date", val_date);
-                resultMap.put("log_idx", i+1);
-                resultMap.put("log", returnlist[i]);
+                resultMap.put("log", log);
 
                 serverLogList.add(resultMap);
             }
@@ -201,9 +248,12 @@ public class ServerInfoService {
 
             Stream<Map<String, Object>> parallelStream_information = serverlist.parallelStream();
             parallelStream_information.forEach(this::serverInformation);
+            logger.info("Server information DATA");
             Stream<Map<String, Object>> parallelStream_log = serverlist.parallelStream();
             parallelStream_log.forEach(this::serverLog);
+            logger.info("Server information LOG");
             saveServerInfo();
+            logger.info("Server information INSERT");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -217,5 +267,9 @@ public class ServerInfoService {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public void deleteServerLog() {
+        serverDBService.deleteServerLog();
     }
 }

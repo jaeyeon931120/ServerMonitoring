@@ -2,44 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.kevin.server_monitor.mapper.ServerDBMapper">
 
-    <select id="detectServer" resultType="map">
-        /* 서버 센서 검색 ServerDBMapper.detectServer */
-        SELECT
-            `system`,
-            ip,
-            server_name,
-            tomcat_port,
-            val_date,
-            status,
-            id,
-            CONVERT(AES_DECRYPT(pw,SHA2(`key`,512)) USING UTF8) as pw,
-            server_port,
-            info_dir,
-            tomcat_dir,
-            trapic_tx,
-            trapic_rx,
-            cpu,
-            memory,
-            disk
-        FROM
-            monitoring_db.server_info_sensor
-        <if test="ip != null">
-        WHERE
-            ip = #{ip}
-        </if>
-        <if test="server_name != null">
-        AND
-            server_name = #{server_name}
-        </if>
-        <if test="tomcat_port != null">
-        AND
-            tomcat_port = ${tomcat_port}
-        </if>
-        ORDER BY `system` DESC
-    </select>
-
-    <select id="detectServerList" resultType="map">
-        /* 서버 센서 검색(리스트) ServerDBMapper.detectServerList */
+    <sql id="server_info_sensor_select">
         SELECT
             `system`,
             ip,
@@ -60,6 +23,29 @@
             end_date
         FROM
             monitoring_db.server_info_sensor
+    </sql>
+
+    <select id="detectServer" resultType="map">
+        /* 서버 센서 검색 ServerDBMapper.detectServer */
+        <include refid="server_info_sensor_select"/>
+        <if test="ip != null">
+        WHERE
+            ip = #{ip}
+        </if>
+        <if test="server_name != null">
+        AND
+            server_name = #{server_name}
+        </if>
+        <if test="tomcat_port != null">
+        AND
+            tomcat_port = ${tomcat_port}
+        </if>
+        ORDER BY `system` DESC
+    </select>
+
+    <select id="detectServerList" resultType="map">
+        /* 서버 센서 검색(리스트) ServerDBMapper.detectServerList */
+        <include refid="server_info_sensor_select"/>
         <if test="ip != null">
         WHERE
             ip = #{ip}
@@ -130,22 +116,19 @@
         ORDER BY `system` DESC
     </select>
 
-    <select id="detectServerLogList" resultType="map">
+    <select id="detectServerLogList" parameterType="com.kevin.server_monitor.dto.ServerLogDto" resultType="com.kevin.server_monitor.dto.ServerLogDto" fetchSize="10000">
         /* 서버 Log 검색(리스트) ServerDBMapper.detectServerLogList */
         SELECT
         `system`,
         ip,
         server_name,
         val_date,
-        log_idx,
         log,
         reg_date
         FROM
-        monitoring_db.server_info_log
-        WHERE
-            log_idx <![CDATA[<=]]> 10
+            monitoring_db.server_info_log
         <if test="ip != null">
-        AND
+        WHERE
             ip = #{ip}
         </if>
         <if test="server_name != null">
@@ -160,7 +143,13 @@
         AND
             val_date <![CDATA[<=]]> #{to_date}
         </if>
-        ORDER BY `system`, server_name, log_idx
+        ORDER BY log_idx DESC
+        <if test="from_date != null and to_date == null">
+        LIMIT 10
+        </if>
+        <if test="from_date != null and to_date != null">
+        LIMIT #{searchDto.pagination.limitStart}, #{searchDto.recordSize}
+        </if>
     </select>
 
     <select id="detectTrapicRowList" resultType="map">
@@ -257,9 +246,9 @@
     <insert id="insertServerLog" parameterType="map">
         /* 서버 센서 추가 ServerDBMapper.insertServerLog */
         INSERT INTO monitoring_db.server_info_log
-        (`system`, ip, server_name, val_date, log_idx, log, reg_date)
+        (`system`, ip, server_name, val_date, log, reg_date)
         VALUES
-            (#{system}, #{ip}, #{server_name}, #{val_date}, ${log_idx}, #{log}, NOW())
+            (#{system}, #{ip}, #{server_name}, #{val_date}, #{log}, NOW())
         ON DUPLICATE KEY UPDATE
                              `system` = #{system},
                              `server_name` = #{server_name},
@@ -270,5 +259,36 @@
     <delete id="deleteServerSensor" parameterType="map">
         /* 서버 정보 삭제 ServerDBMapper.deleteServerSensor */
         DELETE FROM monitoring_db.server_info_sensor WHERE server_name = #{server_name} AND ip = #{ip} AND tomcat_port = ${tomcat_port}
+    </delete>
+    
+    <select id="logCount" parameterType="com.kevin.server_monitor.dto.ServerLogDto" resultType="int">
+        SELECT
+            COUNT(*)
+        FROM
+            monitoring_db.server_info_log
+        <if test="ip != null">
+            WHERE
+            ip = #{ip}
+        </if>
+        <if test="server_name != null">
+            AND
+            server_name = #{server_name}
+        </if>
+        <if test="from_date != null">
+            AND
+            val_date <![CDATA[>=]]> #{from_date}
+        </if>
+        <if test="to_date != null">
+            AND
+            val_date <![CDATA[<=]]> #{to_date}
+        </if>
+        ORDER BY val_date DESC
+        <if test="from_date != null and to_date == null">
+            LIMIT 10
+        </if>
+    </select>
+
+    <delete id="deleteServerLog">
+        TRUNCATE monitoring_db.server_info_log
     </delete>
 </mapper>

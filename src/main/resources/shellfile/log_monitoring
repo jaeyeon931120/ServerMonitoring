@@ -1,32 +1,9 @@
 #!/bin/bash
 
-#서버 로그 길이
-LOG_LENGTH=$(tail -10 /var/log/messages | awk '{print NF}')
+#MONTH="$1"
+#DAY="$2"
+#HOUR="$3"
+#MINUTE="$4"
 
-#로그 갯수
-LOG_NUMBER=$(echo $LOG_LENGTH | awk '{print NF}')
-
-#전체 로그 변수
-LOG_ALL=()
-
-#최근 로그 10개 찍어서 배열에 저장
-for ((j=1; j<="$LOG_NUMBER"; j++)); do
- #라인별 출력 항목 갯수
- LINE_NUMBER=$(echo $LOG_LENGTH | awk '{print $'$j'}')
-
- LOG_UNIT=()
- LOG_UNIT+=$(tail -10 /var/log/messages | awk '{if(NR=='$j') print $3}')
- LOG_UNIT+=" " 
- for ((i=5; i<="$LINE_NUMBER"; i++)); do 
-  LOG_UNIT+=$(tail -10 /var/log/messages | awk '{if(NR=='$j') print $'$i'}')
-  LOG_UNIT+=" "
- done
-
- LOG_ALL+=$LOG_UNIT
- 
- if [ $j != $LOG_NUMBER ]; then 
-  LOG_ALL+="\n"
- fi
-done
-
-echo -e $LOG_ALL
+#서버 로그 2000개 출력
+tail -2500 /var/log/messages | grep "$1 $2 $3:$4:[0-5][0-9]"

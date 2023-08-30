@@ -15,7 +15,7 @@
     <title>Sever Monitoring</title>
     <link href='${pageContext.request.contextPath}/resource/css/monitoring.css' rel='stylesheet'/>
     <link href='${pageContext.request.contextPath}/resource/css/progress.css' rel='stylesheet'/>
-    <link href='${pageContext.request.contextPath}/resource/css/slider.css' rel='stylesheet'/>
+    <link href='${pageContext.request.contextPath}/resource/css/select.css' rel='stylesheet'/>
     <link href='${pageContext.request.contextPath}/resource/css/animation.css' rel='stylesheet'/>
     <link href='${pageContext.request.contextPath}/resource/css/button.css' rel='stylesheet'/>
 </head>
@@ -31,6 +31,7 @@
     </div>
     <jsp:include page="${pageContext.request.contextPath}/WEB-INF/view/common/head.jsp"/>
     <jsp:include page="${pageContext.request.contextPath}/WEB-INF/view/popup/popup.jsp"/>
+    <jsp:include page="${pageContext.request.contextPath}/WEB-INF/view/popup/popup_log.jsp"/>
     <jsp:include page="${pageContext.request.contextPath}/WEB-INF/view/popup/server/plus.jsp"/>
     <jsp:include page="${pageContext.request.contextPath}/WEB-INF/view/popup/server/delete.jsp"/>
     <jsp:include page="${pageContext.request.contextPath}/WEB-INF/view/popup/progress.jsp"/>
@@ -39,21 +40,29 @@
     <jsp:include page="${pageContext.request.contextPath}/WEB-INF/view/popup/user/user_plus.jsp"/>
     <div class="app">
         <div class="left-content">
-            <div class="slide slide_wrap main_box">
+            <div class="server_select_div main_box">
                 <span></span>
                 <span></span>
                 <span></span>
                 <span></span>
+                <div class="select_div">
+                    <label for="select_server"></label>
+                    <select class="select_box" id="select_server" onchange="changeServer()"></select>
+                    <button class="select_button" onclick="clickSelectServer(this)">▼</button>
+                </div>
             </div>
             <div class="alarm_list server main_box">
-                <div class="h1_box"><h1 class="title">서버 로그 (최근 10개)</h1></div>
+                <div class="title_box">
+                    <h1 class="title log">서버 로그 (최근 10개)</h1>
+                    <a class="log_icon" onclick="popupOpen(null, null, 'server_log')"></a>
+                </div>
                 <div class="alarm_list_body server">
                     <ul class="alarm_content server">
                     </ul>
                 </div>
             </div>
             <div class="main_box flex_box server">
-                <div class="h1_box"><h1 class="title">서버 하드웨어 사용량</h1></div>
+                <div class="title_box"><h1 class="title">서버 하드웨어 사용량</h1></div>
                 <div class="graph_bar">
                     <canvas id="myChart1"></canvas>
                 </div>
@@ -79,74 +88,79 @@
         </div>
         <div class="right-content">
             <div class="right_top_content">
-            <div class="server_list_head">
-                <table class="server_table">
-                    <colgroup>
-                        <col/>
-                        <col/>
-                        <col/>
-                        <col/>
-                        <col/>
-                        <col/>
-                        <col/>
-                        <col/>
-                        <col/>
-                        <col/>
-                        <col/>
-                        <col/>
-                    </colgroup>
-                    <thead class="server_header">
-                    <tr>
-                        <th>시스템</th>
-                        <th>IP</th>
-                        <th>서버</th>
-                        <th>서버포트</th>
-                        <th>상태</th>
-                        <th>트래픽 TX</th>
-                        <th>트래픽 RX</th>
-                        <th>CPU</th>
-                        <th>메모리</th>
-                        <th>DISK</th>
-                        <th>가동</th>
-                        <th>정지</th>
-                    </tr>
-                    </thead>
-                </table>
-            </div>
-            <div class="server_list_body">
-                <table class="server_table" id="server_list">
-                    <colgroup>
-                        <col/>
-                        <col/>
-                        <col/>
-                        <col/>
-                        <col/>
-                        <col/>
-                        <col/>
-                        <col/>
-                        <col/>
-                        <col/>
-                        <col/>
-                        <col/>
-                    </colgroup>
-                    <tbody class="server_content">
-                    </tbody>
-                </table>
-            </div>
+                <div class="server_list_head">
+                    <table class="server_table">
+                        <colgroup>
+                            <col/>
+                            <col/>
+                            <col/>
+                            <col/>
+                            <col/>
+                            <col/>
+                            <col/>
+                            <col/>
+                            <col/>
+                            <col/>
+                            <col/>
+                            <col/>
+                        </colgroup>
+                        <thead class="server_header">
+                        <tr>
+                            <th>시스템</th>
+                            <th>IP</th>
+                            <th>서버</th>
+                            <th>서버포트</th>
+                            <th>상태</th>
+                            <th>트래픽 TX</th>
+                            <th>트래픽 RX</th>
+                            <th>CPU</th>
+                            <th>메모리</th>
+                            <th>DISK</th>
+                            <th>가동</th>
+                            <th>정지</th>
+                        </tr>
+                        </thead>
+                    </table>
+                </div>
+                <div class="server_list_body">
+                    <table class="server_table" id="server_list">
+                        <colgroup>
+                            <col/>
+                            <col/>
+                            <col/>
+                            <col/>
+                            <col/>
+                            <col/>
+                            <col/>
+                            <col/>
+                            <col/>
+                            <col/>
+                            <col/>
+                            <col/>
+                        </colgroup>
+                        <tbody class="server_content">
+                        </tbody>
+                    </table>
+                </div>
             </div>
             <div class="right_bottom_content">
                 <div class="graph_line main_box">
-                    <div class="h1_box flex_box">
-                        <h1 class="title">시간별 서버 트래픽 사용량</h1>
-                        <select id="port_select" name="port_selectbox" onchange="changePort()">
-                        </select>
+                    <div class="title_box flex_box">
+                        <div class="h1_box">
+                            <h1 class="title">시간별 서버 트래픽 사용량</h1>
+                        </div>
+                        <div class="select_div select_port">
+                            <label for="port_select"></label>
+                            <select class="select_box" id="port_select" name="port_selectbox" onchange="changePort()"></select>
+                            <button class="select_button" onclick="clickSelectServer(this)">▼</button>
+                        </div>
                     </div>
                     <div class="graph_content">
                         <canvas id="myChart2"></canvas>
                     </div>
                 </div>
                 <div class="alarm_list all main_box">
-                    <div class="h1_box"><h1 class="title">전체 서버 알람 (최근 일주일)</h1></div>
+                    <div class="title_box"><h1 class="title">전체 서버 알람 (최근 일주일)</h1></div>
                     <div class="alarm_list_body all">
                         <ul class="alarm_content all">
                         </ul>

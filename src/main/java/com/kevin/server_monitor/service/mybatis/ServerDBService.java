@@ -1,5 +1,6 @@
 package com.kevin.server_monitor.service.mybatis;
 
+import com.kevin.server_monitor.dto.ServerLogDto;
 import com.kevin.server_monitor.mapper.ServerDBMapper;
 import org.springframework.stereotype.Service;
 
@@ -26,8 +27,8 @@ public class ServerDBService {
         return serverDBMapper.detectTrapicRowList(map);
     }
 
-    public List<Map<String, Object>> detectServerLogList(Map<String, Object> map) {
-        return serverDBMapper.detectServerLogList(map);
+    public List<ServerLogDto> detectServerLogList(ServerLogDto serverLogDto) {
+        return serverDBMapper.detectServerLogList(serverLogDto);
     }
 
     public Map<String, Object> detectServer(Map<String, Object> map) {
@@ -45,4 +46,6 @@ public class ServerDBService {
     public int deleteServerSensor(Map<String, Object> map) {
         return serverDBMapper.deleteServerSensor(map);
     }
+
+    public int deleteServerLog() { return serverDBMapper.deleteServerLog(); }
 }

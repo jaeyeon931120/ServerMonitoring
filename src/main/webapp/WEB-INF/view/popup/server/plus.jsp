@@ -31,9 +31,11 @@
                     <p id="id_check_plus">서버 로그인 아이디를 입력하셔야 됩니다.</p>
                 </li>
                 <li>
-                    <label for="server_pw_plus">서버 PW</label>
-                    <input type="password" id="server_pw_plus" placeholder="서버 PW"/>
-                    <p id="pw_check_plus">서버 로그인 비밀번호를 입력하셔야 됩니다.</p>
+                    <form class="popup_form">
+                        <label for="server_pw_plus">서버 PW</label>
+                        <input type="password" id="server_pw_plus" autocomplete="off" placeholder="서버 PW"/>
+                        <p id="pw_check_plus">서버 로그인 비밀번호를 입력하셔야 됩니다.</p>
+                    </form>
                 </li>
                 <li>
                     <label for="server_name_plus">서버 이름</label>

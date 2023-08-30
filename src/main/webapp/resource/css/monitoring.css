@@ -539,17 +539,9 @@ footer h1 {
     padding-top: 5px;
 }
 
-.alarm_content.server li::before {
-    list-style: none;
-    color: white;
-    margin-inline-end: 0.3em;
-    content: counter(number, circle-numbers);
-    counter-increment: number;
-}
-
 .alarm_content.all li:nth-child(4n+1)::before {
     list-style: none;
-    color: white;
+    color: #5f85bb;
     margin-inline-end: 0.3em;
     content: counter(number, circle-numbers);
 }
@@ -564,7 +556,6 @@ footer h1 {
     padding: 5px 10px 5px 10px;
     text-align: left;
     vertical-align: middle;
-    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
     list-style: none;
     text-indent: 5px;
     white-space: nowrap;
@@ -572,7 +563,7 @@ footer h1 {
 
 .alarm_content.all li:first-child, .alarm_content.all li:nth-child(4n+1) {
     counter-increment: number;
-    color: white;
+    color: #5f85bb;
     border-radius: 3px;
     border-collapse: collapse;
     font-size: 16px;
@@ -580,10 +571,13 @@ footer h1 {
     padding: 5px 10px 5px 10px;
     text-align: left;
     vertical-align: middle;
-    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
 }
 
-.alarm_content.all li:not(:first-child):not(:nth-child(4n+1)) {
+.alarm_content.all li:nth-child(4n) {
+    color: red !important;
+}
+
+.alarm_content.all li:not(:first-child):not(:nth-child(4n+1):not(:nth-child(4n))) {
     color: yellowgreen;
     border-radius: 3px;
     border-collapse: collapse;
@@ -592,26 +586,21 @@ footer h1 {
     padding: 5px 10px 5px 10px;
     text-align: left;
     vertical-align: middle;
-    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
     list-style: none;
     text-indent: 1.7em;
-}
-
-.alarm_list_body li:hover {
-    background: #4E5066;
-    color: #FFFFFF;
-    border-top: 1px solid #22262e;
 }
 
 /* for custom scrollbar for webkit browser*/
 .server_list_body::-webkit-scrollbar,
 .alarm_list_body::-webkit-scrollbar,
+.server_log_table_body::-webkit-scrollbar,
 .user_list_table_body::-webkit-scrollbar {
     width: 12px;
 }
 
 .server_list_body::-webkit-scrollbar-track,
 .alarm_list_body::-webkit-scrollbar-track,
+.server_log_table_body::-webkit-scrollbar-track,
 .user_list_table_body::-webkit-scrollbar-track {
     height: 20%;
     background: #344358;
@@ -620,6 +609,7 @@ footer h1 {
 
 .server_list_body::-webkit-scrollbar-thumb,
 .alarm_list_body::-webkit-scrollbar-thumb,
+.server_log_table_body::-webkit-scrollbar-thumb,
 .user_list_table_body::-webkit-scrollbar-thumb {
     border-radius: 10px;
     background: #29313c;
@@ -769,7 +759,7 @@ a.btn {
     flex-basis: 100%;
 }
 
-.popup_body > ul > li {
+.popup_body > ul > li, .popup_form {
     display: flex;
     align-items: center;
     justify-content: space-around;
@@ -778,7 +768,12 @@ a.btn {
     flex-wrap: wrap;
 }
 
-.popup_body > ul > li > p {
+.popup_form {
+    margin: 0;
+    width: 100%;
+}
+
+.popup_body > ul > li p {
     display: none;
     color: red;
     font-size: 14px;
@@ -789,7 +784,7 @@ a.btn {
     margin-left: 130px;
 }
 
-.popup_body > ul > li > label {
+.popup_body > ul > li label {
     font-size: 13px;
     width: 120px;
     font-weight: bold;
@@ -908,7 +903,7 @@ a.btn {
     border-radius: 20px;
     width: 760px;
     height: auto;
-    max-height: 805px;
+    max-height: 650px;
     position: relative;
     background: #1F252E;
     transition: all 0.5s ease-in-out;
@@ -963,7 +958,8 @@ a.btn {
 .user_list_table_body {
     margin-top: -20px;
     width: 100%;
-    height: calc(100% - 108px);
+    height: auto;
+    max-height: 431px;
     overflow-y: scroll;
     overflow-x: hidden;
 }
@@ -1086,7 +1082,7 @@ a.btn {
     text-align: left;
 }
 
-.popup_body.user_edit > ul > li > label {
+.popup_body.user_edit > ul > li label {
     font-size: 13px;
     width: 120px;
     font-weight: bold;
@@ -1186,7 +1182,7 @@ a.btn {
     margin-left: -21px;
 }
 
-.popup_body.user_plus > ul > li > label {
+.popup_body.user_plus > ul > li label {
     font-size: 13px;
     width: 120px;
     font-weight: bold;
@@ -1249,6 +1245,86 @@ a.btn {
 .popup_body.user_plus > ul > li input:-ms-input-placeholder {
     color: #D3D3D3;
     text-align: center;
+}
+
+/* 서버 로그 팝업 */
+.popup.server_log {
+    margin: 0 auto;
+    border-radius: 25px;
+    width: 1000px;
+    max-height: 650px;
+    height: auto;
+    background: #1F252E;
+    transition: all 0.5s ease-in-out;
+}
+
+.popup_body.server_log {
+    gap: 10px;
+    padding: 15px 30px 10px 30px;
+}
+
+.popup_body.server_log.main_box {
+    border-radius: 0 0 20px 20px;
+}
+
+.server_log_table {
+    table-layout: fixed;
+    width: 100%;
+}
+
+.server_log_table_head {
+    width: calc(100% - 12px);
+    height: 53px;
+    position: sticky;
+    margin-right: 12px;
+}
+
+.server_log_table_body {
+    margin-top: -10px;
+    width: 100%;
+    height: auto;
+    max-height: 405px;
+    overflow-y: scroll;
+    overflow-x: hidden;
+}
+
+.server_log_table_head > .server_log_table > thead > tr > th {
+    background-color: #2B3D57;
+    padding: 20px 15px;
+    text-align: center;
+    font-weight: bold;
+    font-size: 12px;
+    color: #fff;
+    text-transform: uppercase;
+    border-left: 1px solid #2A2B38;
+    border-right: 1px solid #2A2B38;
+    border-top: 1px solid #2A2B38;
+    border-bottom: none;
+    word-break: break-all;
+}
+
+.server_log_table_body > .server_log_table > tbody > tr > td {
+    padding: 10px;
+    text-align: center;
+    vertical-align: middle;
+    font-weight: 300;
+    font-size: 13px;
+    height: 30px;
+    color: #fff;
+    border: 1px solid #2A2B38;
+}
+
+.server_log_table > colgroup > col:nth-child(1) {
+    width: 15%;
+}
+
+.server_log_table > colgroup > col:nth-child(2) {
+    width: 85%;
+}
+
+.server_log_table > tbody > tr > td > button > span {
+    font-size: 13px;
+    font-weight: bold;
 }
 
 /* 메뉴 토글 스타일 */
@@ -1620,18 +1696,38 @@ a.btn {
 }
 
 /* 각 항목별 타이틀 디자인 */
-.h1_box {
+.title_box {
+    display: flex;
+    width: calc(100% - 20px);
+    height: 30px;
     text-align: center;
     padding: 10px;
+    align-items: center;
+    justify-content: center;
+    flex-direction: row;
 }
 
-.h1_box h1 {
+.title_box h1 {
+    height: 20px;
     color: #5f85bb;
     text-transform: uppercase;
     position: relative;
     display: inline-block;
     font-size: 18px;
     font-weight: bold;
+}
+
+.log_icon {
+    margin: auto 20px auto auto;
+    width: 32px;
+    height: 22px;
+    background: url('/resource/image/icon-plus.png') no-repeat center center;
+    background-size: cover;
+}
+
+.title.log {
+    position: absolute;
+    flex-grow: 1;
 }
 
 .title {
@@ -1655,38 +1751,6 @@ a.btn {
     animation: movebg 20s cubic-bezier(0.57, 0.32, 0.43, 0.7) infinite alternate;
 }
 
-/* PORT 셀렉트 박스 설정 */
-#port_select {
-    width: 200px;
-    font-size: 15px;
-    text-align: center;
-    background-color: #2a2b38;
-    color: yellowgreen;
-    border: none;
-    vertical-align: middle;
-    margin-left: auto;
-    margin-right: 20px;
-}
-
-#port_select:active {
-    border: none;
-}
-
-.h1_box.flex_box {
-    text-align: right;
-    height: auto;
-    flex-direction: row;
-    align-items: center;
-    flex-wrap: nowrap;
-    justify-content: center;
-    gap: 50px;
-}
-
-.h1_box.flex_box > .title {
-    position: absolute;
-    flex-grow: 1;
-}
-
 @keyframes movebg {
     0% {
         background-position: 0 0;
@@ -1697,6 +1761,36 @@ a.btn {
     100% {
         background-position: 0 150%;
     }
+}
+
+/* 포트 셀렉트 박스 타이틀 스타일 */
+.h1_box {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.h1_box > title {
+    width: 100%;
+}
+
+/* 로그 팝업창 스타일 */
+.paging {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin-top: 10px;
+}
+.input-page {
+    height: 30px;
+    width: 80px;
+    color: #fff;
+    background-color: #2B3D57;
+    text-align: center;
+    border: none;
+    border-radius: 50px;
 }
 
 /* 노트북 반응형 화면 */

@@ -1,4 +1,4 @@
-package com.kevin.server_monitor.service;
+package com.kevin.server_monitor.service.server;
 
 import com.kevin.server_monitor.service.mybatis.ServerDBService;
 import com.kevin.server_monitor.util.SSHUtils;

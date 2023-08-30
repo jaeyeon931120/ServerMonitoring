@@ -1,6 +1,6 @@
-package com.kevin.server_monitor.interceptor.config;
+package com.kevin.server_monitor.security.interceptor.config;
 
-import com.kevin.server_monitor.interceptor.HttpInterceptor;
+import com.kevin.server_monitor.security.interceptor.HttpInterceptor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;

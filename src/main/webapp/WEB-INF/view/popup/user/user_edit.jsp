@@ -18,12 +18,14 @@
                     <label for="user_edit_id">사용자 ID</label><input type="text" id="user_edit_id" value="" disabled/>
                 </li>
                 <li>
-                    <label for="user_edit_password">
-                        사용자 PW
-                    </label>
-                    <input type="password" id="user_edit_password" placeholder="영어와 숫자, 특수문자를 포함 8~20자리"/>
-                    <p class="guide">비밀번호를 변경하지 않으시면 자동으로 이전 비밀번호가 저장됩니다.</p>
-                    <p id="pw_check_user_edit">비밀번호는 영어와 숫자, 특수문자를 포함하여 8자리 이상 20자리 이하로 작성해주세요.</p>
+                    <form class="popup_form">
+                        <label for="user_edit_password">
+                            사용자 PW
+                        </label>
+                        <input type="password" id="user_edit_password" autocomplete="off" placeholder="영어와 숫자, 특수문자를 포함 8~20자리"/>
+                        <p class="guide">비밀번호를 변경하지 않으시면 자동으로 이전 비밀번호가 저장됩니다.</p>
+                        <p id="pw_check_user_edit">비밀번호는 영어와 숫자, 특수문자를 포함하여 8자리 이상 20자리 이하로 작성해주세요.</p>
+                    </form>
                 </li>
                 <li>
                     <label for="user_edit_username">사용자 이름</label>

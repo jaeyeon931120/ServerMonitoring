@@ -1,6 +1,6 @@
 package com.kevin.server_monitor.scheduled;
 
-import com.kevin.server_monitor.service.ServerInfoService;
+import com.kevin.server_monitor.service.server.ServerInfoService;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -35,5 +35,10 @@ public class MonitorScheduled {
     @Scheduled(cron = "0 0/1 * * * ?") // 매 1분마다 한번씩 실행
     public void insertServerInfoScheduled() {
         serverInfoService.serverInfo();
+    }
+
+    @Scheduled(cron = "0 0 0 * * ?") // 매 1분마다 한번씩 실행
+    public void deleteServerLogScheduled() {
+        serverInfoService.deleteServerLog();
     }
 }

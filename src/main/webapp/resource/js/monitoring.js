@@ -35,13 +35,13 @@ let trapic_length;
 let animation;
 let port_label;
 let port_select;
+let selectServer;
 let slideWidthPlusPx = 0;
 const open = "popup_wrapper open";
 const colorlabel = {
     'red' : 'rgba(255, 99, 132, 1)',
     'blue': ''
 };
-let currSlide = 1;
 
 window.onload = function () {
     token = document.querySelector("input[name='_csrf']").value;
@@ -106,6 +106,24 @@ window.onload = function () {
 
 window.setTimeout(() => getServerInfo(), 60000); // 60초마다 서버 데이터 리프레쉬
 
+function selectOptionCreate() {
+    const select = document.getElementById('select_server');
+
+    select.replaceChildren();
+
+    for (let i = 0; i < serverlist.length; i++) {
+        const option = document.createElement('option');
+        option.className = 'select_item';
+        option.value = serverlist[i];
+        option.textContent = serverlist[i];
+        option.style.height = "40px";
+
+        select.appendChild(option);
+    }
+
+    selectServer = select.options[select.selectedIndex].value;
+}
+
 function addListener(btn, data, action, process, work) {
     if (btn.clickHandler) {
         btn.removeEventListener("click", btn.clickHandler);
@@ -131,8 +149,26 @@ function addListener(btn, data, action, process, work) {
     btn.addEventListener("click", btn.clickHandler);
 }
 
+function clickSelectServer(elem) {
+    const select_id = elem.parentElement.querySelector('select').id;
+    const select = document.getElementById(select_id);
+    select.focus();
+}
+
+function changeServer() {
+    const select_box = document.getElementById("select_server");
+    select_box.blur();
+    selectServer = select_box.options[select_box.selectedIndex].value;
+
+    createGraphBar(selectServer, cpulist, memorylist, disklist);
+    trapicGraphData();
+    getLogDataList("main");
+}
+
 function changePort() {
+    const select_box = document.getElementById("port_select")
     let port = port_select.options[port_select.selectedIndex].value;
+    select_box.blur();
 
     aniGraphLine();
     createGraphLine(port);
@@ -176,40 +212,6 @@ function date_parse(str) {
     let mm = str.substring(10, 12);
     let ss = str.substring(12, 14);
     return y + '-' + m + '-' + d + " " + hh + ":" + mm + ":" + ss;
-}
-
-function createServerSlide() {
-    const slideouter = document.querySelector('.slide.slide_wrap');
-    const left_btn = document.createElement('div')
-    const right_btn = document.createElement('div')
-    const left_span = document.createElement('span');
-    const right_span = document.createElement('span');
-    const top_span = document.createElement('span');
-    const bottom_span = document.createElement('span');
-
-    slideouter.replaceChildren();
-
-    slideouter.appendChild(left_span);
-    slideouter.appendChild(right_span);
-    slideouter.appendChild(top_span);
-    slideouter.appendChild(bottom_span);
-
-    for (let i = 0; i < serverlist.length; i++) {
-        const create_div = document.createElement('div');
-        create_div.className = 'slide_item'
-        create_div.innerText = serverlist[i];
-        slideouter.appendChild(create_div);
-    }
-    if (serverlist.length > 0) {
-        left_btn.className = 'slide_prev_button slide_button'
-        left_btn.innerText = '◀'
-        right_btn.className = 'slide_next_button slide_button'
-        right_btn.innerText = '▶'
-        slideouter.appendChild(left_btn);
-        slideouter.appendChild(right_btn);
-    }
-
-    createSlide();
 }
 
 function setCanvasSize() {
@@ -321,7 +323,7 @@ function aniGraphLine() {
     const totalDuration = 1100;
     const delayBetweenPoints = totalDuration / trapic_length;
     let previousY;
-    if(ctx2.chart !== undefined) {
+    if (ctx2.chart !== undefined) {
         previousY = (ctx2) => ctx2.index === 0 ? ctx2.chart.scales.y.getPixelForValue(100) : ctx2.chart.getDatasetMeta(ctx2.datasetIndex).data[ctx2.index - 1].getProps(['y'], true).y;
     }
     animation = {
@@ -357,7 +359,7 @@ function createGraphLine(port) {
         myChartLine.destroy();
     }
 
-    port_label = tomcatportMap.get(serverlist[currSlide - 1]);
+    port_label = tomcatportMap.get(selectServer);
     let config = {
         type   : 'line',
         data   : {
@@ -367,7 +369,7 @@ function createGraphLine(port) {
             datasets: [],
         },
         options: {
-            responsive: false,
+            responsive : false,
             animation,
             interaction: {
                 intersect: false,
@@ -543,17 +545,16 @@ function getServerInfo() {
                     /*서버 리스트 테이블을 만드는 함수*/
                     tableRowSpan(table_id);
                 }
-                /* 서버 선택 슬라이더를 만드는 함수 */
-                createServerSlide();
+                /* 서버 선택창을 만드는 함수 */
+                selectOptionCreate();
                 /* Bar그래프를 불러오는 함수 */
-                createGraphBar(serverlist[currSlide - 1], cpulist, memorylist, disklist);
+                createGraphBar(selectServer, cpulist, memorylist, disklist);
                 /* Line그래프를 불러오는 함수 */
                 trapicGraphData();
                 /* LogData를 불러오는 함수 */
-                getLogDataList();
+                getLogDataList("main");
                 /* 전체 서버 종료된 날짜 확인 */
                 allServerAlarm();
-                popupClose("progress");
             } else {
                 console.log("request error");
             }
@@ -572,16 +573,15 @@ function trapicGraphData() {
     let data = {};
     httpRequest = new XMLHttpRequest();
 
-    data.server_name = serverlist[currSlide - 1];
-    data.ip = iplist.get(serverlist[currSlide - 1]);
-    data.tomcat_port = tomcatportMap.get(serverlist[currSlide - 1]);
+    data.server_name = selectServer;
+    data.ip = iplist.get(selectServer);
+    data.tomcat_port = tomcatportMap.get(selectServer);
 
     httpRequest.onreadystatechange = () => {
-        popupOpen(null, null, "progress");
         if (httpRequest.readyState === XMLHttpRequest.DONE) {
             if (httpRequest.status === 200) {
                 let res = httpRequest.response;
-                let port_label = tomcatportMap.get(serverlist[currSlide - 1]);
+                let port_label = tomcatportMap.get(selectServer);
                 trapic = new Map();
 
                 if (res !== null) {
@@ -615,12 +615,11 @@ function trapicGraphData() {
                 for (let i = 0; i < port_label.length; i++) {
                     let option = document.createElement('option');
                     option.value = port_label[i];
-                    option.textContent = serverlist[currSlide - 1] + " (" + port_label[i] + ")";
+                    option.textContent = selectServer + " (" + port_label[i] + ")";
                     port_select.appendChild(option);
                 }
 
                 changePort();
-                popupClose("progress");
             } else {
                 console.log("request error");
             }
@@ -687,7 +686,7 @@ function tableCreate(data, table_id, author) {
     newCell8.innerText = cpu;
     newCell9.innerText = memory;
     newCell10.innerText = disk;
-    if(author === "ADMIN") {
+    if (author === "ADMIN") {
         const newCell11 = newRow.insertCell(10);
         const newCell12 = newRow.insertCell(11);
 
@@ -696,7 +695,6 @@ function tableCreate(data, table_id, author) {
 
         addListener(btn_blue, data, 'on', 'power', 'open');
         addListener(btn_red, data, 'off', 'power', 'open');
-
     }
 }
 
@@ -883,6 +881,35 @@ function popupOpen(data, action, process) {
         popupbody.appendChild(btn_box);
         addListener(btn_submit, data, action, 'power', 'close');
         getUserList();
+    } else if (process === 'server_log') {
+        let today = new Date();
+        const popup_log_select = document.getElementById('time_select');
+        popup_log_select.replaceChildren();
+
+        if(today.getHours() === 0) {
+            let option1 = document.createElement('option');
+            let option2 = document.createElement('option');
+
+            option1.value = "00:00";
+            option2.value = "01:00";
+
+            popup_log_select.appendChild(option1);
+            popup_log_select.appendChild(option2);
+        } else {
+            for(let i = 0; i < today.getHours()+1; i++) {
+                let hour = today.getHours() - i;
+                let nowHour = ('0' + hour).slice(-2);
+                let nextHour = ('0' + (hour + 1)).slice(-2);
+                let option = document.createElement('option');
+                option.value = nowHour;
+                option.textContent = nowHour+":00 ~ "+nextHour+":00";
+                popup_log_select.appendChild(option);
+            }
+        }
+
+        const popup_server_log = document.querySelector(".popup_wrapper.server_log");
+        popup_server_log.className = "popup_wrapper open server_log";
+        getLogDataList("popup");
     }
 }
 
@@ -923,7 +950,7 @@ function result_popupOpen(data, action, process) {
     popupbody.appendChild(btn_box);
     addListener(btn_submit, data, action, 'power', 'close');
 
-    if(process.indexOf('user') >= 0) {
+    if (process.indexOf('user') >= 0) {
         getUserList();
     }
 }
@@ -943,13 +970,13 @@ function error_popupOpen(data, action, process) {
     const btn_submit = document.createElement("button");
 
     popupbody.replaceChildren();
-    popup_plus.style.zIndex = 800;
+    popup_plus.style.zIndex = "800";
     btn_box.className = "button_box"
     btn_submit.className = "button button-normal btn_submit";
 
     if (process === "server_plus") {
         const popup_plus = document.querySelector('.popup_wrapper.plus');
-        popup_plus.style.zIndex = 800;
+        popup_plus.style.zIndex = "800";
         if (action === 'detect') {
             h1.textContent = data.server_name + " 서버가 이미 리스트에 존재합니다.";
         } else {
@@ -957,17 +984,17 @@ function error_popupOpen(data, action, process) {
         }
     } else if (process === "server_delete") {
         const popup_delete = document.querySelector('.popup_wrapper.delete');
-        popup_delete.style.zIndex = 800;
+        popup_delete.style.zIndex = "800";
         h1.textContent = "입력하신 정보의 " + datamap.get("server_name") + "가 서버리스트에 없습니다.";
     } else if (process === "user_plus") {
         const popup_user_plus = document.querySelector('.popup_wrapper.user_plus');
-        popup_user_list.style.zIndex = 700;
-        popup_user_plus.style.zIndex = 800;
+        popup_user_list.style.zIndex = "700";
+        popup_user_plus.style.zIndex = "800";
         h1.textContent = datamap.get("id") + " 사용자를 추가하는데 실패했습니다.";
     } else if (process === "user_edit") {
         const popup_user_edit = document.querySelector('.popup_wrapper.user_edit');
-        popup_user_list.style.zIndex = 700;
-        popup_user_edit.style.zIndex = 800;
+        popup_user_list.style.zIndex = "700";
+        popup_user_edit.style.zIndex = "800";
         h1.textContent = datamap.get("id") + " 사용자 정보를 수정하는데 실패했습니다.";
     }
 
@@ -978,7 +1005,7 @@ function error_popupOpen(data, action, process) {
     popupbody.appendChild(btn_box);
     addListener(btn_submit, data, action, 'power', 'close');
 
-    if(process.indexOf('user') >= 0) {
+    if (process.indexOf('user') >= 0) {
         getUserList();
     }
 }
@@ -1007,6 +1034,9 @@ function popupClose(process) {
         const popup_user_plus = document.querySelector(".popup_wrapper.user_plus");
         popup_user_plus.className = "popup_wrapper close user_plus";
         select_value = undefined;
+    } else if (process === 'server_log') {
+        const popup_server_log = document.querySelector(".popup_wrapper.server_log");
+        popup_server_log.className = "popup_wrapper close server_log";
     }
 }
 
@@ -1711,161 +1741,29 @@ function getUserList() {
     httpRequest.send();
 }
 
-// 슬라이더 생성 함수
-function createSlide() {
-    // 슬라이드 전체 크기(width 구하기)
-    const slide = document.querySelector(".slide_wrap");
-    let slideWidth = slide.clientWidth;
-    /* 슬라이더 미디어 쿼리 */
-    if (matchMedia("screen and (width < 1800px)").matches) {
-        slideWidth = 456.8;
-    }
-
-    // 버튼 엘리먼트 선택하기
-    const prevBtn = document.querySelector(".slide_prev_button");
-    const nextBtn = document.querySelector(".slide_next_button");
-
-    // 슬라이드 전체를 선택해 값을 변경해주기 위해 슬라이드 전체 선택하기
-    let slideItems = document.querySelectorAll(".slide_item")
-
-    if (slideItems.length > 0) {
-        // 현재 슬라이드 위치가 슬라이드 개수를 넘기지 않게 하기 위한 변수
-        const maxSlide = slideItems.length;
-
-        // 무한 슬라이드를 위해 start, end 슬라이드 복사하기
-        const startSlide = slideItems[0];
-        const endSlide = slideItems[slideItems.length - 1];
-        const startElem = document.createElement("div");
-        const endElem = document.createElement("div");
-
-        endSlide.classList.forEach((c) => endElem.classList.add(c));
-        endElem.innerHTML = endSlide.innerHTML;
-
-        startSlide.classList.forEach((c) => startElem.classList.add(c));
-        startElem.innerHTML = startSlide.innerHTML;
-
-        // 각 복제한 엘리먼트 추가하기
-        slideItems[0].before(endElem);
-        slideItems[slideItems.length - 1].after(startElem);
-
-        // 슬라이드 전체를 선택해 값을 변경해주기 위해 슬라이드 전체 선택하기
-        slideItems = document.querySelectorAll(".slide_item");
-        let offset = slideWidth + currSlide
-        slideItems.forEach((i) => {
-            i.setAttribute("style", `left: ${-offset}px`);
-        })
-
-        function nextMove() {
-            currSlide++;
-            //마지막 슬라이드 이상으로 넘어가지 않게 하기 위해서
-            if (currSlide <= maxSlide) {
-                // 슬라이드를 이동시키기 위한 offset 계산
-                const offset = slideWidth * currSlide;
-                // 각 슬라이드 아이템의 left에 offset 적용
-                slideItems.forEach((i) => {
-                    i.setAttribute("style", `left: ${-offset}px`);
-                });
-            } else {
-                // 무한 슬라이드 기능 - currSlide 값만 변경해줘도 되지만 시각적으로 자연스럽게 하기 위해 아래 코드 작성
-                currSlide = 0;
-                let offset = slideWidth * currSlide;
-                slideItems.forEach((i) => {
-                    i.setAttribute("style", `transition: ${0}s; left: ${-offset}px`);
-                });
-                currSlide++;
-                offset = slideWidth * currSlide;
-                // 각 슬라이드 아이템의 left에 offset 적용
-                setTimeout(() => {
-                    // 각 슬라이드 아이템의 left에 offset 적용
-                    slideItems.forEach((i) => {
-                        i.setAttribute("style", `transition: ${0.15}s; left: ${-offset}px`);
-                    })
-                }, 0);
-            }
-            createGraphBar(serverlist[currSlide - 1], cpulist, memorylist, disklist);
-            trapicGraphData();
-            getLogDataList();
-        }
-
-        function prevMove() {
-            currSlide--;
-            // 1번째 슬라이드 이하로 넘어가지 않게 하기 위해서
-            if (currSlide > 0) {
-                const offset = slideWidth * currSlide;
-                // 각 슬라이드 아이템의 left에 offset 적용
-                slideItems.forEach((i) => {
-                    i.setAttribute("style", `left: ${-offset}px`);
-                });
-            } else {
-                // 무한 슬라이드 기능 - currSlide 값만 변경해줘도 되지만 시각적으로 자연스럽게 하기 위해 아래 코드 작성
-                currSlide = maxSlide + 1;
-                let offset = slideWidth * currSlide;
-                slideItems.forEach((i) => {
-                    i.setAttribute("style", `transition: ${0}s; left: ${-offset}px`);
-                });
-                currSlide--;
-                offset = slideWidth * currSlide;
-                setTimeout(() => {
-                    // 각 슬라이드 아이템의 left에 offset 적용
-                    slideItems.forEach((i) => {
-                        i.setAttribute("style", `transition: ${0.15}s; left: ${-offset}px`);
-                    })
-                }, 0);
-            }
-            createGraphBar(serverlist[currSlide - 1], cpulist, memorylist, disklist);
-            trapicGraphData();
-            getLogDataList();
-        }
-
-        // 버튼 엘리먼트에 클릭 이벤트 추가하기
-        nextBtn.addEventListener("click", () => {
-            // 이후 버튼 누를 경우 현재 슬라이드를 변경
-            nextMove();
-        })
-        prevBtn.addEventListener("click", () => {
-            // 이전 버튼 누를 경우 현재 슬라이드를 변경
-            prevMove();
-        })
-
-        // 브라우저 화면이 조정될 때 마다 slideWidth를 변경하기 위해
-        window.addEventListener("resize", () => {
-            slideWidth = slide.clientWidth;
-        });
-
-        // 드래그(스와이프) 이벤트를 위한 변수 초기화
-        let startPoint = 0;
-        let endPoint = 0;
-
-        // PC 클릭 이벤트 (드래그)
-        slide.addEventListener("mousedown", (e) => {
-            startPoint = e.pageX; // 마우스 드래그 시작 위치 저장
-        })
-
-        slide.addEventListener("mouseup", (e) => {
-            endPoint = e.pageX; // 마우스 드래그 끝 위치 지정
-            if (startPoint < endPoint) {
-                // 마우스가 오른쪽으로 드래그 된 경우
-                prevMove();
-            } else if (startPoint > endPoint) {
-                // 마우스가 왼쪽으로 드래그 된 경우
-                nextMove();
-            }
-        })
-    }
-}
-
-function getLogDataList() {
+function getLogDataList(process) {
     let httpRequest;
     let data = {};
     httpRequest = new XMLHttpRequest();
     const serverlog_body = document.querySelector('.alarm_list_body.server');
+    const log_icon = document.querySelector('.log_icon');
+    const popup_log_select = document.getElementById('time_select');
     const serverlog_ul = document.createElement('ul');
+    let selectHours;
     serverlog_ul.className = 'alarm_content server';
+    popup_log_select.blur();
 
-    serverlog_body.replaceChildren();
-
-    data.server_name = serverlist[currSlide - 1];
-    data.ip = iplist.get(serverlist[currSlide - 1]);
+    data.server_name = selectServer;
+    data.ip = iplist.get(selectServer);
+    if(process === "main") {
+        let today = new Date();
+        data.hours = ('0' + today.getHours()).slice(-2);
+        data.process = "main";
+    } else if(process === "popup") {
+        selectHours = popup_log_select.options[popup_log_select.selectedIndex].value;
+        data.hours = selectHours;
+        data.process = "popup";
+    }
 
     httpRequest.onreadystatechange = () => {
         popupOpen(null, null, "progress");
@@ -1873,27 +1771,32 @@ function getLogDataList() {
             if (httpRequest.status === 200) {
                 let res = httpRequest.response;
 
-                if (res !== null && res !== undefined) {
-                    for (let i = 0; i < res.length; i++) {
-                        const li = document.createElement("li");
+                if(process === "main") {
+                    serverlog_body.replaceChildren();
+                    if (res !== null && res.length !== 0) {
+                        log_icon.style.display = 'inline-block';
 
-                        if(res[i].log_idx === (i+1)) {
-                            li.textContent = res[i].log;
+                        for (let i = 0; i < res.list.length; i++) {
+                            const li = document.createElement("li");
+                            li.textContent = "( " + res.list[i].val_date + " ) " + res.list[i].log;
+
+                            serverlog_body.appendChild(serverlog_ul);
+                            serverlog_ul.appendChild(li);
                         }
+                    } else {
+                        const p = document.createElement('p');
+                        p.textContent = "해당 서버의 최근에 기록된 로그가 없습니다."
 
-                        serverlog_body.appendChild(serverlog_ul);
-                        serverlog_ul.appendChild(li);
+                        log_icon.style.display = 'none';
+                        serverlog_body.appendChild(p);
                     }
-                } else {
-                    const p = document.createElement('p');
-                    p.textContent = "해당 서버의 최근에 기록된 로그가 없습니다."
-
-                    serverlog_body.appendChild(p);
+                } else if (process === "popup") {
+                    findAlllog(res);
                 }
-
                 popupClose("progress");
             } else {
                 console.log("request error");
+                popupClose("progress");
             }
         }
     }
@@ -1916,14 +1819,13 @@ function allServerAlarm() {
     alarm_body.replaceChildren();
 
     httpRequest.onreadystatechange = () => {
-        popupOpen(null, null, "progress");
         if (httpRequest.readyState === XMLHttpRequest.DONE) {
             if (httpRequest.status === 200) {
                 let res = httpRequest.response;
 
                 if (res !== null && res.length !== 0) {
                     for (let i = 0; i < res.length; i++) {
-                        if(res[i].end_date != null) {
+                        if (res[i].end_date != null) {
                             const li_name = document.createElement("li");
                             const li_location = document.createElement("li");
                             const li_tomcatport = document.createElement("li");
@@ -1948,8 +1850,6 @@ function allServerAlarm() {
 
                     alarm_body.appendChild(p);
                 }
-
-                popupClose("progress");
             } else {
                 console.log("request error");
             }
@@ -1957,6 +1857,157 @@ function allServerAlarm() {
     }
 
     httpRequest.open('POST', "/alarm_data", true);
+    httpRequest.responseType = "json";
+    httpRequest.setRequestHeader('Content-Type', 'application/json');
+    httpRequest.setRequestHeader(header, token);
+    httpRequest.send(JSON.stringify(data));
+}
+
+function findAlllog(res) {
+    // 1. PagingResponse의 멤버인 List<T> 타입의 list를 의미
+    const table = document.getElementById('server_log_list');
+    const tbody = document.getElementById('server_log_list_tbody');
+    const list = res.list;
+
+    while (tbody.hasChildNodes()) {
+        tbody.removeChild(tbody.firstChild);
+    }
+
+    // 2. 리스트가 비어있는 경우, 행에 "검색 결과가 없다"는 메시지를 출력하고, 페이지 번호(페이지네이션) HTML을 제거(초기화)한 후 로직을 종료
+    if ( !list.length ) {
+        const newRow = table.insertRow();
+        const newCell1 = newRow.insertCell(0);
+
+        newCell1.colSpan = 2;
+        newCell1.className = "no-data-msg";
+        newCell1.innerText = "해당 조건의 로그가 없습니다.";
+    }
+
+    // 3. PagingResponse의 멤버인 pagination을 의미
+    const pagination = res.pagination;
+
+    // 4. SearchDto 타입의 객체인 params를 의미
+    const params = 1;
+
+    // 6. 리스트 데이터 렌더링
+    drawList(list);
+
+    // 7. 페이지 번호 렌더링
+    drawPage(pagination, params);
+}
+
+// 리스트 HTML draw
+function drawList(list) {
+
+    /*
+     * 1. 기존에 리스트 데이터를 그리던 것과 유사한 로직
+     *    기존에는 게시글 번호를 (전체 데이터 수 - loop의 인덱스 번호)로 처리했으나, 현재는 (전체 데이터 수 - ((현재 페이지 번호 - 1) * 페이지당 출력할 데이터 개수))로 정밀히 계산
+     */
+    const table = document.getElementById('server_log_list');
+
+    for (let i = 0; i < list.length; i++) {
+        const newRow = table.insertRow();
+        const newCell1 = newRow.insertCell(0);
+        const newCell2 = newRow.insertCell(1);
+
+        newCell1.innerText = list[i].val_date;
+        newCell2.innerText = list[i].log;
+    }
+}
+
+
+// 페이지 HTML draw
+function drawPage(pagination, params) {
+    const paging = document.querySelector('.paging');
+
+    // 1. 필수 파라미터가 없는 경우, 페이지 번호(페이지네이션) HTML을 제거(초기화)한 후 로직 종료
+    if ( !pagination || !params ) {
+        paging.replaceChildren();
+    } else {
+        paging.replaceChildren();
+        // 3. 이전 페이지가 있는 경우, 즉 시작 페이지(startPage)가 1이 아닌 경우 첫 페이지 버튼과 이전 페이지 버튼을 HTML에 추가
+        const first = document.createElement('button');
+        const prev = document.createElement('button');
+
+        first.className = "button button-normal page_button";
+        first.addEventListener('click', () => movePage(1));
+        first.textContent = "<<"
+        prev.className = "button button-normal page_button";
+        prev.addEventListener('click', () => movePage(pagination.page - 1));
+        prev.textContent = "<"
+        paging.appendChild(first);
+        paging.appendChild(prev);
+
+
+        /*
+         * 4. 시작 페이지(startPage)와 끝 페이지(endPage) 사이의 페이지 번호(i)를 넘버링 하는 로직
+         *    페이지 번호(i)와 현재 페이지 번호(params.page)가 동일한 경우, 페이지 번호(i)를 활성화(on) 처리
+         */
+        const input_page = document.createElement('input');
+        input_page.className = 'input-page';
+        input_page.value = pagination.page;
+        input_page.addEventListener('change', () => movePage(input_page.value));
+        paging.appendChild(input_page);
+
+
+        // 5. 현재 위치한 페이지 뒤에 데이터가 더 있는 경우, 다음 페이지 버튼과 끝 페이지 버튼을 HTML에 추가
+        const last = document.createElement('button');
+        const next = document.createElement('button');
+
+        last.className = "button button-normal page_button";
+        last.addEventListener('click', () => movePage(pagination.totalPageCount));
+        last.textContent = ">>"
+        next.className = "button button-normal page_button";
+        next.addEventListener('click', () => movePage(pagination.page + 1));
+        next.textContent = ">"
+        paging.appendChild(next);
+        paging.appendChild(last);
+    }
+}
+
+// 페이지 이동
+function movePage(page) {
+    /*
+     * 1. 리스트 번호를 변경하거나 페이지 좌우 이동시
+     *    AJAX 통신을 이용하여 로그 데이터 표시
+     */
+    let httpRequest;
+    httpRequest = new XMLHttpRequest();
+    const popup_log_select = document.getElementById('time_select');
+    let selectHours = popup_log_select.options[popup_log_select.selectedIndex].value;
+
+    if(page === 0) {
+        page = 1;
+    }
+
+    // 2. drawPage( )의 각 버튼에 선언된 onclick 이벤트를 통해 전달받는 page(페이지 번호)를 기준으로 객체 생성
+    let pageParam = {
+        page      : page,
+        recordSize: 10,
+        pageSize  : 10
+    };
+    let data = {
+        server_name : selectServer,
+        ip : iplist.get(selectServer),
+        hours : selectHours,
+        process : "popup",
+        searchDto : pageParam
+    };
+
+    popupOpen(null, null, "progress");
+    httpRequest.onreadystatechange = () => {
+        if (httpRequest.readyState === XMLHttpRequest.DONE) {
+            if (httpRequest.status === 200) {
+                let res = httpRequest.response;
+                findAlllog(res);
+            } else {
+                console.log("request error");
+            }
+            popupClose('progress');
+        }
+    }
+
+    httpRequest.open('POST', "/log_data", true);
     httpRequest.responseType = "json";
     httpRequest.setRequestHeader('Content-Type', 'application/json');
     httpRequest.setRequestHeader(header, token);
