@@ -63,5 +63,15 @@ public interface ServerDBMapper {
      */
     int logCount(ServerLogDto params);
 
+    /**
+     * 로그 테이블 전체 삭제(하루 단위)
+     * @return 게시글 수
+     */
     int deleteServerLog();
+
+    /**
+     * 서버 정보 RAW테이블 전체 삭제(하루 단위)
+     * @return 게시글 수
+     */
+    int deleteServerRaw();
 }

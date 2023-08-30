@@ -270,6 +270,26 @@ public class ServerInfoService {
     }
 
     public void deleteServerLog() {
-        serverDBService.deleteServerLog();
+        try {
+            int result = serverDBService.deleteServerLog();
+            if (result <= 0) {
+                logger.error("서버 LOG테이블 삭제중에 오류가 발생했습니다.");
+            }
+        } catch (Exception e) {
+            logger.error("서버 LOG테이블 삭제중에 오류가 발생했습니다.");
+            e.printStackTrace();
+        }
+    }
+
+    public void deleteServerRaw() {
+        try {
+            int result = serverDBService.deleteServerRaw();
+            if (result <= 0) {
+                logger.error("서버 RAW테이블 삭제중에 오류가 발생했습니다.");
+            }
+        } catch (Exception e) {
+            logger.error("서버 RAW테이블 삭제중에 오류가 발생했습니다.");
+            e.printStackTrace();
+        }
     }
 }

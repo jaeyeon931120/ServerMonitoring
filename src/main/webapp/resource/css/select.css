@@ -49,23 +49,10 @@
 }
 
 .select_item {
-    /* layout */
-    display: flex;
-    align-items: center;
-    justify-content: center;
     color: yellowgreen;
-
-    /* position - 버튼 클릭시 left offset값을 적용시키기 위해 */
-    position: relative;
-    left: 0;
-
-    /* size */
-    width: 100%;
-    /* flex item의 flex-shrink는 기본값이 1이므로 컨테이너 크기에 맞게 줄어드는데, 슬라이드를 구현할 것이므로 줄어들지 않도록 0을 준다. */
-    flex-shrink: 0;
-
-    /* transition */
-    transition: left 0.15s;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 4px;
 }
 
 .select_button {
@@ -207,7 +194,7 @@ li {
 
 /* PORT 셀렉트 박스 설정 */
 .select_box {
-    width: 300px;
+    width: 100%;
     font-size: 15px;
     text-align: center;
     background-color: #2a2b38 !important;
@@ -217,6 +204,9 @@ li {
     -webkit-appearance:none; /* for chrome */
     -moz-appearance:none; /*for firefox*/
     appearance:none;
+    /* style */
+    text-decoration: none;
+    text-transform: uppercase;
 }
 
 .select_box::-ms-expand{

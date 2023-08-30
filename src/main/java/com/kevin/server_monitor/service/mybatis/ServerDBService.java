@@ -48,4 +48,5 @@ public class ServerDBService {
     }
 
     public int deleteServerLog() { return serverDBMapper.deleteServerLog(); }
+    public int deleteServerRaw() { return serverDBMapper.deleteServerRaw(); }
 }

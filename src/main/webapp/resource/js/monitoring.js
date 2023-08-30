@@ -1771,9 +1771,11 @@ function getLogDataList(process) {
             if (httpRequest.status === 200) {
                 let res = httpRequest.response;
 
+                console.log("res : ", res);
+
                 if(process === "main") {
                     serverlog_body.replaceChildren();
-                    if (res !== null && res.length !== 0) {
+                    if (res.list !== null && res.list.length !== 0) {
                         log_icon.style.display = 'inline-block';
 
                         for (let i = 0; i < res.list.length; i++) {
@@ -1880,7 +1882,7 @@ function findAlllog(res) {
 
         newCell1.colSpan = 2;
         newCell1.className = "no-data-msg";
-        newCell1.innerText = "해당 조건의 로그가 없습니다.";
+        newCell1.innerText = "해당 조건의 서버 로그가 없습니다.";
     }
 
     // 3. PagingResponse의 멤버인 pagination을 의미

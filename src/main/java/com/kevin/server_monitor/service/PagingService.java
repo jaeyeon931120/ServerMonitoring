@@ -5,8 +5,6 @@ import com.kevin.server_monitor.common.paging.PagingResponse;
 import com.kevin.server_monitor.dto.SearchDto;
 import com.kevin.server_monitor.dto.ServerLogDto;
 import com.kevin.server_monitor.mapper.ServerDBMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -14,8 +12,6 @@ import java.util.List;
 
 @Service
 public class PagingService {
-
-    private static final Logger logger = LoggerFactory.getLogger(PagingService.class);
     private final ServerDBMapper serverDBMapper;
 
     public PagingService(ServerDBMapper serverDBMapper) {

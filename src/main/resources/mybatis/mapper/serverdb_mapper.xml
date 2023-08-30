@@ -291,4 +291,8 @@
     <delete id="deleteServerLog">
         TRUNCATE monitoring_db.server_info_log
     </delete>
+
+    <delete id="deleteServerRaw">
+        TRUNCATE monitoring_db.server_info_raw
+    </delete>
 </mapper>
