@@ -103,17 +103,6 @@ public class MonitoringService {
         return view;
     }
 
-    public String getSessionCheck() {
-        String id = null;
-        try {
-            id = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return id;
-    }
-
     public Map<String, Object> getPower(Map<String, Object> req) {
         Map<String, Object> resultMap = new HashMap<>();
         Map<String, Object> inputMap = new HashMap<>();
