@@ -721,8 +721,8 @@ a.btn {
 }
 
 .popup_head {
-    border-top-left-radius: 20px;
-    border-top-right-radius: 20px;
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
     width: auto;
     height: 32px;
     padding: 12px 30px;
