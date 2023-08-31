@@ -95,7 +95,7 @@ public class MonitoringService {
                     view.setViewName("monitoring_user");
                 }
             } else {
-                view.setViewName("login");
+                view.setViewName("redirect:/login");
             }
         } catch (Exception e) {
             e.printStackTrace();
