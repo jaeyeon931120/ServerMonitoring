@@ -52,20 +52,6 @@ public class MonitorController {
         return view;
     }
 
-    @GetMapping("/session_check")
-    public String getSessionCheck() {
-        try {
-            String id = monitoringService.getSessionCheck();
-            if (id == null) {
-                return "redirect:/login";
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return null;
-    }
-
     @PostMapping("/power")
     @ResponseBody
     public Map<String, Object> getPower(@RequestBody Map<String, Object> req) {

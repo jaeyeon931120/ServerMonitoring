@@ -104,7 +104,6 @@ window.onload = function () {
 }
 
 window.setTimeout(() => getServerInfo(), 60000); // 60초마다 서버 데이터 리프레쉬
-window.setTimeout(() => sessionCheck(), 300000); // 5분마다 세션 체크
 
 function selectOptionCreate() {
     const select = document.getElementById('select_server');
@@ -2021,17 +2020,4 @@ function movePage(page) {
     httpRequest.setRequestHeader('Content-Type', 'application/json');
     httpRequest.setRequestHeader(header, token);
     httpRequest.send(JSON.stringify(data));
-}
-
-// 세션 체크
-function sessionCheck() {
-    /*
-     * 1. 리스트 번호를 변경하거나 페이지 좌우 이동시
-     *    AJAX 통신을 이용하여 로그 데이터 표시
-     */
-    let httpRequest = new XMLHttpRequest();
-    httpRequest.onreadystatechange = () => {}
-    httpRequest.open('GET', "/session_check", true);
-    httpRequest.setRequestHeader(header, token);
-    httpRequest.send();
 }
