@@ -62,7 +62,7 @@
                 </div>
             </div>
             <div class="main_box flex_box server">
-                <div class="h1_box"><h1 class="title">서버 하드웨어 사용량</h1></div>
+                <div class="title_box"><h1 class="title">서버 하드웨어 사용량</h1></div>
                 <div class="graph_bar">
                     <canvas id="myChart1"></canvas>
                 </div>
@@ -136,7 +136,7 @@
                     </div>
                 </div>
                 <div class="alarm_list all main_box">
-                    <div class="h1_box"><h1 class="title">전체 서버 알람 (최근 일주일)</h1></div>
+                    <div class="title_box"><h1 class="title">전체 서버 알람 (최근 일주일)</h1></div>
                     <div class="alarm_list_body all">
                         <ul class="alarm_content all">
                         </ul>

@@ -8,7 +8,7 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <div class="popup_wrapper user_plus">
-    <div class="popup_user_plus">
+    <div class="popup user_plus">
         <div class="popup_head user_plus">
             <h1>사용자 추가</h1>
             <a class="btn-close trigger" onclick="popupClose('user_plus')">x</a>

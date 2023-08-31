@@ -6,6 +6,7 @@
         /* User 테이블 가져오기 UserMapper.getUserList */
         SELECT *
         FROM monitoring_db.monitoring_admin
+        ORDER BY REG_DATE
     </select>
 
     <insert id="insertUser">

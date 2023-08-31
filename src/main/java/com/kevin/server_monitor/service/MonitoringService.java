@@ -71,32 +71,47 @@ public class MonitoringService {
         try {
             // token에 저장되어 있는 인증된 사용자의 id 값
             String id = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-            UserVo userVo = userService.getUserById(id);
-            String name = userVo.getUsername();
-            String author = userVo.getAuthor();
+            if(id != null) {
+                UserVo userVo = userService.getUserById(id);
+                String name = userVo.getUsername();
+                String author = userVo.getAuthor();
 
-            HttpSession session = request.getSession();
-            session.setAttribute("id", id);
-            session.setAttribute("username", name);
-            session.setAttribute("author", author);
-            // 세션 유지시간 설정(초단위) - 30분
-            session.setMaxInactiveInterval(30*60);
+                HttpSession session = request.getSession();
+                session.setAttribute("id", id);
+                session.setAttribute("username", name);
+                session.setAttribute("author", author);
+                // 세션 유지시간 설정(초단위) - 30분
+                session.setMaxInactiveInterval(30*60);
 
-            if(author.contains("ADMIN")) {
-                view.addObject("id", id);
-                view.addObject("username", name);
-                view.addObject("author", author);
-                view.setViewName("monitoring_admin");
-            } else if(author.contains("USER")) {
-                view.addObject("id", id);
-                view.addObject("username", name);
-                view.addObject("author", author);
-                view.setViewName("monitoring_user");
+                if(author.contains("ADMIN")) {
+                    view.addObject("id", id);
+                    view.addObject("username", name);
+                    view.addObject("author", author);
+                    view.setViewName("monitoring_admin");
+                } else if(author.contains("USER")) {
+                    view.addObject("id", id);
+                    view.addObject("username", name);
+                    view.addObject("author", author);
+                    view.setViewName("monitoring_user");
+                }
+            } else {
+                view.setViewName("login");
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
         return view;
+    }
+
+    public String getSessionCheck() {
+        String id = null;
+        try {
+            id = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return id;
     }
 
     public Map<String, Object> getPower(Map<String, Object> req) {
@@ -283,12 +298,10 @@ public class MonitoringService {
                 serverLogDto.setTo_date(to_date);
             }
 
-            if(serverLogDto.getSearchDto() != null) {
-                returnList = pagingService.findAllLog(serverLogDto);
-            } else {
+            if (serverLogDto.getSearchDto() == null) {
                 serverLogDto.setSearchDto(new SearchDto());
-                returnList = pagingService.findAllLog(serverLogDto);
             }
+            returnList = pagingService.findAllLog(serverLogDto);
         } catch (Exception e) {
             logger.error("서버 로그 리스트를 불러오는 중에 오류가 발생했습니다.");
             e.printStackTrace();

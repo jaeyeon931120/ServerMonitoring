@@ -195,7 +195,7 @@ li {
 /* PORT 셀렉트 박스 설정 */
 .select_box {
     width: 100%;
-    font-size: 15px;
+    font-size: 14px;
     text-align: center;
     background-color: #2a2b38 !important;
     color: yellowgreen;
@@ -229,4 +229,5 @@ li {
 .server_log > .select_div > .select_box {
     font-size: 16px;
     font-weight: 600;
+    height: 100%;
 }

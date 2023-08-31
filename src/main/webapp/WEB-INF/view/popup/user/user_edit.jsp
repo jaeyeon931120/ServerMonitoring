@@ -7,7 +7,7 @@
 --%>
 <%@ page contentType="text/html;charset=UTF-8" %>
 <div class="popup_wrapper user_edit">
-    <div class="popup_user_edit">
+    <div class="popup user_edit">
         <div class="popup_head user_edit">
             <h1>사용자 정보 수정</h1>
             <a class="btn-close trigger" onclick="popupClose('user_edit')">x</a>

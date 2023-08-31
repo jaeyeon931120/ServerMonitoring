@@ -778,6 +778,7 @@ a.btn {
     color: red;
     font-size: 14px;
     margin-top: 10px;
+    margin-bottom: -10px;
     text-align: center;
     line-height: 20px;
     font-weight: bold;
@@ -788,6 +789,31 @@ a.btn {
     font-size: 13px;
     width: 120px;
     font-weight: bold;
+}
+
+.popup_body > ul > li input {
+    height: 30px;
+    width: 320px;
+    color: #fff;
+    background-color: #2B3D57;
+    text-align: center;
+    border: none;
+    border-radius: 30px;
+}
+
+.popup_body > ul > li input::placeholder {
+    color: #D3D3D3;
+    text-align: center;
+}
+
+.popup_body > ul > li input::-webkit-input-placeholder {
+    color: #D3D3D3;
+    text-align: center;
+}
+
+.popup_body > ul > li input:-ms-input-placeholder {
+    color: #D3D3D3;
+    text-align: center;
 }
 
 .popup_body.fa-thumbs-o-up {
@@ -822,7 +848,7 @@ a.btn {
 }
 
 /* 서버 추가 팝업 스타일 */
-.popup_plus, .popup_delete {
+.popup.plus, .popup.delete {
     margin: 0 auto;
     border-radius: 20px;
     width: 538px;
@@ -855,14 +881,6 @@ a.btn {
     margin: 15px 15px 0 15px;
 }
 
-.popup_body.plus > ul > li input, .popup_body.delete > ul > li input {
-    height: 30px;
-    width: 320px;
-    color: #fff;
-    background-color: #2B3D57;
-    text-align: center;
-}
-
 .popup_body.plus > .btn.blue, .popup_body.delete > .btn.blue {
     margin-top: 20px;
     margin-right: 40px;
@@ -882,23 +900,8 @@ a.btn {
     font-weight: bold;
 }
 
-.popup_body.plus > ul > li input::placeholder, .popup_body.delete > ul > li input::placeholder {
-    color: #D3D3D3;
-    text-align: center;
-}
-
-.popup_body.plus > ul > li input::-webkit-input-placeholder, .popup_body.delete > ul > li input::-webkit-input-placeholder {
-    color: #D3D3D3;
-    text-align: center;
-}
-
-.popup_body.plus > ul > li input:-ms-input-placeholder, .popup_body.delete > ul > li input:-ms-input-placeholder {
-    color: #D3D3D3;
-    text-align: center;
-}
-
 /* 유저 리스트 팝업 style */
-.popup_user_list {
+.popup.user_list {
     margin: 0 auto;
     border-radius: 20px;
     width: 760px;
@@ -907,7 +910,6 @@ a.btn {
     position: relative;
     background: #1F252E;
     transition: all 0.5s ease-in-out;
-    border: 3px solid #2B3D57;
 }
 
 .popup_user_list > .popup_head.user_list {
@@ -1027,7 +1029,7 @@ a.btn {
     backdrop-filter: blur(2px);
 }
 
-.popup_user_edit, .popup_user_plus {
+.popup.user_edit, .popup.user_plus {
     margin: 0 auto;
     border-radius: 20px;
     width: 600px;
@@ -1047,11 +1049,17 @@ a.btn {
     gap: 10px;
 }
 
+#pw_check_user_edit {
+    margin-bottom: 0;
+    margin-top: 5px;
+}
+
 .guide {
     display: block !important;
     font-size: 13px !important;
     color: #D3D3D3 !important;
     margin-left: 107px !important;
+    margin-bottom: 0 !important;
 }
 
 .popup_body.user_edit > ul {
@@ -1550,10 +1558,8 @@ a.btn {
     font-size: 0.87em;
     line-height: 14px;
     background-color: #2B3D57;
-    border-top: 2px solid rgb(33, 33, 33);
-    border-left: 2px solid rgb(33, 33, 33);
-    border-right: 2px solid rgb(128, 128, 128);
-    border-bottom: 2px solid rgb(128, 128, 128);
+    border: none;
+    border-radius: 30px;
     box-sizing: border-box;
     cursor: pointer;
     color: #ffffff;
@@ -1598,10 +1604,8 @@ a.btn {
 .list-member li button {
     width: 100%;
     padding: 7px 10px;
-    border-top: 2px solid rgb(33, 33, 33);
-    border-left: 2px solid rgb(33, 33, 33);
-    border-right: 2px solid rgb(128, 128, 128);
-    border-bottom: 2px solid rgb(128, 128, 128);
+    border: none;
+    border-radius: 30px;
     background-color: #2B3D57;
     cursor: pointer;
     /* 말줄임 */
@@ -1847,7 +1851,7 @@ a.btn {
         flex-wrap: nowrap;
         align-items: center;
         justify-content: space-between;
-        width: 33%;
+        width: 30%;
         height: 100%;
         margin-left: 10px;
     }

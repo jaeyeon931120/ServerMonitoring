@@ -10,7 +10,9 @@ let popup_user_plus;
 let id_check_btn;
 let ok_img;
 let user_plus_id;
-let user_plus_pw;
+let pw_check_edit;
+let auth_check_edit;
+let tel_check_edit;
 let id_check_plus;
 let pw_check_plus;
 let auth_check_plus;
@@ -36,12 +38,7 @@ let animation;
 let port_label;
 let port_select;
 let selectServer;
-let slideWidthPlusPx = 0;
 const open = "popup_wrapper open";
-const colorlabel = {
-    'red' : 'rgba(255, 99, 132, 1)',
-    'blue': ''
-};
 
 window.onload = function () {
     token = document.querySelector("input[name='_csrf']").value;
@@ -51,11 +48,13 @@ window.onload = function () {
     popupbody = document.querySelector(".popup_body");
     h1 = document.createElement("h1");
     btn_manual = document.querySelector('.btn_manual_download');
-    popup_user_plus = document.querySelector('.popup_user_plus');
+    popup_user_plus = document.querySelector('.popup.user_plus');
     id_check_btn = document.querySelector('.popup_body.user_plus > ul > li > .btn_check');
     ok_img = document.querySelector('.popup_body.user_plus > ul > li > img');
     user_plus_id = document.getElementById('user_plus_id');
-    user_plus_pw = document.getElementById('user_plus_password');
+    pw_check_edit = document.getElementById('pw_check_user_edit');
+    auth_check_edit = document.getElementById('auth_check_user_edit');
+    tel_check_edit = document.getElementById('tel_check_user_edit');
     id_check_plus = document.getElementById('id_check_user_plus');
     pw_check_plus = document.getElementById('pw_check_user_plus');
     auth_check_plus = document.getElementById('auth_check_user_plus');
@@ -105,6 +104,7 @@ window.onload = function () {
 }
 
 window.setTimeout(() => getServerInfo(), 60000); // 60초마다 서버 데이터 리프레쉬
+window.setTimeout(() => sessionCheck(), 300000); // 5분마다 세션 체크
 
 function selectOptionCreate() {
     const select = document.getElementById('select_server');
@@ -807,13 +807,18 @@ function popupOpen(data, action, process) {
         const btn_edit_cancel = document.querySelector(".popup_body.user_edit > .button_box > .btn_cancel");
         const btn_edit_select = document.getElementById('user_edit_auth');
         const user_id = document.getElementById("user_edit_id");
+        const user_pw = document.getElementById("user_edit_password");
         const username = document.getElementById("user_edit_username");
         const user_tel = document.getElementById("user_edit_tel");
         select_value = data.author;
         btn_edit_select.textContent = data.author;
         user_id.value = data.id;
+        user_pw.value = "";
         username.value = data.username;
         user_tel.value = data.tel;
+        pw_check_edit.style.display = "none";
+        auth_check_edit.style.display = "none";
+        tel_check_edit.style.display = "none";
         popup_wrapper_edit.className = "popup_wrapper open user_edit blur";
         select_function('user_edit');
 
@@ -851,7 +856,7 @@ function popupOpen(data, action, process) {
     } else if (process === 'user_delete') {
         popup.className = open;
         const popup_user_list = document.querySelector('.popup_wrapper.user_list');
-        popup_user_list.style.zIndex = 800;
+        popup_user_list.style.zIndex = "800";
         const btn_box = document.createElement("div");
         const btn_submit = document.createElement("button");
         popupbody.replaceChildren();
@@ -886,7 +891,7 @@ function popupOpen(data, action, process) {
         const popup_log_select = document.getElementById('time_select');
         popup_log_select.replaceChildren();
 
-        if(today.getHours() === 0) {
+        if (today.getHours() === 0) {
             let option1 = document.createElement('option');
             let option2 = document.createElement('option');
 
@@ -896,13 +901,13 @@ function popupOpen(data, action, process) {
             popup_log_select.appendChild(option1);
             popup_log_select.appendChild(option2);
         } else {
-            for(let i = 0; i < today.getHours()+1; i++) {
+            for (let i = 0; i < today.getHours() + 1; i++) {
                 let hour = today.getHours() - i;
                 let nowHour = ('0' + hour).slice(-2);
                 let nextHour = ('0' + (hour + 1)).slice(-2);
                 let option = document.createElement('option');
                 option.value = nowHour;
-                option.textContent = nowHour+":00 ~ "+nextHour+":00";
+                option.textContent = nowHour + ":00 ~ " + nextHour + ":00";
                 popup_log_select.appendChild(option);
             }
         }
@@ -934,10 +939,10 @@ function result_popupOpen(data, action, process) {
     } else if (process === "server_delete") {
         h1.textContent = datamap.get("server_name") + " 서버를 삭제하는데 성공했습니다.";
     } else if (process === "user_plus") {
-        popup_user_list.style.zIndex = 800;
+        popup_user_list.style.zIndex = "800";
         h1.textContent = datamap.get("id") + " 사용자를 추가하는데 성공했습니다.";
     } else if (process === "user_edit") {
-        popup_user_list.style.zIndex = 800;
+        popup_user_list.style.zIndex = "800";
         popupbody.style.width = "auto";
         popuphead.style.width = "90%";
         h1.textContent = datamap.get("id") + " 사용자 정보를 수정하는데 성공했습니다.";
@@ -1106,7 +1111,7 @@ function select_function(process) {
     const list_select = document.getElementById(process + "-member");
     const popup_wrapper_select = document.querySelector(".popup_wrapper." + process);
     const popup_head_select = document.querySelector(".popup_head." + process);
-    const popup_body_select = document.querySelector(".popup_" + process);
+    const popup_body_select = document.querySelector(".popup." + process);
 
     if (btn_select.clickHandler) {
         btn_select.removeEventListener('click', btn_select.clickHandler);
@@ -1289,7 +1294,7 @@ function pw_check(pw, process) {
     if (process === "user_delete") {
         return true;
     } else {
-        const popup = document.querySelector(".popup_" + process);
+        const popup = document.querySelector(".popup." + process);
         const user_id = document.getElementById(process + '_id');
         const pw_p = document.getElementById('pw_check_' + process);
         let id = user_id.value;
@@ -1333,7 +1338,7 @@ function auth_check(auth, process) {
     if (process === "user_delete") {
         return true;
     } else {
-        const popup = document.querySelector(".popup_" + process);
+        const popup = document.querySelector(".popup." + process);
         const auth_p = document.getElementById('auth_check_' + process);
         if (auth === "사용자 권한") {
             auth_p.style.display = 'block';
@@ -1353,7 +1358,7 @@ function tel_check(tel, process) {
         return true;
     } else {
         let regexTel = /^[0-9]{3}-[0-9]{4}-[0-9]{4}$/;
-        const popup = document.querySelector(".popup_" + process);
+        const popup = document.querySelector(".popup." + process);
         const tel_p = document.getElementById('tel_check_' + process);
 
         if (isStringValue(tel)) {
@@ -1377,7 +1382,7 @@ function tel_check(tel, process) {
 
 function ip_check(ip, process) {
     let regexIP = /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
-    const popup = document.querySelector(".popup_" + process);
+    const popup = document.querySelector(".popup." + process);
     const ip_p = document.getElementById('ip_check_' + process);
 
     if (isStringValue(ip)) {
@@ -1402,7 +1407,7 @@ function ip_check(ip, process) {
 
 function port_check(port, process, portname) {
     let regexPort = /(6553[0-5]|655[0-2]\d|65[0-4]\d{2}|6[0-4]\d{3}|5\d{4}|[0-9]\d{0,3})/;
-    const popup = document.querySelector(".popup_" + process);
+    const popup = document.querySelector(".popup." + process);
     const port_p = document.getElementById(portname + '_port_check_' + process);
 
     if (isStringValue(port)) {
@@ -1426,7 +1431,7 @@ function port_check(port, process, portname) {
 }
 
 function system_check(system, process) {
-    const popup = document.querySelector(".popup_" + process);
+    const popup = document.querySelector(".popup." + process);
     const system_p = document.getElementById('system_check_' + process);
 
     if (!isStringValue(system)) {
@@ -1446,7 +1451,7 @@ function name_check(name, process, checkname) {
     if (process === "user_delete") {
         return true;
     } else {
-        const popup = document.querySelector(".popup_" + process);
+        const popup = document.querySelector(".popup." + process);
         const name_p = document.getElementById(checkname + '_check_' + process);
 
         if (!isStringValue(name)) {
@@ -1745,6 +1750,7 @@ function getLogDataList(process) {
     let httpRequest;
     let data = {};
     httpRequest = new XMLHttpRequest();
+    const left_content = document.querySelector('.left-content');
     const serverlog_body = document.querySelector('.alarm_list_body.server');
     const log_icon = document.querySelector('.log_icon');
     const popup_log_select = document.getElementById('time_select');
@@ -1755,11 +1761,11 @@ function getLogDataList(process) {
 
     data.server_name = selectServer;
     data.ip = iplist.get(selectServer);
-    if(process === "main") {
+    if (process === "main") {
         let today = new Date();
         data.hours = ('0' + today.getHours()).slice(-2);
         data.process = "main";
-    } else if(process === "popup") {
+    } else if (process === "popup") {
         selectHours = popup_log_select.options[popup_log_select.selectedIndex].value;
         data.hours = selectHours;
         data.process = "popup";
@@ -1771,11 +1777,10 @@ function getLogDataList(process) {
             if (httpRequest.status === 200) {
                 let res = httpRequest.response;
 
-                console.log("res : ", res);
-
-                if(process === "main") {
+                if (process === "main") {
                     serverlog_body.replaceChildren();
                     if (res.list !== null && res.list.length !== 0) {
+                        left_content.style.width = "30%";
                         log_icon.style.display = 'inline-block';
 
                         for (let i = 0; i < res.list.length; i++) {
@@ -1786,6 +1791,8 @@ function getLogDataList(process) {
                             serverlog_ul.appendChild(li);
                         }
                     } else {
+                        console.log(left_content);
+                        left_content.style.width = "33%";
                         const p = document.createElement('p');
                         p.textContent = "해당 서버의 최근에 기록된 로그가 없습니다."
 
@@ -1876,13 +1883,13 @@ function findAlllog(res) {
     }
 
     // 2. 리스트가 비어있는 경우, 행에 "검색 결과가 없다"는 메시지를 출력하고, 페이지 번호(페이지네이션) HTML을 제거(초기화)한 후 로직을 종료
-    if ( !list.length ) {
+    if (!list.length) {
         const newRow = table.insertRow();
         const newCell1 = newRow.insertCell(0);
 
         newCell1.colSpan = 2;
         newCell1.className = "no-data-msg";
-        newCell1.innerText = "해당 조건의 서버 로그가 없습니다.";
+        newCell1.innerText = "해당 시간의 서버 로그가 없습니다.";
     }
 
     // 3. PagingResponse의 멤버인 pagination을 의미
@@ -1923,7 +1930,7 @@ function drawPage(pagination, params) {
     const paging = document.querySelector('.paging');
 
     // 1. 필수 파라미터가 없는 경우, 페이지 번호(페이지네이션) HTML을 제거(초기화)한 후 로직 종료
-    if ( !pagination || !params ) {
+    if (!pagination || !params) {
         paging.replaceChildren();
     } else {
         paging.replaceChildren();
@@ -1978,7 +1985,7 @@ function movePage(page) {
     const popup_log_select = document.getElementById('time_select');
     let selectHours = popup_log_select.options[popup_log_select.selectedIndex].value;
 
-    if(page === 0) {
+    if (page === 0) {
         page = 1;
     }
 
@@ -1989,11 +1996,11 @@ function movePage(page) {
         pageSize  : 10
     };
     let data = {
-        server_name : selectServer,
-        ip : iplist.get(selectServer),
-        hours : selectHours,
-        process : "popup",
-        searchDto : pageParam
+        server_name: selectServer,
+        ip         : iplist.get(selectServer),
+        hours      : selectHours,
+        process    : "popup",
+        searchDto  : pageParam
     };
 
     popupOpen(null, null, "progress");
@@ -2014,4 +2021,17 @@ function movePage(page) {
     httpRequest.setRequestHeader('Content-Type', 'application/json');
     httpRequest.setRequestHeader(header, token);
     httpRequest.send(JSON.stringify(data));
+}
+
+// 세션 체크
+function sessionCheck() {
+    /*
+     * 1. 리스트 번호를 변경하거나 페이지 좌우 이동시
+     *    AJAX 통신을 이용하여 로그 데이터 표시
+     */
+    let httpRequest = new XMLHttpRequest();
+    httpRequest.onreadystatechange = () => {}
+    httpRequest.open('GET', "/session_check", true);
+    httpRequest.setRequestHeader(header, token);
+    httpRequest.send();
 }

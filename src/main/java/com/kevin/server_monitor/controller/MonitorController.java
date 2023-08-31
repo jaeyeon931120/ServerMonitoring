@@ -6,10 +6,7 @@ import com.kevin.server_monitor.service.MonitoringService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
@@ -53,6 +50,20 @@ public class MonitorController {
         }
 
         return view;
+    }
+
+    @GetMapping("/session_check")
+    public String getSessionCheck() {
+        try {
+            String id = monitoringService.getSessionCheck();
+            if (id == null) {
+                return "redirect:/login";
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
     }
 
     @PostMapping("/power")

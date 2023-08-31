@@ -8,7 +8,7 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <div class="popup_wrapper delete">
-    <div class="popup_delete">
+    <div class="popup delete">
         <div class="popup_head delete">
             <h1>서버 삭제</h1>
             <a class="btn-close trigger" onclick="popupClose('delete')">x</a>

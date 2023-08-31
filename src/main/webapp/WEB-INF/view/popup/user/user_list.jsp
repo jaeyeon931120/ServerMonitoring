@@ -7,7 +7,7 @@
 --%>
 <%@ page contentType="text/html;charset=UTF-8" %>
 <div class="popup_wrapper user_list">
-    <div class="popup_user_list">
+    <div class="popup user_list">
         <div class="popup_head user_list">
             <h1>사용자 리스트</h1>
             <a class="btn-close trigger" onclick="popupClose('user_list')">x</a>
