@@ -43,7 +43,7 @@ public class UserController {
 
     @GetMapping("/")
     public String home(Model model) { // 인증된 사용자의 정보를 보여줌
-        String id = (String)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String id = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         // token에 저장되어 있는 인증된 사용자의 id 값
 
         UserVo userVo = userService.getUserById(id);
@@ -61,9 +61,9 @@ public class UserController {
     public String loginPage(HttpServletRequest request, Model model) {
         Map<String, ?> redirectMap = RequestContextUtils.getInputFlashMap(request);
 
-        if(redirectMap != null) {
-            String error = (String)redirectMap.get("error");
-            String exception = (String)redirectMap.get("exception");
+        if (redirectMap != null) {
+            String error = (String) redirectMap.get("error");
+            String exception = (String) redirectMap.get("exception");
 
             model.addAttribute("error", error);
             model.addAttribute("exception", exception);
@@ -116,7 +116,7 @@ public class UserController {
         try {
             int result = userService.signup(userVo);
 
-            if(result > 0) {
+            if (result > 0) {
                 resultMap.put("result", "ok");
             } else {
                 resultMap.put("result", "nok");
@@ -137,7 +137,7 @@ public class UserController {
         try {
             int result = userService.edit(userVo);
 
-            if(result > 0) {
+            if (result > 0) {
                 resultMap.put("result", "ok");
             } else {
                 resultMap.put("result", "nok");
@@ -156,12 +156,12 @@ public class UserController {
         List<Map<String, Object>> resultList = new ArrayList<>();
         Map<String, Object> resultMap = new HashMap<>();
         try {
-            for(UserVo user : userVo) {
+            for (UserVo user : userVo) {
                 resultMap = new HashMap<>();
                 String id = user.getId();
                 int result = userService.withdraw(id);
 
-                if(result > 0) {
+                if (result > 0) {
                     resultMap.put("result", "ok");
                     resultMap.put("id", id);
                 } else {
