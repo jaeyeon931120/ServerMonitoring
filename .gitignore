@@ -9,6 +9,7 @@
 logs/*
 work/*
 qodana.yaml
+.logs/*
 
 # User-specific stuff
 .idea/**/workspace.xml

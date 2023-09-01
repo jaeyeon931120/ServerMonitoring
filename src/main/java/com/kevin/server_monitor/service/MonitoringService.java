@@ -50,10 +50,10 @@ public class MonitoringService {
             returnList = serverDBService.detectServerList(null);
 
             returnList.sort(
-                    Comparator.comparing((Map<String, Object> map) -> (String) map.get("system"))
-                            .thenComparing((Map<String, Object> map) -> (String) map.get("ip"))
-                            .thenComparing((Map<String, Object> map) -> (String) map.get("server_name"))
-                            .thenComparing((Map<String, Object> map) -> (Integer) map.get("tomcat_port"))
+                    Comparator.comparing((Map<String, Object> map) -> (String)map.get("system"))
+                            .thenComparing((Map<String, Object> map) -> (String)map.get("ip"))
+                            .thenComparing((Map<String, Object> map) -> (String)map.get("server_name"))
+                            .thenComparing((Map<String, Object> map) -> (Integer)map.get("tomcat_port"))
             );
 
             returnMap.put("author", session.getAttribute("author"));
@@ -71,27 +71,31 @@ public class MonitoringService {
         try {
             // token에 저장되어 있는 인증된 사용자의 id 값
             String id = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-            UserVo userVo = userService.getUserById(id);
-            String name = userVo.getUsername();
-            String author = userVo.getAuthor();
+            if(id != null) {
+                UserVo userVo = userService.getUserById(id);
+                String name = userVo.getUsername();
+                String author = userVo.getAuthor();
 
-            HttpSession session = request.getSession();
-            session.setAttribute("id", id);
-            session.setAttribute("username", name);
-            session.setAttribute("author", author);
-            // 세션 유지시간 설정(초단위) - 30분
-            session.setMaxInactiveInterval(30 * 60);
+                HttpSession session = request.getSession();
+                session.setAttribute("id", id);
+                session.setAttribute("username", name);
+                session.setAttribute("author", author);
+                // 세션 유지시간 설정(초단위) - 30분
+                session.setMaxInactiveInterval(30*60);
 
-            if (author.contains("ADMIN")) {
-                view.addObject("id", id);
-                view.addObject("username", name);
-                view.addObject("author", author);
-                view.setViewName("monitoring_admin");
-            } else if (author.contains("USER")) {
-                view.addObject("id", id);
-                view.addObject("username", name);
-                view.addObject("author", author);
-                view.setViewName("monitoring_user");
+                if(author.contains("ADMIN")) {
+                    view.addObject("id", id);
+                    view.addObject("username", name);
+                    view.addObject("author", author);
+                    view.setViewName("monitoring_admin");
+                } else if(author.contains("USER")) {
+                    view.addObject("id", id);
+                    view.addObject("username", name);
+                    view.addObject("author", author);
+                    view.setViewName("monitoring_user");
+                }
+            } else {
+                view.setViewName("redirect:/login");
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -144,7 +148,7 @@ public class MonitoringService {
                     inputMap.put("status", "가동");
                     updateresult = serverDBService.updateServerSensor(inputMap);
 
-                    if (updateresult < 0) {
+                    if(updateresult < 0) {
                         logger.error("서버 가동상태를 DB에 업데이트 도중에 오류가 발생했습니다.");
                     }
                 } else if (resultStr.contains("during start.") || resultStr.contains("Start aborted.")) {
@@ -162,7 +166,7 @@ public class MonitoringService {
                     result = "ok";
                     updateresult = serverDBService.updateServerSensor(inputMap);
 
-                    if (updateresult < 0) {
+                    if(updateresult < 0) {
                         logger.error("서버 가동상태를 DB에 업데이트 도중에 오류가 발생했습니다.");
                     }
                 } else if (resultStr.contains("Stop aborted")) {
@@ -178,7 +182,7 @@ public class MonitoringService {
             }
             resultMap.put("result", result);
         } catch (Exception e) {
-            logger.error("서버를 {}", power + " 하는중에 오류가 발생했습니다.");
+            logger.error("서버를 {}",power+" 하는중에 오류가 발생했습니다.");
             e.printStackTrace();
         }
 
@@ -194,7 +198,7 @@ public class MonitoringService {
 
             result = userService.getIDCheck(id);
 
-            if (result > 0) {
+            if(result > 0) {
                 resultMap.put("result", "nok");
             } else {
                 resultMap.put("result", "ok");
@@ -268,7 +272,7 @@ public class MonitoringService {
             String from_date;
             String to_date;
 
-            if (hours.equals("00")) {
+            if(hours.equals("00")) {
                 from_date = "00:00:00";
                 to_date = "00:59:59";
             } else {
@@ -276,9 +280,9 @@ public class MonitoringService {
                 to_date = hours + ":59:59";
             }
 
-            if (process.equals("main")) {
+            if(process.equals("main")) {
                 serverLogDto.setFrom_date(from_date);
-            } else if (process.equals("popup")) {
+            } else if(process.equals("popup")) {
                 serverLogDto.setFrom_date(from_date);
                 serverLogDto.setTo_date(to_date);
             }
