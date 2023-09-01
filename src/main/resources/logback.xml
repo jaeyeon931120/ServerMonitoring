@@ -38,7 +38,7 @@
 
     <!-- debug level로 콘솔에 로그를 출력하도록 한다. -->
     <!-- debug level로 ASYNC_FILE appender로 로그를 출력하도록 한다. -->
-    <root level="error">
+    <root level="ERROR">
         <appender-ref ref="ASYNC_FILE"/>
         <appender-ref ref="CONSOLE"/>
     </root>

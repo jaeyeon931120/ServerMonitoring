@@ -152,8 +152,7 @@ public class ServerInfoService {
 
             String command;
 
-            command = "cd " + infodir + " && echo '" + user_pw + "' | sudo -S ./log_monitoring " + val_month + " " + val_day
-                    + " " + val_hour + " " + cmd_minute;
+            command = "cd " + infodir + " && echo '" + user_pw + "' | sudo -S ./log_monitoring " + val_hour + " " + cmd_minute;
 
             String finalCommand = command;
             result = sshUtils.sshControll(user_id, user_pw, ip, serverport, finalCommand);
@@ -175,10 +174,6 @@ public class ServerInfoService {
                 }
 
                 String log = end_log.toString();
-
-                logger.info("log : {}", all_log);
-                logger.info("val_date : {}", val_date);
-                logger.info("log_tail : {}", end_log);
 
                 resultMap = new HashMap<>();
 
@@ -271,10 +266,7 @@ public class ServerInfoService {
 
     public void deleteServerLog() {
         try {
-            int result = serverDBService.deleteServerLog();
-            if (result <= 0) {
-                logger.error("서버 LOG테이블 삭제중에 오류가 발생했습니다.");
-            }
+            serverDBService.deleteServerLog();
         } catch (Exception e) {
             logger.error("서버 LOG테이블 삭제중에 오류가 발생했습니다.");
             e.printStackTrace();
@@ -283,10 +275,7 @@ public class ServerInfoService {
 
     public void deleteServerRaw() {
         try {
-            int result = serverDBService.deleteServerRaw();
-            if (result <= 0) {
-                logger.error("서버 RAW테이블 삭제중에 오류가 발생했습니다.");
-            }
+            serverDBService.deleteServerRaw();
         } catch (Exception e) {
             logger.error("서버 RAW테이블 삭제중에 오류가 발생했습니다.");
             e.printStackTrace();
