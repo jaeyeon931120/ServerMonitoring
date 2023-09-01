@@ -129,8 +129,6 @@ public class ServerInfoService {
                 cal.add(Calendar.MINUTE, -1);
             }
 
-            String val_month = sdf_month.format(cal.getTime());
-            String val_day = Integer.toString(cal.get(Calendar.DATE));
             String val_hour = sdf_hour.format(cal.getTime());
 
             String val_minute = sdf_minute.format(cal.getTime());
@@ -139,8 +137,6 @@ public class ServerInfoService {
             if(second_minute == 0) {
                 cal.add(Calendar.MINUTE, -1);
 
-                val_month = sdf_month.format(cal.getTime());
-                val_day = Integer.toString(cal.get(Calendar.DATE));
                 val_hour = sdf_hour.format(cal.getTime());
                 val_minute = sdf_minute.format(cal.getTime());
                 first_minute = val_minute.substring(0, 1);
@@ -163,6 +159,9 @@ public class ServerInfoService {
                 String[] log_units = all_log.split(" ");
 
                 String val_date = log_units[2];
+                if(!val_date.contains(":")) {
+                    val_date = log_units[3];
+                }
                 StringBuilder end_log = new StringBuilder();
 
                 for(int i = 4; i < log_units.length; i++) {
