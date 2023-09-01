@@ -12,7 +12,7 @@
         <div class="footer_content">
             <ul>
                 <li><p><span>케빈랩(주)</span></p></li>
-                <li><p><span>주소:</span>경기도 안양시 만안구 안양로 111 경기벤처연성대학교센터 12층 1206호</p></li>
+                <li><p><span>주소:</span>경기도 안양시 만안구 덕천로 152번길 25 안양아이에스비즈타워 11층 1101호</p></li>
                 <li><p><span>전화:</span>031-400-3794</p></li>
             </ul>
         </div>
