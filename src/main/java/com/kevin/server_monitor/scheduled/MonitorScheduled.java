@@ -34,12 +34,12 @@ public class MonitorScheduled {
      */
     @Scheduled(cron = "0 0/1 * * * ?") // 매 1분마다 한번씩 실행
     public void insertServerInfoScheduled() {
-        serverInfoService.serverInfo();
+//        serverInfoService.serverInfo();
     }
 
     @Scheduled(cron = "0 0 0 * * ?") // 매일 0시 0분 0초마다 한번씩 실행
     public void deleteServerLogScheduled() {
-        serverInfoService.deleteServerLog();
-        serverInfoService.deleteServerRaw();
+//        serverInfoService.deleteServerLog();
+//        serverInfoService.deleteServerRaw();
     }
 }

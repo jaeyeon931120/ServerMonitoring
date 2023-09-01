@@ -120,6 +120,14 @@ function selectOptionCreate() {
         select.appendChild(option);
     }
 
+    if(selectServer !== undefined) {
+        for(let i = 0; i < select.options.length; i++) {
+            if(select.options[i].value === selectServer) {
+                select.options[i].selected = true;
+            }
+        }
+    }
+
     selectServer = select.options[select.selectedIndex].value;
 }
 
