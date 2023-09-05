@@ -1,6 +1,9 @@
 package com.kevin.server_monitor.scheduled;
 
+import com.kevin.server_monitor.controller.MonitorController;
 import com.kevin.server_monitor.service.server.ServerInfoService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -9,6 +12,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 @SpringBootApplication
 public class MonitorScheduled {
 
+    private static final Logger logger = LoggerFactory.getLogger(MonitorController.class);
     private final ServerInfoService serverInfoService;
     public MonitorScheduled(ServerInfoService serverInfoService) {
         this.serverInfoService = serverInfoService;
@@ -35,6 +39,10 @@ public class MonitorScheduled {
     @Scheduled(cron = "0 0/1 * * * ?") // 매 1분마다 한번씩 실행
     public void insertServerInfoScheduled() {
         serverInfoService.serverInfo();
+        long heapSize = Runtime.getRuntime().totalMemory();
+        String heapSize_M = (heapSize / (1024 * 1024)) + " MB";
+        logger.error("Heap Size : {}", heapSize);
+        logger.error("Heap Size(M) : {}", heapSize_M);
     }
 
     @Scheduled(cron = "0 0 0 * * ?") // 매일 0시 0분 0초마다 한번씩 실행
