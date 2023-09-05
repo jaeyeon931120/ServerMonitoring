@@ -348,6 +348,7 @@ footer h1 {
     height: 100%;
     margin-left: 10px;
     gap: 10px;
+    max-width: 564px;
 }
 
 .graph_bar {
@@ -1862,7 +1863,6 @@ input:-webkit-autofill, input:-webkit-autofill:hover, input:-webkit-autofill:foc
         width: 30%;
         height: 100%;
         margin-left: 10px;
-        max-width: 564px;
     }
 
     .graph_line {
