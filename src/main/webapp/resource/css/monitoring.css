@@ -778,12 +778,17 @@ a.btn {
     display: none;
     color: red;
     font-size: 14px;
-    margin-top: 10px;
+    margin-top: 5px;
     margin-bottom: -10px;
     text-align: center;
     line-height: 20px;
     font-weight: bold;
     margin-left: 130px;
+}
+
+#password_check_user_edit {
+    margin-top: 0;
+    margin-bottom: 0;
 }
 
 .popup_body > ul > li label {
@@ -857,7 +862,7 @@ input:-webkit-autofill, input:-webkit-autofill:hover, input:-webkit-autofill:foc
 }
 
 /* 서버 추가 팝업 스타일 */
-.popup.plus, .popup.delete {
+.popup.server_plus, .popup.server_delete {
     margin: 0 auto;
     border-radius: 20px;
     width: 538px;
@@ -867,11 +872,11 @@ input:-webkit-autofill, input:-webkit-autofill:hover, input:-webkit-autofill:foc
     transition: all 0.5s ease-in-out;
 }
 
-.popup_head.plus, .popup_head.delete {
+.popup_head.server_plus, .popup_head.server_delete {
     padding: 12px 27px;
 }
 
-.popup_body.plus, .popup_body.delete {
+.popup_body.server_plus, .popup_body.server_delete {
     padding: 15px 30px 0 30px;
     display: flex;
     align-content: center;
@@ -882,29 +887,29 @@ input:-webkit-autofill, input:-webkit-autofill:hover, input:-webkit-autofill:foc
     width: auto;
 }
 
-.popup_body.plus > ul > li, .popup_body.delete > ul > li {
+.popup_body.server_plus > ul > li, .popup_body.server_delete > ul > li {
     margin: 15px;
 }
 
-.popup_body.plus > ul > li:last-child, .popup_body.delete > ul > li:last-child {
+.popup_body.server_plus > ul > li:last-child, .popup_body.server_delete > ul > li:last-child {
     margin: 15px 15px 0 15px;
 }
 
-.popup_body.plus > .btn.blue, .popup_body.delete > .btn.blue {
+.popup_body.server_plus > .btn.blue, .popup_body.server_delete > .btn.blue {
     margin-top: 20px;
     margin-right: 40px;
 }
 
-.popup_body.plus > .btn.red, .popup_body.delete > .btn.red {
+.popup_body.server_plus > .btn.red, .popup_body.server_delete > .btn.red {
     margin-top: 20px;
 }
 
-.popup_body.plus > .btn.blue > span, .popup_body.delete > .btn.blue > span {
+.popup_body.server_plus > .btn.blue > span, .popup_body.server_delete > .btn.blue > span {
     font-size: 17px;
     font-weight: bold;
 }
 
-.popup_body.plus > .btn.red > span, .popup_body.delete > .btn.red > span {
+.popup_body.server_plus > .btn.red > span, .popup_body.server_delete > .btn.red > span {
     font-size: 17px;
     font-weight: bold;
 }

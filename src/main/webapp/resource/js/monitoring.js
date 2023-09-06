@@ -52,11 +52,11 @@ window.onload = function () {
     id_check_btn = document.querySelector('.popup_body.user_plus > ul > li > .btn_check');
     ok_img = document.querySelector('.popup_body.user_plus > ul > li > img');
     user_plus_id = document.getElementById('user_plus_id');
-    pw_check_edit = document.getElementById('pw_check_user_edit');
+    pw_check_edit = document.getElementById('password_check_user_edit');
     auth_check_edit = document.getElementById('auth_check_user_edit');
     tel_check_edit = document.getElementById('tel_check_user_edit');
     id_check_plus = document.getElementById('id_check_user_plus');
-    pw_check_plus = document.getElementById('pw_check_user_plus');
+    pw_check_plus = document.getElementById('password_check_user_plus');
     auth_check_plus = document.getElementById('auth_check_user_plus');
     tel_check_plus = document.getElementById('tel_check_user_plus');
     clock = document.getElementById('clock');
@@ -154,6 +154,50 @@ function addListener(btn, data, action, process, work) {
     }
 
     btn.addEventListener("click", btn.clickHandler);
+}
+
+function addinputListener(btn, work, process) {
+    let value;
+
+    if(work === "auth") {
+        value = btn.textContent;
+    } else {
+        value = btn.value;
+    }
+
+    if (btn.clickHandler) {
+        btn.removeEventListener("change", btn.clickHandler);
+    }
+
+    btn.clickHandler = () => {
+        if(process.indexOf("user") > -1) {
+            if(work === "id") {
+                console.log("user_id");
+                id_check(process);
+            } else if(work === "pw") {
+                console.log("user_pw");
+                pw_check(process);
+            } else if(work === "username") {
+                console.log("user_name");
+                name_check(process, work);
+            } else if(work === "tel") {
+                tel_check(process);
+            }
+        } else if(process.indexOf("server") > -1) {
+            if(work === "system") {
+                system_check(process);
+            } else if(work === "ip") {
+                ip_check(process);
+            } else if(work.indexOf("port") > -1) {
+                console.log("sever_port");
+                port_check(process, work);
+            } else {
+                name_check(process, work);
+            }
+        }
+    }
+
+    btn.addEventListener("change", btn.clickHandler);
 }
 
 function clickSelectServer(elem) {
@@ -787,20 +831,47 @@ function popupOpen(data, action, process) {
         popupbody.appendChild(div_btn);
         addListener(btn_green, data, action, process, 'power_work');
         addListener(btn_red, data, action, process, 'close');
-    } else if (process === 'plus') {
-        const popup_wrapper_plus = document.querySelector(".popup_wrapper.plus");
-        const btn_plus_submit = document.querySelector(".popup_body.plus > .button_box > .btn_submit");
-        const btn_plus_cancel = document.querySelector(".popup_body.plus > .button_box > .btn_cancel");
-        popup_wrapper_plus.className = "popup_wrapper open plus";
+    } else if (process === 'server_plus') {
+        const popup_wrapper_plus = document.querySelector(".popup_wrapper.server_plus");
+        const btn_plus_submit = document.querySelector(".popup_body.server_plus > .button_box > .btn_submit");
+        const btn_plus_cancel = document.querySelector(".popup_body.server_plus > .button_box > .btn_cancel");
+        const server_plus_system = document.getElementById("server_plus_system");
+        const server_plus_ip = document.getElementById("server_plus_ip");
+        const server_plus_id = document.getElementById("server_plus_id");
+        const server_plus_pw = document.getElementById("server_plus_password");
+        const server_plus_name = document.getElementById("server_plus_server_name");
+        const server_plus_port = document.getElementById("server_plus_server_port");
+        const server_plus_tomcat_port = document.getElementById("server_plus_tomcat_port");
+        const server_plus_tomcat_dir = document.getElementById("server_plus_tomcat_dir");
+        popup_wrapper_plus.className = "popup_wrapper open server_plus";
 
+
+        addinputListener(server_plus_system, "system", process);
+        addinputListener(server_plus_ip, "ip", process);
+        addinputListener(server_plus_id, "id", process);
+        addinputListener(server_plus_pw, "password", process);
+        addinputListener(server_plus_name, "server_name", process);
+        addinputListener(server_plus_port, "server_port", process);
+        addinputListener(server_plus_tomcat_port, "tomcat_port", process);
+        addinputListener(server_plus_tomcat_dir, "tomcat_dir", process);
         addListener(btn_plus_submit, data, action, process, 'server_manage');
         addListener(btn_plus_cancel, data, action, process, 'close');
-    } else if (process === 'delete') {
-        const popup_wrapper_delete = document.querySelector(".popup_wrapper.delete");
-        const btn_delete_submit = document.querySelector(".popup_body.delete > .button_box > .btn_submit");
-        const btn_delete_cancel = document.querySelector(".popup_body.delete > .button_box > .btn_cancel");
-        popup_wrapper_delete.className = "popup_wrapper open delete";
+    } else if (process === 'server_delete') {
+        const popup_wrapper_delete = document.querySelector(".popup_wrapper.server_delete");
+        const btn_delete_submit = document.querySelector(".popup_body.server_delete > .button_box > .btn_submit");
+        const btn_delete_cancel = document.querySelector(".popup_body.server_delete > .button_box > .btn_cancel");
+        const server_delete_system = document.getElementById("server_delete_system");
+        const server_delete_ip = document.getElementById("server_delete_ip");
+        const server_delete_name = document.getElementById("server_delete_server_name");
+        const server_delete_port = document.getElementById("server_delete_server_port");
+        const server_delete_tomcat_port = document.getElementById("server_delete_tomcat_port");
+        popup_wrapper_delete.className = "popup_wrapper open server_delete";
 
+        addinputListener(server_delete_system, "system", process);
+        addinputListener(server_delete_ip, "ip", process);
+        addinputListener(server_delete_name, "server_name", process);
+        addinputListener(server_delete_port, "server_port", process);
+        addinputListener(server_delete_tomcat_port, "tomcat_port", process);
         addListener(btn_delete_submit, data, action, process, 'server_manage');
         addListener(btn_delete_cancel, data, action, process, 'close');
     } else if (process === 'progress') {
@@ -829,6 +900,10 @@ function popupOpen(data, action, process) {
         popup_wrapper_edit.className = "popup_wrapper open user_edit blur";
         select_function('user_edit');
 
+        addinputListener(user_id, "id", "user_edit");
+        addinputListener(user_pw, "pw", "user_edit");
+        addinputListener(username, "username", "user_edit");
+        addinputListener(user_tel, "tel", "user_edit");
         addListener(btn_edit_submit, data, action, process, 'user_manage');
         addListener(btn_edit_cancel, data, action, process, 'close');
     } else if (process === 'user_plus') {
@@ -858,6 +933,10 @@ function popupOpen(data, action, process) {
         user_plus_name.value = "";
         user_plus_tel.value = "";
 
+        addinputListener(user_plus_id, "id", "user_plus");
+        addinputListener(user_plus_pw, "pw", "user_plus");
+        addinputListener(user_plus_name, "username", "user_plus");
+        addinputListener(user_plus_tel, "tel", "user_plus");
         addListener(btn_user_plus_submit, data, action, process, 'user_manage');
         addListener(btn_user_plus_cancel, data, action, process, 'close');
     } else if (process === 'user_delete') {
@@ -977,7 +1056,7 @@ function error_popupOpen(data, action, process) {
     popup.className = open;
 
     const popup_user_list = document.querySelector('.popup_wrapper.user_list');
-    const popup_plus = document.querySelector('.popup_wrapper.plus');
+    const popup_plus = document.querySelector('.popup_wrapper.server_plus');
     const btn_box = document.createElement("div");
     const btn_submit = document.createElement("button");
 
@@ -987,7 +1066,7 @@ function error_popupOpen(data, action, process) {
     btn_submit.className = "button button-normal btn_submit";
 
     if (process === "server_plus") {
-        const popup_plus = document.querySelector('.popup_wrapper.plus');
+        const popup_plus = document.querySelector('.popup_wrapper.server_plus');
         popup_plus.style.zIndex = "800";
         if (action === 'detect') {
             h1.textContent = data.server_name + " 서버가 이미 리스트에 존재합니다.";
@@ -995,7 +1074,7 @@ function error_popupOpen(data, action, process) {
             h1.textContent = data.server_name + " 서버를 추가하는데 실패했습니다.";
         }
     } else if (process === "server_delete") {
-        const popup_delete = document.querySelector('.popup_wrapper.delete');
+        const popup_delete = document.querySelector('.popup_wrapper.server_delete');
         popup_delete.style.zIndex = "800";
         h1.textContent = "입력하신 정보의 " + datamap.get("server_name") + "가 서버리스트에 없습니다.";
     } else if (process === "user_plus") {
@@ -1026,12 +1105,12 @@ function popupClose(process) {
     if (process === 'power') {
         popup.className = "popup_wrapper close";
         popupbody.replaceChildren();
-    } else if (process === 'plus') {
-        const popup_plus = document.querySelector(".popup_wrapper.plus");
-        popup_plus.className = "popup_wrapper close plus";
-    } else if (process === 'delete') {
-        const popup_plus = document.querySelector(".popup_wrapper.delete");
-        popup_plus.className = "popup_wrapper close delete";
+    } else if (process === 'server_plus') {
+        const popup_plus = document.querySelector(".popup_wrapper.server_plus");
+        popup_plus.className = "popup_wrapper close server_plus";
+    } else if (process === 'server_delete') {
+        const popup_plus = document.querySelector(".popup_wrapper.server_delete");
+        popup_plus.className = "popup_wrapper close server_delete";
     } else if (process === 'progress') {
         const popup_wrapper_progress = document.querySelector(".popup_progress_back");
         popup_wrapper_progress.className = "popup_progress_back close";
@@ -1261,13 +1340,15 @@ function id_duplication_check(process) {
     }
 }
 
-function id_check(id, process) {
+function id_check(process) {
     if (process === "user_edit") {
         id_check_result = true;
         return true;
     } else if (process === "user_delete") {
         return true;
     } else {
+        const id_input = document.getElementById(process + '_id');
+        let id = id_input.value;
         if (isStringValue(id)) {
             if (id_check_result === undefined) {
                 id_check_plus.innerText = "ID 중복체크를 하지 않았습니다. ID 중복체크를 해주세요."
@@ -1297,14 +1378,16 @@ function id_check(id, process) {
     }
 }
 
-function pw_check(pw, process) {
+function pw_check(process) {
     if (process === "user_delete") {
         return true;
     } else {
         const popup = document.querySelector(".popup." + process);
-        const user_id = document.getElementById(process + '_id');
-        const pw_p = document.getElementById('pw_check_' + process);
-        let id = user_id.value;
+        const id_input = document.getElementById(process + '_id');
+        const pw_input = document.getElementById(process + '_password');
+        const pw_p = document.getElementById('password_check_' + process);
+        let id = id_input.value;
+        let pw = pw_input.value;
         let checkNumber = pw.search(/[0-9]/g);
         let checkEnglish = pw.search(/[a-z]/ig);
         if (isStringValue(pw)) {
@@ -1341,12 +1424,14 @@ function pw_check(pw, process) {
     }
 }
 
-function auth_check(auth, process) {
+function auth_check(process) {
     if (process === "user_delete") {
         return true;
     } else {
         const popup = document.querySelector(".popup." + process);
+        const auth_select = document.getElementById(process + '_auth');
         const auth_p = document.getElementById('auth_check_' + process);
+        let auth = auth_select.textContent;
         if (auth === "사용자 권한") {
             auth_p.style.display = 'block';
             popup.style.overflow = 'hidden';
@@ -1360,13 +1445,15 @@ function auth_check(auth, process) {
     }
 }
 
-function tel_check(tel, process) {
+function tel_check(process) {
     if (process === "user_delete") {
         return true;
     } else {
         let regexTel = /^[0-9]{3}-[0-9]{4}-[0-9]{4}$/;
         const popup = document.querySelector(".popup." + process);
+        const tel_input = document.getElementById(process + '_tel');
         const tel_p = document.getElementById('tel_check_' + process);
+        let tel = tel_input.value;
 
         if (isStringValue(tel)) {
             if (regexTel.test(tel)) {
@@ -1387,10 +1474,12 @@ function tel_check(tel, process) {
     }
 }
 
-function ip_check(ip, process) {
+function ip_check(process) {
     let regexIP = /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
     const popup = document.querySelector(".popup." + process);
+    const ip_input = document.getElementById(process + '_ip');
     const ip_p = document.getElementById('ip_check_' + process);
+    let ip = ip_input.value;
 
     if (isStringValue(ip)) {
         if (!regexIP.test(ip)) {
@@ -1412,10 +1501,14 @@ function ip_check(ip, process) {
     }
 }
 
-function port_check(port, process, portname) {
+function port_check(process, portname) {
+    console.log("process : ", process);
+    console.log("portname : ",  portname);
     let regexPort = /(6553[0-5]|655[0-2]\d|65[0-4]\d{2}|6[0-4]\d{3}|5\d{4}|[0-9]\d{0,3})/;
     const popup = document.querySelector(".popup." + process);
-    const port_p = document.getElementById(portname + '_port_check_' + process);
+    const port_input = document.getElementById(process + "_" + portname);
+    const port_p = document.getElementById(portname + '_check_' + process);
+    let port = port_input.value;
 
     if (isStringValue(port)) {
         if (!regexPort.test(port)) {
@@ -1437,9 +1530,11 @@ function port_check(port, process, portname) {
     }
 }
 
-function system_check(system, process) {
+function system_check(process) {
     const popup = document.querySelector(".popup." + process);
+    const system_input = document.getElementById(process + '_system');
     const system_p = document.getElementById('system_check_' + process);
+    let system = system_input.value;
 
     if (!isStringValue(system)) {
         system_p.innerText = "시스템이 입력되지 않았습니다."
@@ -1454,19 +1549,22 @@ function system_check(system, process) {
     }
 }
 
-function name_check(name, process, checkname) {
+function name_check(process, checkname) {
     if (process === "user_delete") {
         return true;
     } else {
         const popup = document.querySelector(".popup." + process);
+        const input = document.getElementById(process + "_" + checkname);
         const name_p = document.getElementById(checkname + '_check_' + process);
+        console.log(process + "_" + checkname);
+        let name = input.value;
 
         if (!isStringValue(name)) {
             if (checkname === "server_name") {
                 name_p.innerText = "서버 이름이 입력되지 않았습니다."
             } else if (checkname === "id") {
                 name_p.innerText = "서버 로그인 ID가 입력되지 않았습니다."
-            } else if (checkname === "pw") {
+            } else if (checkname === "password") {
                 name_p.innerText = "서버 로그인 PW가 입력되지 않았습니다."
             } else if (checkname === "tomcat_dir") {
                 name_p.innerText = "톰캣 폴더 위치가 입력되지 않았습니다."
@@ -1515,25 +1613,25 @@ function user_management(process) {
             return;
         }
     }
-    if (id_check(id, process)) {
+    if (id_check(process)) {
         let data = {}
         let userList = []
         if (process === "user_edit") {
             if (isStringValue(pw)) {
-                pw_check_result = pw_check(pw, process);
+                pw_check_result = pw_check(process);
                 data.password = pw;
             } else {
                 pw_check_result = true;
                 data.password = null;
             }
         } else {
-            pw_check_result = pw_check(pw, process);
+            pw_check_result = pw_check(process);
             if (pw_check_result === true) {
                 data.password = pw;
             }
         }
-        if (pw_check_result && name_check(name, process, "username") && auth_check(auth, process)
-            && tel_check(tel, process)) {
+        if (pw_check_result && name_check(process, "username") && auth_check(process)
+            && tel_check(process)) {
             if (process !== "user_delete") {
                 data.id = id;
                 data.username = name;
@@ -1614,13 +1712,13 @@ function user_management(process) {
 }
 
 function server_management(process) {
-    const server_system = document.getElementById('system_' + process);
-    const server_ip = document.getElementById('ip_' + process);
-    const server_id = document.getElementById('server_id_' + process);
-    const server_pw = document.getElementById('server_pw_' + process);
-    const server_name = document.getElementById('server_name_' + process);
-    const server_port = document.getElementById('server_port_' + process);
-    const tomcat_port = document.getElementById('tomcat_port_' + process);
+    const server_system = document.getElementById(process + "_system");
+    const server_ip = document.getElementById(process + "_ip");
+    const server_id = document.getElementById(process + "_id");
+    const server_pw = document.getElementById(process + "_password");
+    const server_name = document.getElementById(process + "_server_name");
+    const server_port = document.getElementById(process + "_server_port");
+    const tomcat_port = document.getElementById(process + "_tomcat_port");
     let tomcat_dir;
     let system = server_system.value;
     let ip = server_ip.value;
@@ -1632,23 +1730,25 @@ function server_management(process) {
     let tomcatdir;
     let id_check_result = false;
     let pw_check_result = false;
-    if (process === "plus") {
+    let dir_check_result = false;
+    if (process === "server_plus") {
         id = server_id.value;
         pw = server_pw.value;
 
-        tomcat_dir = document.getElementById('tomcat_dir_' + process);
+        tomcat_dir = document.getElementById(process + '_tomcat_dir');
         tomcatdir = tomcat_dir.value;
-    } else if (process === "delete") {
+    } else if (process === "server_delete") {
         id_check_result = true;
         pw_check_result = true;
+        dir_check_result = true;
         tomcatdir = "delete";
     }
 
-    if (system_check(system, process) && ip_check(ip, process)
-        && (id_check_result || name_check(id, process, "id"))
-        && (pw_check_result || name_check(pw, process, "pw"))
-        && name_check(name, process, "server_name") && port_check(serverport, process, "server") && port_check(tomcatport, process, "tomcat")
-        && name_check(tomcatdir, process, "tomcat_dir")) {
+    if (system_check(process) && ip_check(process)
+        && (id_check_result || name_check(process, "id"))
+        && (pw_check_result || name_check(process, "password"))
+        && name_check(process, "server_name") && port_check(process, "server_port") && port_check(process, "tomcat_port")
+        && (dir_check_result || name_check(process, "tomcat_dir"))) {
         let data = {}
         data.system = system;
         data.ip = ip;
@@ -1670,11 +1770,11 @@ function server_management(process) {
                     let res = httpRequest.response;
                     if (res.result === "ok") {
                         popupClose(process);
-                        result_popupOpen(data, null, "server_" + process);
+                        result_popupOpen(data, null, process);
                     } else if (res.result === "detect") {
-                        error_popupOpen(data, "detect", "server_" + process);
+                        error_popupOpen(data, "detect", process);
                     } else {
-                        error_popupOpen(data, null, "server_" + process);
+                        error_popupOpen(data, null, process);
                     }
                     getServerInfo();
                 } else {
@@ -1683,7 +1783,7 @@ function server_management(process) {
             }
         }
 
-        httpRequest.open('POST', "/server_" + process, true);
+        httpRequest.open('POST', process, true);
         httpRequest.responseType = "json";
         httpRequest.setRequestHeader('Content-Type', 'application/json');
         httpRequest.setRequestHeader(header, token);

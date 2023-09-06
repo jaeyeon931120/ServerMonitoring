@@ -32,8 +32,8 @@
     <jsp:include page="${pageContext.request.contextPath}/WEB-INF/view/common/head.jsp"/>
     <jsp:include page="${pageContext.request.contextPath}/WEB-INF/view/popup/popup.jsp"/>
     <jsp:include page="${pageContext.request.contextPath}/WEB-INF/view/popup/popup_log.jsp"/>
-    <jsp:include page="${pageContext.request.contextPath}/WEB-INF/view/popup/server/plus.jsp"/>
-    <jsp:include page="${pageContext.request.contextPath}/WEB-INF/view/popup/server/delete.jsp"/>
+    <jsp:include page="${pageContext.request.contextPath}/WEB-INF/view/popup/server/server_plus.jsp"/>
+    <jsp:include page="${pageContext.request.contextPath}/WEB-INF/view/popup/server/server_delete.jsp"/>
     <jsp:include page="${pageContext.request.contextPath}/WEB-INF/view/popup/progress.jsp"/>
     <jsp:include page="${pageContext.request.contextPath}/WEB-INF/view/popup/user/user_list.jsp"/>
     <jsp:include page="${pageContext.request.contextPath}/WEB-INF/view/popup/user/user_edit.jsp"/>
@@ -76,10 +76,10 @@
                 <div class="menu_head"></div>
                 <div class="menu_body">
                     <ul>
-                        <a onclick="popupOpen(null, null, 'plus')">
+                        <a onclick="popupOpen(null, null, 'server_plus')">
                             <li>추가</li>
                         </a>
-                        <a onclick="popupOpen(null, null, 'delete')">
+                        <a onclick="popupOpen(null, null, 'server_delete')">
                             <li>삭제</li>
                         </a>
                     </ul>

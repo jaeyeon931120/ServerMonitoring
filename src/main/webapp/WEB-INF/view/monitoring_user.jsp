@@ -32,8 +32,8 @@
     <jsp:include page="${pageContext.request.contextPath}/WEB-INF/view/common/head.jsp"/>
     <jsp:include page="${pageContext.request.contextPath}/WEB-INF/view/popup/popup.jsp"/>
     <jsp:include page="${pageContext.request.contextPath}/WEB-INF/view/popup/popup_log.jsp"/>
-    <jsp:include page="${pageContext.request.contextPath}/WEB-INF/view/popup/server/plus.jsp"/>
-    <jsp:include page="${pageContext.request.contextPath}/WEB-INF/view/popup/server/delete.jsp"/>
+    <jsp:include page="${pageContext.request.contextPath}/WEB-INF/view/popup/server/server_plus.jsp"/>
+    <jsp:include page="${pageContext.request.contextPath}/WEB-INF/view/popup/server/server_delete.jsp"/>
     <jsp:include page="${pageContext.request.contextPath}/WEB-INF/view/popup/progress.jsp"/>
     <jsp:include page="${pageContext.request.contextPath}/WEB-INF/view/popup/user/user_list.jsp"/>
     <jsp:include page="${pageContext.request.contextPath}/WEB-INF/view/popup/user/user_edit.jsp"/>
