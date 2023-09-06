@@ -1030,7 +1030,7 @@ function result_popupOpen(data, action, process) {
     } else if (process === "user_edit") {
         popup_user_list.style.zIndex = "800";
         popupbody.style.width = "auto";
-        popuphead.style.width = "90%";
+        popuphead.style.width = "auto";
         h1.textContent = datamap.get("id") + " 사용자 정보를 수정하는데 성공했습니다.";
     }
 
