@@ -61,10 +61,10 @@ logging:
       max-file-size: 100MB
       max-history: 30
       total-size-cap: 1GB
-      file-name-pattern: "/logs/spring/server_monitoring.log.%d{yyyy-MM-dd}"
+      file-name-pattern: "/logs/server_monitoring.log.%d{yyyy-MM-dd}"
   file:
     path: logs/
-    name: monitoring
+    name: server_monitoring
 #  config: classpath:logback.xml
 
 #톰캣 설정

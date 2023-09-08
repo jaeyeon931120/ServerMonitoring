@@ -1275,7 +1275,7 @@ async function manual_download() {
     const aElement = document.createElement('a');
 
     document.body.appendChild(aElement);
-    aElement.download = 'KevinLAB 서버 모니터링 시스템 메뉴얼'; // a tag에 download 속성을 줘서 클릭할 때 다운로드가 일어날 수 있도록 하기
+    aElement.download = 'KevinLAB 서비스 관리 시스템 메뉴얼'; // a tag에 download 속성을 줘서 클릭할 때 다운로드가 일어날 수 있도록 하기
     aElement.href = downloadUrl; // href에 url 달아주기
 
     aElement.click(); // 코드 상으로 클릭을 해줘서 다운로드를 트리거
@@ -1416,10 +1416,15 @@ function pw_check(process) {
                 return true;
             }
         } else {
-            pw_p.innerText = "PW를 입력하지 않았습니다. 패스워드를 입력해주세요.";
-            pw_p.style.display = 'block';
-            popup.style.overflow = 'hidden';
-            return false;
+            if(process === "user_edit") {
+                pw_p.style.display = 'none';
+                return true;
+            } else {
+                pw_p.innerText = "PW를 입력하지 않았습니다. 패스워드를 입력해주세요.";
+                pw_p.style.display = 'block';
+                popup.style.overflow = 'hidden';
+                return false;
+            }
         }
     }
 }

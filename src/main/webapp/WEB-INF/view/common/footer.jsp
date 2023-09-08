@@ -8,7 +8,7 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 <footer>
     <div class="footer_wrap">
-        <h1>KevinLAB 서버 모니터링 VER 1.0.0</h1>
+        <h1>KevinLAB 서비스 관리 시스템 VER 1.0.0</h1>
         <div class="footer_content">
             <ul>
                 <li><p><span>케빈랩(주)</span></p></li>
