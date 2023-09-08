@@ -85,3 +85,4 @@ server:
   port: 80
   compression:
     enabled: true
+  address: monitoring.4st.co.kr
