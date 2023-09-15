@@ -69,6 +69,13 @@ logging:
 
 #톰캣 설정
 server:
+  servlet:
+    session:
+      timeout: 30m
+      cookie:
+        max-age: 30m
+        http-only: true
+        secure: true
   tomcat:
     keep-alive-timeout: 30s
     max-keep-alive-requests: 100

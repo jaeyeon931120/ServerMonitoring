@@ -207,6 +207,7 @@ li {
     /* style */
     text-decoration: none;
     text-transform: uppercase;
+    cursor: pointer;
 }
 
 .select_box::-ms-expand{

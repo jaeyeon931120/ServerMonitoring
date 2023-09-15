@@ -30,7 +30,7 @@ public class SecurityConfig {
         // 권한에 따라 허용하는 url 설정
         // /login, /signup 페이지는 모두 허용, 다른 페이지는 인증된 사용자만 허용
         // 2. 실패시 fail 핸들러를 호출한다. 추가로 사용해보자
-// 로그인 실패시 exception 정보를 매개변수로 -
+        // 로그인 실패시 exception 정보를 매개변수로 -
         http
                 .authorizeRequests()
                     .antMatchers("/login", "/auth", "/logout", "/resource/**").permitAll()
@@ -53,13 +53,21 @@ public class SecurityConfig {
                     // logout 설정
                     .logout()
                     .logoutUrl("/logout")
+                    .invalidateHttpSession(true)
                     .addLogoutHandler((request, response, authentication) -> {
                         HttpSession session = request.getSession();
                         if (session != null) {
                             session.invalidate();
                         }
                     })  // 로그아웃 핸들러 추가
-                    .deleteCookies("JSESSIONID", "remember - me"); // 로그아웃 후 해당 쿠키 삭제
+                    .deleteCookies("JSESSIONID", "XSRF-TOKEN") // 로그아웃 후 해당 쿠키 삭제
+                .and()
+                        .sessionManagement()
+                        .sessionFixation().changeSessionId()
+                        .invalidSessionUrl("/error/invalid")
+                        .maximumSessions(1)
+                        .maxSessionsPreventsLogin(false)
+                        .expiredUrl("/error/expired");
 
         return http.build();
     }

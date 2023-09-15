@@ -10,6 +10,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.support.RequestContextUtils;
 
@@ -17,10 +18,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Controller
 public class UserController {
@@ -43,21 +41,36 @@ public class UserController {
 
     @GetMapping("/")
     public String home(Model model) { // 인증된 사용자의 정보를 보여줌
-        String id = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         // token에 저장되어 있는 인증된 사용자의 id 값
+        String id = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         UserVo userVo = userService.getUserById(id);
         userVo.setPassword(null); // password는 보이지 않도록 null로 설정
 
-        model.addAttribute("user", userVo);
         model.addAttribute("id", id);
         model.addAttribute("username", userVo.getUsername());
+
+        if (isAuthenticated()) {
+            return "redirect:/monitoring";
+        }
 
         return "redirect:/login";
     }
 
+    @GetMapping("/error/expired")
+    public ModelAndView expiredPage() {
+        logger.info("Expired page");
+        return new ModelAndView("error/expired");
+    }
+
+    @GetMapping("/error/invalid")
+    public ModelAndView invalidPage() {
+        logger.info("Invalid page");
+        return new ModelAndView("error/invalid");
+    }
+
     // 로그인되지 않은 상태이면 로그인 페이지를, 로그인된 상태이면 home 페이지를 보여줌
-    @GetMapping("/login")
+    @RequestMapping("/login")
     public String loginPage(HttpServletRequest request, Model model) {
         Map<String, ?> redirectMap = RequestContextUtils.getInputFlashMap(request);
 
@@ -69,18 +82,15 @@ public class UserController {
             model.addAttribute("exception", exception);
         }
 
-        if (isAuthenticated()) {
-            return "redirect:/monitoring";
-        }
-
         return "/login/login";
     }
 
     @PostMapping("/auth")
-    public String postLogin(HttpSession session, HttpServletRequest request,
+    public String postLogin(HttpServletRequest request,
                             @RequestParam(value = "error", required = false) String error,
                             RedirectAttributes redirectAttr) {
         String exception = request.getAttribute("exception").toString();
+        HttpSession session = request.getSession(true);
 
         redirectAttr.addFlashAttribute("error", error);
         redirectAttr.addFlashAttribute("exception", exception);

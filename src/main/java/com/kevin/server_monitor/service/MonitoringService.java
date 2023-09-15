@@ -80,8 +80,6 @@ public class MonitoringService {
                 session.setAttribute("id", id);
                 session.setAttribute("username", name);
                 session.setAttribute("author", author);
-                // 세션 유지시간 설정(초단위) - 30분
-                session.setMaxInactiveInterval(30*60);
 
                 if(author.contains("ADMIN")) {
                     view.addObject("id", id);

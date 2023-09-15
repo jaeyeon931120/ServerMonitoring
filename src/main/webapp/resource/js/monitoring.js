@@ -74,6 +74,7 @@ window.onload = function () {
 
     getClock();
     setInterval(getClock, 1000);
+    setInterval(getServerInfo, 60000);
     setCanvasSize();
 
     /*메인데이터를 불러오는 함수*/
@@ -103,8 +104,6 @@ window.onload = function () {
     }
 }
 
-window.setTimeout(() => getServerInfo(), 60000); // 60초마다 서버 데이터 리프레쉬
-
 function selectOptionCreate() {
     const select = document.getElementById('select_server');
 
@@ -128,7 +127,9 @@ function selectOptionCreate() {
         }
     }
 
-    selectServer = select.options[select.selectedIndex].value;
+    if(select.options[select.selectedIndex] !== undefined) {
+        selectServer = select.options[select.selectedIndex].value;
+    }
 }
 
 function addListener(btn, data, action, process, work) {
@@ -516,13 +517,15 @@ function lineGraphDataSet(config, port) {
             fill           : true
         }
 
-        for (let i = 0; i < trapic.get(port + sort_trapic[j]).length; i++) {
-            let data = trapic.get(port + sort_trapic[j])[i];
-            let xy_data = {
-                x: data.get("date"),
-                y: data.get("value")
-            };
-            newDataset.data.push(xy_data);
+        if(trapic.get(port + sort_trapic[j]) !== undefined) {
+            for (let i = 0; i < trapic.get(port + sort_trapic[j]).length; i++) {
+                let data = trapic.get(port + sort_trapic[j])[i];
+                let xy_data = {
+                    x: data.get("date"),
+                    y: data.get("value")
+                };
+                newDataset.data.push(xy_data);
+            }
         }
         // 데이터 반영
         config.data.datasets.push(newDataset);
@@ -547,14 +550,15 @@ function getServerInfo() {
                 cpulist = new Map();
                 memorylist = new Map();
                 disklist = new Map();
-                while (tbody.hasChildNodes()) {
-                    tbody.removeChild(tbody.firstChild);
-                }
                 let res = httpRequest.response;
                 let tomcatportlist = [];
 
                 /* 서버 슬라이드 및 관련 그래프를 만드는데 필요한 데이터 분류 */
                 if (res !== null && res.length !== 0) {
+                    while (tbody.hasChildNodes()) {
+                        tbody.removeChild(tbody.firstChild);
+                    }
+
                     let author = res.author;
                     let res_list = res.server_list;
                     for (let i = 0; i < res_list.length; i++) {
@@ -595,18 +599,25 @@ function getServerInfo() {
                     }
                     /*서버 리스트 테이블을 만드는 함수*/
                     tableRowSpan(table_id);
+
+                    /* 서버 선택창을 만드는 함수 */
+                    selectOptionCreate();
+                    /* Bar그래프를 불러오는 함수 */
+                    createGraphBar(selectServer, cpulist, memorylist, disklist);
+                    /* Line그래프를 불러오는 함수 */
+                    trapicGraphData();
+                    /* LogData를 불러오는 함수 */
+                    getLogDataList("main");
+                    /* 전체 서버 종료된 날짜 확인 */
+                    allServerAlarm();
+                } else {
+                    popupClose("progress");
+                    error_popupOpen(null, null, "request");
+                    console.log("request error");
                 }
-                /* 서버 선택창을 만드는 함수 */
-                selectOptionCreate();
-                /* Bar그래프를 불러오는 함수 */
-                createGraphBar(selectServer, cpulist, memorylist, disklist);
-                /* Line그래프를 불러오는 함수 */
-                trapicGraphData();
-                /* LogData를 불러오는 함수 */
-                getLogDataList("main");
-                /* 전체 서버 종료된 날짜 확인 */
-                allServerAlarm();
             } else {
+                popupClose("progress");
+                error_popupOpen(null, null, "request");
                 console.log("request error");
             }
         }
@@ -794,7 +805,12 @@ function tableRowSpan(table_id) {
 }
 
 function popupOpen(data, action, process) {
+    const input_ps = document.querySelectorAll('.popup_body > ul > li p');
     let datamap = new Map();
+
+    for(let i = 0; i < input_ps.length; i++) {
+        input_ps[i].style.display = 'none';
+    }
 
     if (data !== undefined && data !== null) {
         datamap = ObjectToMap(data);
@@ -1087,6 +1103,8 @@ function error_popupOpen(data, action, process) {
         popup_user_list.style.zIndex = "700";
         popup_user_edit.style.zIndex = "800";
         h1.textContent = datamap.get("id") + " 사용자 정보를 수정하는데 실패했습니다.";
+    } else if (process === "request") {
+        h1.textContent = "세션이 만료되었습니다. 다시 로그인 해주시기 바랍니다."
     }
 
     btn_submit.textContent = "확인";
@@ -1094,7 +1112,12 @@ function error_popupOpen(data, action, process) {
 
     popupbody.appendChild(h1);
     popupbody.appendChild(btn_box);
-    addListener(btn_submit, data, action, 'power', 'close');
+
+    if(process === "request") {
+        btn_submit.addEventListener("click", () => {window.location.reload()});
+    } else {
+        addListener(btn_submit, data, action, 'power', 'close');
+    }
 
     if (process.indexOf('user') >= 0) {
         getUserList();
@@ -1150,28 +1173,36 @@ function power_work(data, action) {
             popup.className = open;
             if (httpRequest.status === 200) {
                 let res = httpRequest.response;
+                const btn_box = document.createElement("div");
+                const btn_submit = document.createElement("button");
+                btn_box.className = "button_box"
+                btn_submit.className = "button button-normal btn_submit";
+                btn_submit.textContent = "확인";
+                btn_box.appendChild(btn_submit);
+
                 if (res.result === "ok") {
                     if (action === "on") {
                         h1.textContent = datamap.get("server_name") + "서버를 구동 하였습니다.";
                     } else if (action === "off") {
                         h1.textContent = datamap.get("server_name") + "서버를 종료 하였습니다.";
                     }
-                    popupbody.appendChild(h1);
                 } else if (res.result === "reason") {
                     if (action === "on") {
                         h1.textContent = datamap.get("server_name") + "서버가 이미 작동중입니다.";
                     } else if (action === "off") {
                         h1.textContent = datamap.get("server_name") + "서버가 이미 종료되있습니다.";
                     }
-                    popupbody.appendChild(h1);
                 } else {
                     if (action === "on") {
                         h1.textContent = datamap.get("server_name") + "서버 구동에 실패했습니다.";
                     } else if (action === "off") {
                         h1.textContent = datamap.get("server_name") + "서버 종료에 실패했습니다.";
                     }
-                    popupbody.appendChild(h1);
                 }
+
+                popupbody.appendChild(h1);
+                popupbody.appendChild(btn_box);
+                addListener(btn_submit, data, action, 'power', 'close');
                 getServerInfo();
             } else {
                 if (action === "on") {
@@ -1891,25 +1922,27 @@ function getLogDataList(process) {
 
                 if (process === "main") {
                     serverlog_body.replaceChildren();
-                    if (res.list !== null && res.list.length !== 0) {
-                        left_content.style.width = "30%";
-                        log_icon.style.display = 'inline-block';
+                    if(res != null) {
+                        if (res.list !== null && res.list.length !== 0) {
+                            left_content.style.width = "30%";
+                            log_icon.style.display = 'inline-block';
 
-                        for (let i = 0; i < res.list.length; i++) {
-                            const li = document.createElement("li");
-                            li.textContent = "( " + res.list[i].val_date + " ) " + res.list[i].log;
+                            for (let i = 0; i < res.list.length; i++) {
+                                const li = document.createElement("li");
+                                li.textContent = "( " + res.list[i].val_date + " ) " + res.list[i].log;
 
-                            serverlog_body.appendChild(serverlog_ul);
-                            serverlog_ul.appendChild(li);
+                                serverlog_body.appendChild(serverlog_ul);
+                                serverlog_ul.appendChild(li);
+                            }
+                        } else {
+                            console.log(left_content);
+                            left_content.style.width = "33%";
+                            const p = document.createElement('p');
+                            p.textContent = "해당 서버의 최근에 기록된 로그가 없습니다."
+
+                            log_icon.style.display = 'none';
+                            serverlog_body.appendChild(p);
                         }
-                    } else {
-                        console.log(left_content);
-                        left_content.style.width = "33%";
-                        const p = document.createElement('p');
-                        p.textContent = "해당 서버의 최근에 기록된 로그가 없습니다."
-
-                        log_icon.style.display = 'none';
-                        serverlog_body.appendChild(p);
                     }
                 } else if (process === "popup") {
                     findAlllog(res);
@@ -2134,3 +2167,4 @@ function movePage(page) {
     httpRequest.setRequestHeader(header, token);
     httpRequest.send(JSON.stringify(data));
 }
+
