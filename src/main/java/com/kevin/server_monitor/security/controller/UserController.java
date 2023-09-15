@@ -72,6 +72,7 @@ public class UserController {
     // 로그인되지 않은 상태이면 로그인 페이지를, 로그인된 상태이면 home 페이지를 보여줌
     @RequestMapping("/login")
     public String loginPage(HttpServletRequest request, Model model) {
+
         Map<String, ?> redirectMap = RequestContextUtils.getInputFlashMap(request);
 
         if (redirectMap != null) {
@@ -80,6 +81,10 @@ public class UserController {
 
             model.addAttribute("error", error);
             model.addAttribute("exception", exception);
+        }
+
+        if (isAuthenticated()) {
+            return "redirect:/monitoring";
         }
 
         return "/login/login";

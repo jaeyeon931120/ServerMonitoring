@@ -62,12 +62,12 @@ public class SecurityConfig {
                     })  // 로그아웃 핸들러 추가
                     .deleteCookies("JSESSIONID", "XSRF-TOKEN") // 로그아웃 후 해당 쿠키 삭제
                 .and()
-                        .sessionManagement()
-                        .sessionFixation().changeSessionId()
-                        .invalidSessionUrl("/error/invalid")
-                        .maximumSessions(1)
-                        .maxSessionsPreventsLogin(false)
-                        .expiredUrl("/error/expired");
+                    .sessionManagement()
+                    .sessionFixation().changeSessionId()
+                    .invalidSessionUrl("/error/invalid")
+                    .maximumSessions(1)
+                    .maxSessionsPreventsLogin(false)
+                    .expiredUrl("/error/expired");
 
         return http.build();
     }

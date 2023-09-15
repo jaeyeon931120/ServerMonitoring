@@ -75,7 +75,7 @@ server:
       cookie:
         max-age: 30m
         http-only: true
-        secure: true
+        secure: false
   tomcat:
     keep-alive-timeout: 30s
     max-keep-alive-requests: 100
