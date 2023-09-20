@@ -19,10 +19,10 @@ spring:
     #Hikari(springboot 기본 설정)
     hikari:
       driver-class-name: com.mysql.cj.jdbc.Driver
-      jdbc-url: jdbc:mysql://db-fqi4k.pub-cdb.ntruss.com:3306/monitoring_db?rewriteBatchedStatements=true&profileSQL=true&logger=Slf4JLogger&maxQuerySizeToLog=999999&allowMultiQueries=true
+      jdbc-url: jdbc:mysql://localhost:3306/monitoring_db?rewriteBatchedStatements=true&profileSQL=true&logger=Slf4JLogger&maxQuerySizeToLog=999999&allowMultiQueries=true
       #jdbc-url: jdbc:mysql://dbkrems.4st.co.kr:3306/monitoring_db?rewriteBatchedStatements=true&profileSQL=true&logger=Slf4JLogger&maxQuerySizeToLog=999999&allowMultiQueries=true
-      username: kremsuser
-      password: kremsuser!
+      username: testuser
+      password: testuser!
       connection-test-query: SELECT 1
       pool-name: SpringBootMyBatisHikariCP
       maximum-pool-size: 10
