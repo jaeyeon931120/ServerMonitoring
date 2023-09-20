@@ -72,7 +72,7 @@
         </if>
         <if test="end_date != null">
         AND
-            end_date IS NOT NULL
+            end_date <![CDATA[>=]]> #{from_date}
         </if>
         ORDER BY `system` DESC
     </select>
