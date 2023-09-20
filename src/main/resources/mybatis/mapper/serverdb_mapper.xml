@@ -71,8 +71,8 @@
             val_date <![CDATA[<=]]> #{to_date}
         </if>
         <if test="end_date != null">
-        AND
-            end_date IS NOT NULL
+            AND
+            end_date <![CDATA[>=]]> #{from_date}
         </if>
         ORDER BY `system` DESC
     </select>

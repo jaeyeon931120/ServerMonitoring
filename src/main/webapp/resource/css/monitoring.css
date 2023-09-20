@@ -1117,8 +1117,9 @@ input:-webkit-autofill, input:-webkit-autofill:hover, input:-webkit-autofill:foc
     width: 120px;
     font-weight: bold;
     margin-right: 30px;
-    margin-left: 15px;
+    margin-left: 16px;
     display: inline-block;
+    letter-spacing: 0.01em;
 }
 
 .popup_body.user_edit > ul > li input {
@@ -1567,7 +1568,7 @@ input:-webkit-autofill, input:-webkit-autofill:hover, input:-webkit-autofill:foc
 }
 
 .btn-select {
-    width: 324px;
+    width: 328px;
     padding: 9px 30px 9px 30px;
     font-size: 0.87em;
     line-height: 14px;
@@ -1891,7 +1892,8 @@ input:-webkit-autofill, input:-webkit-autofill:hover, input:-webkit-autofill:foc
     }
 
     .cont-select > label {
-        margin-left: 14px;
+        margin-left: 17px;
+        margin-right: 26px;
     }
 
     .alarm_list {

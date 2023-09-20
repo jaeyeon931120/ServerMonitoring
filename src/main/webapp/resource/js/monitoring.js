@@ -158,13 +158,6 @@ function addListener(btn, data, action, process, work) {
 }
 
 function addinputListener(btn, work, process) {
-    let value;
-
-    if(work === "auth") {
-        value = btn.textContent;
-    } else {
-        value = btn.value;
-    }
 
     if (btn.clickHandler) {
         btn.removeEventListener("change", btn.clickHandler);
@@ -1975,6 +1968,7 @@ function allServerAlarm() {
     httpRequest.onreadystatechange = () => {
         if (httpRequest.readyState === XMLHttpRequest.DONE) {
             if (httpRequest.status === 200) {
+                alarm_body.replaceChildren();
                 let res = httpRequest.response;
 
                 if (res !== null && res.length !== 0) {
