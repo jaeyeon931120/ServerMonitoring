@@ -1898,6 +1898,7 @@ function getLogDataList(process) {
     data.server_name = selectServer;
     data.ip = iplist.get(selectServer);
     if (process === "main") {
+        serverlog_body.replaceChildren();
         let today = new Date();
         data.hours = ('0' + today.getHours()).slice(-2);
         data.process = "main";
@@ -1914,7 +1915,6 @@ function getLogDataList(process) {
                 let res = httpRequest.response;
 
                 if (process === "main") {
-                    serverlog_body.replaceChildren();
                     if(res != null) {
                         if (res.list !== null && res.list.length !== 0) {
                             left_content.style.width = "30%";
@@ -1928,7 +1928,6 @@ function getLogDataList(process) {
                                 serverlog_ul.appendChild(li);
                             }
                         } else {
-                            console.log(left_content);
                             left_content.style.width = "33%";
                             const p = document.createElement('p');
                             p.textContent = "해당 서버의 최근에 기록된 로그가 없습니다."

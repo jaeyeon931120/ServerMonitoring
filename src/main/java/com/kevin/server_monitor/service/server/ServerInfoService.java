@@ -33,17 +33,16 @@ public class ServerInfoService {
         String result;
         String val_date;
         Map<String, Object> resultMap;
+        String server_name = map.get("server_name").toString();
+        String user_id = map.get("id").toString();
+        String user_pw = map.get("pw").toString();
+        int serverport = Integer.parseInt(map.get("server_port").toString());
+        int tomcatport = Integer.parseInt(map.get("tomcat_port").toString());
+        String infodir = map.get("info_dir").toString();
+        String ip = map.get("ip").toString();
+        String system = map.get("system").toString();
 
         try {
-            String server_name = map.get("server_name").toString();
-            String user_id = map.get("id").toString();
-            String user_pw = map.get("pw").toString();
-            int serverport = Integer.parseInt(map.get("server_port").toString());
-            int tomcatport = Integer.parseInt(map.get("tomcat_port").toString());
-            String infodir = map.get("info_dir").toString();
-            String ip = map.get("ip").toString();
-            String system = map.get("system").toString();
-
             String command;
 
             command = "cd " + infodir + " && echo '" + user_pw + "' | sudo -S ./server_monitoring " + tomcatport;
@@ -57,50 +56,55 @@ public class ServerInfoService {
             ObjectMapper objectMapper = new ObjectMapper();
             TypeReference<Map<String, Object>> typeReference = new TypeReference<>() {
             };
-            
-            resultMap = objectMapper.readValue(result, typeReference);
 
-            Double memorydouble = Double.parseDouble(resultMap.get("memory").toString());
-            Double diskdouble = Double.parseDouble(resultMap.get("disk").toString());
-            String memory = String.format("%.2f", memorydouble) + "%";
-            String disk = String.format("%.2f", diskdouble) + "%";
-            String cpu = resultMap.get("cpu").toString() + "%";
-            String end_date = null;
+            if(result != null) {
+                resultMap = objectMapper.readValue(result, typeReference);
 
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
-            Calendar cal = Calendar.getInstance(Locale.KOREA);
-            val_date = sdf.format(cal.getTime());
+                Double memorydouble = Double.parseDouble(resultMap.get("memory").toString());
+                Double diskdouble = Double.parseDouble(resultMap.get("disk").toString());
+                String memory = String.format("%.2f", memorydouble) + "%";
+                String disk = String.format("%.2f", diskdouble) + "%";
+                String cpu = resultMap.get("cpu").toString() + "%";
+                String end_date = null;
 
-            String portstatus = resultMap.get("port_status").toString();
-            if (portstatus.equals("0")) {
-                portstatus = "가동";
-            } else if (portstatus.equals("1")) {
-                end_date = val_date;
-                portstatus = "정지";
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
+                Calendar cal = Calendar.getInstance(Locale.KOREA);
+                val_date = sdf.format(cal.getTime());
+
+                String portstatus = resultMap.get("port_status").toString();
+                if (portstatus.equals("0")) {
+                    portstatus = "가동";
+                } else if (portstatus.equals("1")) {
+                    end_date = val_date;
+                    portstatus = "정지";
+                }
+
+                String rx = resultMap.get("RX").toString();
+                String tx = resultMap.get("TX").toString();
+                rx = unitchage(rx);
+                tx = unitchage(tx);
+
+                resultMap = new HashMap<>();
+
+                resultMap.put("trapic_rx", rx);
+                resultMap.put("trapic_tx", tx);
+                resultMap.put("cpu", cpu);
+                resultMap.put("memory", memory);
+                resultMap.put("disk", disk);
+                resultMap.put("status", portstatus);
+                resultMap.put("server_name", server_name);
+                resultMap.put("system", system);
+                resultMap.put("ip", ip);
+                resultMap.put("tomcat_port", tomcatport);
+                resultMap.put("val_date", val_date);
+                resultMap.put("end_date", end_date);
+
+                serverInfoList.add(resultMap);
+            } else {
+                logger.error("{} 서버의 {} 포트의 데이터를 수신하는데 오류가 발생했습니다. 오류내용 : 수신된 데이터가 없음", server_name, tomcatport);
             }
-
-            String rx = resultMap.get("RX").toString();
-            String tx = resultMap.get("TX").toString();
-            rx = unitchage(rx);
-            tx = unitchage(tx);
-
-            resultMap = new HashMap<>();
-
-            resultMap.put("trapic_rx", rx);
-            resultMap.put("trapic_tx", tx);
-            resultMap.put("cpu", cpu);
-            resultMap.put("memory", memory);
-            resultMap.put("disk", disk);
-            resultMap.put("status", portstatus);
-            resultMap.put("server_name", server_name);
-            resultMap.put("system", system);
-            resultMap.put("ip", ip);
-            resultMap.put("tomcat_port", tomcatport);
-            resultMap.put("val_date", val_date);
-            resultMap.put("end_date", end_date);
-
-            serverInfoList.add(resultMap);
         } catch (Exception e) {
+            logger.error("{} 서버의 {} 포트의 데이터를 수신하는데 오류가 발생했습니다. 오류내용 : {}", server_name, tomcatport, e.getMessage());
             e.printStackTrace();
         }
     }
@@ -108,18 +112,16 @@ public class ServerInfoService {
     private void serverLog(Map<String, Object> map) {
         String result;
         Map<String, Object> resultMap;
+        String server_name = map.get("server_name").toString();
+        String user_id = map.get("id").toString();
+        String user_pw = map.get("pw").toString();
+        int serverport = Integer.parseInt(map.get("server_port").toString());
+        int tomcatport = Integer.parseInt(map.get("tomcat_port").toString());
+        String infodir = map.get("info_dir").toString();
+        String ip = map.get("ip").toString();
+        String system = map.get("system").toString();
 
         try {
-            String server_name = map.get("server_name").toString();
-            String user_id = map.get("id").toString();
-            String user_pw = map.get("pw").toString();
-            int serverport = Integer.parseInt(map.get("server_port").toString());
-            int tomcatport = Integer.parseInt(map.get("tomcat_port").toString());
-            String infodir = map.get("info_dir").toString();
-            String ip = map.get("ip").toString();
-            String system = map.get("system").toString();
-
-            SimpleDateFormat sdf_month = new SimpleDateFormat("MMM", Locale.ENGLISH);
             SimpleDateFormat sdf_hour = new SimpleDateFormat("HH");
             SimpleDateFormat sdf_minute = new SimpleDateFormat("mm");
             Calendar cal = Calendar.getInstance(Locale.KOREA);
@@ -153,39 +155,44 @@ public class ServerInfoService {
             String finalCommand = command;
             result = sshUtils.sshControll(user_id, user_pw, ip, serverport, finalCommand);
 
-            String[] returnlist = result.split("\n");
+            if(result != null && !result.isEmpty()) {
+                String[] returnlist = result.split("\n");
 
-            for(String all_log : returnlist) {
-                String[] log_units = all_log.split(" ");
+                for (String all_log : returnlist) {
+                    String[] log_units = all_log.split(" ");
 
-                String val_date = log_units[2];
-                if(!val_date.contains(":")) {
-                    val_date = log_units[3];
-                }
-                StringBuilder end_log = new StringBuilder();
-
-                for(int i = 4; i < log_units.length; i++) {
-                    if (i != log_units.length - 1) {
-                        end_log.append(log_units[i]).append(" ");
-                    } else {
-                        end_log.append(log_units[i]);
+                    String val_date = log_units[2];
+                    if (!val_date.contains(":")) {
+                        val_date = log_units[3];
                     }
+                    StringBuilder end_log = new StringBuilder();
+
+                    for (int i = 4; i < log_units.length; i++) {
+                        if (i != log_units.length - 1) {
+                            end_log.append(log_units[i]).append(" ");
+                        } else {
+                            end_log.append(log_units[i]);
+                        }
+                    }
+
+                    String log = end_log.toString();
+
+                    resultMap = new HashMap<>();
+
+                    resultMap.put("server_name", server_name);
+                    resultMap.put("system", system);
+                    resultMap.put("ip", ip);
+                    resultMap.put("tomcat_port", tomcatport);
+                    resultMap.put("val_date", val_date);
+                    resultMap.put("log", log);
+
+                    serverLogList.add(resultMap);
                 }
-
-                String log = end_log.toString();
-
-                resultMap = new HashMap<>();
-
-                resultMap.put("server_name", server_name);
-                resultMap.put("system", system);
-                resultMap.put("ip", ip);
-                resultMap.put("tomcat_port", tomcatport);
-                resultMap.put("val_date", val_date);
-                resultMap.put("log", log);
-
-                serverLogList.add(resultMap);
+            } else {
+                logger.error("{} 서버의 {} 포트의 로그 내용을 수신하는데 오류가 발생했습니다. 오류내용 : 수신된 데이터가 없음", server_name, tomcatport);
             }
         } catch (Exception e) {
+            logger.error("{} 서버의 {} 포트의 로그 내용을 수신하는데 오류가 발생했습니다. 오류내용 : {}", server_name, tomcatport, e.getMessage());
             e.printStackTrace();
         }
     }
