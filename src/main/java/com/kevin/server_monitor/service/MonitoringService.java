@@ -278,9 +278,7 @@ public class MonitoringService {
                 to_date = hours + ":59:59";
             }
 
-            if(process.equals("main")) {
-                serverLogDto.setFrom_date(from_date);
-            } else if(process.equals("popup")) {
+            if(process.equals("popup")) {
                 serverLogDto.setFrom_date(from_date);
                 serverLogDto.setTo_date(to_date);
             }
@@ -288,6 +286,7 @@ public class MonitoringService {
             if (serverLogDto.getSearchDto() == null) {
                 serverLogDto.setSearchDto(new SearchDto());
             }
+
             returnList = pagingService.findAllLog(serverLogDto);
         } catch (Exception e) {
             logger.error("서버 로그 리스트를 불러오는 중에 오류가 발생했습니다.");

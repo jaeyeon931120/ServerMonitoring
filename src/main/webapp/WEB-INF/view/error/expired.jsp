@@ -17,6 +17,7 @@
     <link rel='stylesheet' type='text/css' href="${pageContext.request.contextPath}/resource/css/monitoring.css">
     <link rel='stylesheet' type='text/css' href="${pageContext.request.contextPath}/resource/css/button.css">
     <link rel='stylesheet' type='text/css' href="${pageContext.request.contextPath}/resource/css/error.css">
+    <link rel="favicon" href="${pageContext.request.contextPath}/resource/image/favicon.ico"/>
 </head>
 <body class="login_bg">
 <div class="error_box">

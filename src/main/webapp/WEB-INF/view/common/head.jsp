@@ -8,7 +8,6 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <header>
-    <link rel="shortcut icon" href="${pageContext.request.contextPath}/resource/image/favicon.ico"/>
     <div class="innerheader">
         <a href="/monitoring"><img src="${pageContext.request.contextPath}/resource/image/logo.png" id="logo" alt="4st BEMS"></a>
         <div class="headerlist">

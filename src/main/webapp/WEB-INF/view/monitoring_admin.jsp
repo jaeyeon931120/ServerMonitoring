@@ -18,6 +18,7 @@
     <link href='${pageContext.request.contextPath}/resource/css/select.css' rel='stylesheet'/>
     <link href='${pageContext.request.contextPath}/resource/css/animation.css' rel='stylesheet'/>
     <link href='${pageContext.request.contextPath}/resource/css/button.css' rel='stylesheet'/>
+    <link rel="favicon" href="${pageContext.request.contextPath}/resource/image/favicon.ico"/>
 </head>
 <body>
 <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>

@@ -28,6 +28,7 @@ let gradient2;
 let gradient3;
 let serverlist = [];
 let tomcatportMap = new Map();
+let systemlist = new Map();
 let iplist = new Map();
 let cpulist = new Map();
 let memorylist = new Map();
@@ -560,6 +561,8 @@ function getServerInfo() {
                         if (i === res_list.length - 1 && res_list[j].server_name !== res_list[i].server_name) {
                             serverlist.push(res_list[j].server_name);
                             serverlist.push(res_list[i].server_name);
+                            systemlist.set(res_list[j].server_name, res_list[j].system);
+                            systemlist.set(res_list[j].server_name, res_list[j].system);
                             iplist.set(res_list[j].server_name, res_list[j].ip);
                             iplist.set(res_list[i].server_name, res_list[i].ip);
                             cpulist.set(res_list[j].server_name, Number(res_list[j].cpu.substring(0, res_list[j].cpu.length - 1)));
@@ -575,6 +578,7 @@ function getServerInfo() {
                             tomcatportMap.set(res_list[i].server_name, tomcatportlist);
                         } else if ((res_list[j].ip !== res_list[i].ip) || (i === res_list.length - 1 && res_list[j].server_name === res_list[i].server_name)) {
                             serverlist.push(res_list[j].server_name);
+                            systemlist.set(res_list[j].server_name, res_list[j].system);
                             iplist.set(res_list[j].server_name, res_list[j].ip);
                             cpulist.set(res_list[j].server_name, Number(res_list[j].cpu.substring(0, res_list[j].cpu.length - 1)));
                             memorylist.set(res_list[j].server_name, Number(res_list[j].memory.substring(0, res_list[j].memory.length - 1)));
@@ -2134,6 +2138,7 @@ function movePage(page) {
         pageSize  : 10
     };
     let data = {
+        system     : systemlist.get(selectServer),
         server_name: selectServer,
         ip         : iplist.get(selectServer),
         hours      : selectHours,

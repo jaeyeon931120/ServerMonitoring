@@ -14,6 +14,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>로그인</title>
     <link rel='stylesheet' type='text/css' href="${pageContext.request.contextPath}/resource/css/monitoring.css">
+    <link rel="favicon" href="${pageContext.request.contextPath}/resource/image/favicon.ico"/>
 </head>
 <body class="login_bg">
 <div class="login_box">

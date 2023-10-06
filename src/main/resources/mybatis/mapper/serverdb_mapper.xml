@@ -71,7 +71,7 @@
             val_date <![CDATA[<=]]> #{to_date}
         </if>
         <if test="end_date != null">
-            AND
+        AND
             end_date <![CDATA[>=]]> #{from_date}
         </if>
         ORDER BY `system` DESC
@@ -131,6 +131,10 @@
         WHERE
             ip = #{ip}
         </if>
+        <if test="system != null">
+        AND
+            `system` = #{system}
+        </if>
         <if test="server_name != null">
         AND
             server_name = #{server_name}
@@ -144,7 +148,7 @@
             val_date <![CDATA[<=]]> #{to_date}
         </if>
         ORDER BY log_idx DESC
-        <if test="from_date != null and to_date == null">
+        <if test="from_date == null and to_date == null">
         LIMIT 10
         </if>
         <if test="from_date != null and to_date != null">
@@ -260,31 +264,35 @@
         /* 서버 정보 삭제 ServerDBMapper.deleteServerSensor */
         DELETE FROM monitoring_db.server_info_sensor WHERE server_name = #{server_name} AND ip = #{ip} AND tomcat_port = ${tomcat_port}
     </delete>
-    
+
     <select id="logCount" parameterType="com.kevin.server_monitor.dto.ServerLogDto" resultType="int">
         SELECT
             COUNT(*)
         FROM
             monitoring_db.server_info_log
         <if test="ip != null">
-            WHERE
+        WHERE
             ip = #{ip}
         </if>
+        <if test="system != null">
+        AND
+            `system` = #{system}
+        </if>
         <if test="server_name != null">
-            AND
+        AND
             server_name = #{server_name}
         </if>
         <if test="from_date != null">
-            AND
+        AND
             val_date <![CDATA[>=]]> #{from_date}
         </if>
         <if test="to_date != null">
-            AND
+        AND
             val_date <![CDATA[<=]]> #{to_date}
         </if>
         ORDER BY val_date DESC
-        <if test="from_date != null and to_date == null">
-            LIMIT 10
+        <if test="from_date == null and to_date == null">
+        LIMIT 10
         </if>
     </select>
 
