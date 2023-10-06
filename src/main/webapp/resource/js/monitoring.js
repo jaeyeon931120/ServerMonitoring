@@ -167,13 +167,10 @@ function addinputListener(btn, work, process) {
     btn.clickHandler = () => {
         if(process.indexOf("user") > -1) {
             if(work === "id") {
-                console.log("user_id");
                 id_check(process);
             } else if(work === "pw") {
-                console.log("user_pw");
                 pw_check(process);
             } else if(work === "username") {
-                console.log("user_name");
                 name_check(process, work);
             } else if(work === "tel") {
                 tel_check(process);
@@ -184,7 +181,6 @@ function addinputListener(btn, work, process) {
             } else if(work === "ip") {
                 ip_check(process);
             } else if(work.indexOf("port") > -1) {
-                console.log("sever_port");
                 port_check(process, work);
             } else {
                 name_check(process, work);
@@ -1535,8 +1531,6 @@ function ip_check(process) {
 }
 
 function port_check(process, portname) {
-    console.log("process : ", process);
-    console.log("portname : ",  portname);
     let regexPort = /(6553[0-5]|655[0-2]\d|65[0-4]\d{2}|6[0-4]\d{3}|5\d{4}|[0-9]\d{0,3})/;
     const popup = document.querySelector(".popup." + process);
     const port_input = document.getElementById(process + "_" + portname);
@@ -1589,7 +1583,6 @@ function name_check(process, checkname) {
         const popup = document.querySelector(".popup." + process);
         const input = document.getElementById(process + "_" + checkname);
         const name_p = document.getElementById(checkname + '_check_' + process);
-        console.log(process + "_" + checkname);
         let name = input.value;
 
         if (!isStringValue(name)) {

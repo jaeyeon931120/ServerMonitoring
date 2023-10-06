@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
@@ -40,6 +41,7 @@ public class MonitoringService {
         this.serverManageService = serverManageService;
     }
 
+    @Transactional
     public Map<String, Object> getServerlist(HttpServletRequest request) {
         List<Map<String, Object>> returnList;
         Map<String, Object> returnMap = new HashMap<>();
@@ -66,6 +68,7 @@ public class MonitoringService {
         return returnMap;
     }
 
+    @Transactional
     public ModelAndView getMonitoring(HttpServletRequest request) {
         ModelAndView view = new ModelAndView();
         try {
@@ -101,6 +104,7 @@ public class MonitoringService {
         return view;
     }
 
+    @Transactional
     public Map<String, Object> getPower(Map<String, Object> req) {
         Map<String, Object> resultMap = new HashMap<>();
         Map<String, Object> inputMap = new HashMap<>();
@@ -187,6 +191,7 @@ public class MonitoringService {
         return resultMap;
     }
 
+    @Transactional
     public Map<String, Object> getIDCheck(Map<String, Object> req) {
         Map<String, Object> resultMap = new HashMap<>();
 
@@ -209,6 +214,7 @@ public class MonitoringService {
         return resultMap;
     }
 
+    @Transactional
     public Map<String, Object> getServerPlus(Map<String, Object> req) {
         Map<String, Object> resultMap = new HashMap<>();
 
@@ -223,6 +229,7 @@ public class MonitoringService {
         return resultMap;
     }
 
+    @Transactional
     public Map<String, Object> getServerDelete(Map<String, Object> req) {
         Map<String, Object> resultMap = new HashMap<>();
 
@@ -236,6 +243,7 @@ public class MonitoringService {
         return resultMap;
     }
 
+    @Transactional
     public List<Map<String, Object>> getTrapicDatalist(Map<String, Object> req) {
         List<Map<String, Object>> returnList = new ArrayList<>();
 
@@ -261,6 +269,7 @@ public class MonitoringService {
         return returnList;
     }
 
+    @Transactional
     public PagingResponse<ServerLogDto> getLogDatalist(ServerLogDto serverLogDto) {
         PagingResponse<ServerLogDto> returnList = null;
 
@@ -295,6 +304,7 @@ public class MonitoringService {
         return returnList;
     }
 
+    @Transactional
     public List<Map<String, Object>> getAlarmDatalist(Map<String, Object> req) {
         List<Map<String, Object>> returnList = new ArrayList<>();
 
