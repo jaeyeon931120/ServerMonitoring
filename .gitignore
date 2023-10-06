@@ -10,6 +10,8 @@ logs/*
 work/*
 qodana.yaml
 .logs/*
+ChainCA/*
+monitoring.jks
 
 # User-specific stuff
 .idea/**/workspace.xml
