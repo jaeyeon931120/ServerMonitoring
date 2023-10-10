@@ -120,15 +120,15 @@ function selectOptionCreate() {
         select.appendChild(option);
     }
 
-    if(selectServer !== undefined) {
-        for(let i = 0; i < select.options.length; i++) {
-            if(select.options[i].value === selectServer) {
+    if (selectServer !== undefined) {
+        for (let i = 0; i < select.options.length; i++) {
+            if (select.options[i].value === selectServer) {
                 select.options[i].selected = true;
             }
         }
     }
 
-    if(select.options[select.selectedIndex] !== undefined) {
+    if (select.options[select.selectedIndex] !== undefined) {
         selectServer = select.options[select.selectedIndex].value;
     }
 }
@@ -165,22 +165,22 @@ function addinputListener(btn, work, process) {
     }
 
     btn.clickHandler = () => {
-        if(process.indexOf("user") > -1) {
-            if(work === "id") {
+        if (process.indexOf("user") > -1) {
+            if (work === "id") {
                 id_check(process);
-            } else if(work === "pw") {
+            } else if (work === "pw") {
                 pw_check(process);
-            } else if(work === "username") {
+            } else if (work === "username") {
                 name_check(process, work);
-            } else if(work === "tel") {
+            } else if (work === "tel") {
                 tel_check(process);
             }
-        } else if(process.indexOf("server") > -1) {
-            if(work === "system") {
+        } else if (process.indexOf("server") > -1) {
+            if (work === "system") {
                 system_check(process);
-            } else if(work === "ip") {
+            } else if (work === "ip") {
                 ip_check(process);
-            } else if(work.indexOf("port") > -1) {
+            } else if (work.indexOf("port") > -1) {
                 port_check(process, work);
             } else {
                 name_check(process, work);
@@ -507,7 +507,7 @@ function lineGraphDataSet(config, port) {
             fill           : true
         }
 
-        if(trapic.get(port + sort_trapic[j]) !== undefined) {
+        if (trapic.get(port + sort_trapic[j]) !== undefined) {
             for (let i = 0; i < trapic.get(port + sort_trapic[j]).length; i++) {
                 let data = trapic.get(port + sort_trapic[j])[i];
                 let xy_data = {
@@ -551,44 +551,46 @@ function getServerInfo() {
 
                     let author = res.author;
                     let res_list = res.server_list;
-                    for (let i = 0; i < res_list.length; i++) {
-                        tableCreate(res_list[i], table_id, author);
-                        tomcatportlist.push(res_list[i].tomcat_port);
-                        if (i === res_list.length - 1 && res_list[j].server_name !== res_list[i].server_name) {
-                            serverlist.push(res_list[j].server_name);
-                            serverlist.push(res_list[i].server_name);
-                            systemlist.set(res_list[j].server_name, res_list[j].system);
-                            systemlist.set(res_list[j].server_name, res_list[j].system);
-                            iplist.set(res_list[j].server_name, res_list[j].ip);
-                            iplist.set(res_list[i].server_name, res_list[i].ip);
-                            cpulist.set(res_list[j].server_name, Number(res_list[j].cpu.substring(0, res_list[j].cpu.length - 1)));
-                            cpulist.set(res_list[i].server_name, Number(res_list[i].cpu.substring(0, res_list[i].cpu.length - 1)));
-                            memorylist.set(res_list[j].server_name, Number(res_list[j].memory.substring(0, res_list[j].memory.length - 1)));
-                            memorylist.set(res_list[i].server_name, Number(res_list[i].memory.substring(0, res_list[i].memory.length - 1)));
-                            disklist.set(res_list[j].server_name, Number(res_list[j].disk.substring(0, res_list[j].disk.length - 1)));
-                            disklist.set(res_list[i].server_name, Number(res_list[i].disk.substring(0, res_list[i].disk.length - 1)));
-                            tomcatportlist.splice(tomcatportlist.length - 1);
-                            tomcatportMap.set(res_list[j].server_name, tomcatportlist);
-                            tomcatportlist = [];
+                    if (res_list !== null && res_list !== undefined) {
+                        for (let i = 0; i < res_list.length; i++) {
+                            tableCreate(res_list[i], table_id, author);
                             tomcatportlist.push(res_list[i].tomcat_port);
-                            tomcatportMap.set(res_list[i].server_name, tomcatportlist);
-                        } else if ((res_list[j].ip !== res_list[i].ip) || (i === res_list.length - 1 && res_list[j].server_name === res_list[i].server_name)) {
-                            serverlist.push(res_list[j].server_name);
-                            systemlist.set(res_list[j].server_name, res_list[j].system);
-                            iplist.set(res_list[j].server_name, res_list[j].ip);
-                            cpulist.set(res_list[j].server_name, Number(res_list[j].cpu.substring(0, res_list[j].cpu.length - 1)));
-                            memorylist.set(res_list[j].server_name, Number(res_list[j].memory.substring(0, res_list[j].memory.length - 1)));
-                            disklist.set(res_list[j].server_name, Number(res_list[j].disk.substring(0, res_list[j].disk.length - 1)));
-                            tomcatportlist.splice(tomcatportlist.length - 1);
-                            if (i === res_list.length - 1) {
+                            if (i === res_list.length - 1 && res_list[j].server_name !== res_list[i].server_name) {
+                                serverlist.push(res_list[j].server_name);
+                                serverlist.push(res_list[i].server_name);
+                                systemlist.set(res_list[j].server_name, res_list[j].system);
+                                systemlist.set(res_list[j].server_name, res_list[j].system);
+                                iplist.set(res_list[j].server_name, res_list[j].ip);
+                                iplist.set(res_list[i].server_name, res_list[i].ip);
+                                cpulist.set(res_list[j].server_name, Number(res_list[j].cpu.substring(0, res_list[j].cpu.length - 1)));
+                                cpulist.set(res_list[i].server_name, Number(res_list[i].cpu.substring(0, res_list[i].cpu.length - 1)));
+                                memorylist.set(res_list[j].server_name, Number(res_list[j].memory.substring(0, res_list[j].memory.length - 1)));
+                                memorylist.set(res_list[i].server_name, Number(res_list[i].memory.substring(0, res_list[i].memory.length - 1)));
+                                disklist.set(res_list[j].server_name, Number(res_list[j].disk.substring(0, res_list[j].disk.length - 1)));
+                                disklist.set(res_list[i].server_name, Number(res_list[i].disk.substring(0, res_list[i].disk.length - 1)));
+                                tomcatportlist.splice(tomcatportlist.length - 1);
+                                tomcatportMap.set(res_list[j].server_name, tomcatportlist);
+                                tomcatportlist = [];
+                                tomcatportlist.push(res_list[i].tomcat_port);
+                                tomcatportMap.set(res_list[i].server_name, tomcatportlist);
+                            } else if ((res_list[j].ip !== res_list[i].ip) || (i === res_list.length - 1 && res_list[j].server_name === res_list[i].server_name)) {
+                                serverlist.push(res_list[j].server_name);
+                                systemlist.set(res_list[j].server_name, res_list[j].system);
+                                iplist.set(res_list[j].server_name, res_list[j].ip);
+                                cpulist.set(res_list[j].server_name, Number(res_list[j].cpu.substring(0, res_list[j].cpu.length - 1)));
+                                memorylist.set(res_list[j].server_name, Number(res_list[j].memory.substring(0, res_list[j].memory.length - 1)));
+                                disklist.set(res_list[j].server_name, Number(res_list[j].disk.substring(0, res_list[j].disk.length - 1)));
+                                tomcatportlist.splice(tomcatportlist.length - 1);
+                                if (i === res_list.length - 1) {
+                                    tomcatportlist.push(res_list[i].tomcat_port);
+                                }
+                                tomcatportMap.set(res_list[j].server_name, tomcatportlist);
+
+                                tomcatportlist = [];
                                 tomcatportlist.push(res_list[i].tomcat_port);
                             }
-                            tomcatportMap.set(res_list[j].server_name, tomcatportlist);
-
-                            tomcatportlist = [];
-                            tomcatportlist.push(res_list[i].tomcat_port);
+                            j = i;
                         }
-                        j = i;
                     }
                     /*서버 리스트 테이블을 만드는 함수*/
                     tableRowSpan(table_id);
@@ -801,7 +803,7 @@ function popupOpen(data, action, process) {
     const input_ps = document.querySelectorAll('.popup_body > ul > li p');
     let datamap = new Map();
 
-    for(let i = 0; i < input_ps.length; i++) {
+    for (let i = 0; i < input_ps.length; i++) {
         input_ps[i].style.display = 'none';
     }
 
@@ -1106,8 +1108,10 @@ function error_popupOpen(data, action, process) {
     popupbody.appendChild(h1);
     popupbody.appendChild(btn_box);
 
-    if(process === "request") {
-        btn_submit.addEventListener("click", () => {window.location.reload()});
+    if (process === "request") {
+        btn_submit.addEventListener("click", () => {
+            window.location.reload()
+        });
     } else {
         addListener(btn_submit, data, action, 'power', 'close');
     }
@@ -1440,7 +1444,7 @@ function pw_check(process) {
                 return true;
             }
         } else {
-            if(process === "user_edit") {
+            if (process === "user_edit") {
                 pw_p.style.display = 'none';
                 return true;
             } else {
@@ -1912,7 +1916,7 @@ function getLogDataList(process) {
                 let res = httpRequest.response;
 
                 if (process === "main") {
-                    if(res != null) {
+                    if (res != null) {
                         if (res.list !== null && res.list.length !== 0) {
                             left_content.style.width = "30%";
                             log_icon.style.display = 'inline-block';
