@@ -11,7 +11,7 @@
     <property name="LOG_PATH" value="./logs"/>
     <property name="LOG_FILE_NAME" value="server_monitoring" />
     <property name="LOG_FILE_NAME_ERR" value="server_monitoring_err" />
-    <property name="LOG_PATTERN" value="[%d{yyyy-MM-dd HH:mm:ss.SSS, UTC}] %-5level %-40.40logger{39} \(%4line\) - %msg%n"/>
+    <property name="LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss}:%-3relative][%thread] %-5level %logger{36} - %msg%n"/>
 
     <springProfile name="local, dev">
         <!-- log4jdbc 옵션 설정 -->

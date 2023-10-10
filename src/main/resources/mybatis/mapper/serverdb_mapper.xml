@@ -201,6 +201,14 @@
             (`system`, ip, server_name, tomcat_port, val_date, status, trapic_tx, trapic_rx, cpu, memory, disk, reg_date)
         VALUES
             (#{system}, #{ip}, #{server_name}, ${tomcat_port}, #{val_date}, #{status}, #{trapic_tx}, #{trapic_rx}, #{cpu}, #{memory}, #{disk}, NOW())
+        ON DUPLICATE KEY UPDATE
+                             `val_date` = #{val_date},
+                             `status` = #{status},
+                             `trapic_tx` = #{trapic_tx},
+                             `trapic_rx` = #{trapic_rx},
+                             `cpu` = #{cpu},
+                             `memory` = #{memory},
+                             `disk` = #{disk}
     </insert>
 
     <update id="updateServerSensor" parameterType="map">
