@@ -11,8 +11,8 @@
 
     <insert id="insertUser">
         /* 회원가입 UserMapper.insertUser */
-        INSERT INTO monitoring_db.monitoring_admin (ID, PASSWORD, USERNAME, TEL, AUTHOR, MEMO)
-        VALUES (#{id}, #{password}, #{username}, #{tel}, #{author}, #{memo})
+        INSERT INTO monitoring_db.monitoring_admin (ID, PASSWORD, USERNAME, TEL, AUTHOR, MEMO, SALT)
+        VALUES (#{id}, #{password}, #{username}, #{tel}, #{author}, #{memo}, #{salt})
     </insert>
 
     <select id="getUserById" resultType="com.kevin.server_monitor.security.vo.UserVo">
@@ -30,6 +30,7 @@
         AUTHOR = #{author}
         <if test="password != null">
             ,PASSWORD = #{password}
+            ,SALT = #{salt}
         </if>
         WHERE ID = #{id}
     </update>

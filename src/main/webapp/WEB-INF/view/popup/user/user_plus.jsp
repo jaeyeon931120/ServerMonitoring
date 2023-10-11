@@ -30,9 +30,12 @@
                         <label for="user_plus_password">
                             사용자 PW
                         </label>
-                        <input type="password" id="user_plus_password" autocomplete="off" placeholder="영어와 숫자, 특수문자를 포함 8~20자리"/>
-                        <p id="password_check_user_plus">비밀번호는 영어와 숫자, 특수문자를 포함하여 8자리 이상 20자리 이하로 작성해주세요.</p>
+                        <div class="pw_input">
+                            <input type="password" id="user_plus_password" autocomplete="off" placeholder="영어와 숫자, 특수문자를 포함 8~20자리"/>
+                            <i class="fa-eye"></i>
+                        </div>
                     </form>
+                    <p id="password_check_user_plus">비밀번호는 영어와 숫자, 특수문자를 포함하여 8자리 이상 20자리 이하로 작성해주세요.</p>
                 </li>
                 <li>
                     <label for="user_plus_username">사용자 이름</label>

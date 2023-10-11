@@ -2,19 +2,21 @@ package com.kevin.server_monitor.security.service;
 
 import com.kevin.server_monitor.security.mapper.UserMapper;
 import com.kevin.server_monitor.security.vo.UserVo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.util.List;
 
 @Service
 public class UserService {
 
+    private static final Logger logger = LoggerFactory.getLogger(UserService.class);
     private final UserMapper userMapper;
-
-    private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     public UserService(UserMapper userMapper) {
         this.userMapper = userMapper;
@@ -39,9 +41,11 @@ public class UserService {
             userVo.setAuthor("USER");
         }
 
-        if (!userVo.getId().equals("")) {
+        if (!userVo.getId().isEmpty()) {
             // password는 암호화해서 DB에 저장
-            userVo.setPassword(passwordEncoder.encode(userVo.getPassword()));
+            String salt = getSalt();
+            userVo.setSalt(salt);
+            userVo.setPassword(getEncrypt(userVo.getPassword(), salt));
             result = userMapper.insertUser(userVo);
         }
         return result;
@@ -57,7 +61,9 @@ public class UserService {
         }
 
         if(userVo.getPassword() != null) {
-            userVo.setPassword(passwordEncoder.encode(userVo.getPassword()));
+            String salt = getSalt();
+            userVo.setSalt(salt);
+            userVo.setPassword(getEncrypt(userVo.getPassword(), salt));
         }
         result = userMapper.updateUser(userVo);
 
@@ -71,11 +77,47 @@ public class UserService {
         return result;
     }
 
-    public PasswordEncoder passwordEncoder() {
-        return this.passwordEncoder;
-    }
-
     public UserDetails getUserDetails(String id) {
         return userMapper.getUserDetails(id);
+    }
+
+    /* 무작이 문자열 Salt */
+    public String getSalt() {
+
+        //1. Random, salt 생성
+        SecureRandom sr = new SecureRandom();
+        byte[] salt = new byte[20];
+
+        //2. 난수 생성
+        sr.nextBytes(salt);
+
+        //3. byte To String(10진수 문자열로 변경)
+        StringBuilder sb = new StringBuilder();
+        for(byte b : salt) {
+            sb.append(String.format("%02x", b));
+        }
+
+        return sb.toString();
+    }
+
+    public String getEncrypt(String pwd, String salt) {
+        String result = "";
+        try {
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
+
+            md.update((pwd + salt).getBytes());
+            byte[] pwdSalt = md.digest();
+
+            StringBuilder sb = new StringBuilder();
+            for(byte b : pwdSalt) {
+                sb.append(String.format("%02x", b));
+            }
+
+            result = sb.toString();
+        } catch (NoSuchAlgorithmException e) {
+            logger.error("password hashing algorithm to error, java error : {}", e.getMessage());
+        }
+
+        return result;
     }
 }

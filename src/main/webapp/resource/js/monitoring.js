@@ -73,23 +73,31 @@ window.onload = function () {
     const tb1header = document.getElementsByClassName('tb1-header');
     let scrollwidth;
 
+    /* 시간 설정 및 캔버스 크기 재조정 */
     getClock();
     setInterval(getClock, 1000);
     setInterval(getServerInfo, 60000);
     setCanvasSize();
 
-    /*메인데이터를 불러오는 함수*/
-    getServerInfo();
+    /* 비밀번호 보기/숨기기 표시 이벤트 */
+    passwordView().then();
 
+    /* 메인데이터를 불러오는 함수(비동기 콜백 방식으로 프로그래스 바 종료) */
+    getServerInfo().then(r => popupClose('progress'));
+
+    /* 서버 정보 테이블 바디 크기 재설정*/
     for (let i = 0; i < content.length; i++) {
         if (content_table.item(i) !== undefined) {
             scrollwidth = content.item(i).width - content_table.item(i).clientWidth;
         }
     }
+
+    /* 서버 정보 테이블 헤더 크기 재설정 */
     for (let i = 0; i < tb1header.length; i++) {
         tb1header.item(i).css('padding-right', scrollwidth)
     }
 
+    /* 설정 클릭 이벤트 */
     for (let i = 0; i < head_menu_button.length; i++) {
         if (head_menu_button[i].clickHandler) {
             head_menu_button[i].removeEventListener('click', () => gear_check.checked = false);
@@ -97,11 +105,33 @@ window.onload = function () {
         head_menu_button[i].addEventListener('click', () => gear_check.checked = false);
     }
 
+    /* 메뉴바 클릭 이벤트 */
     for (let i = 0; i < menu_button.length; i++) {
         if (menu_button[i].clickHandler) {
             menu_button[i].removeEventListener('click', () => menu_check.checked = false);
         }
         menu_button[i].addEventListener('click', () => menu_check.checked = false);
+    }
+}
+
+/* 비밀번호 보이게하는 이벤트 */
+async function passwordView() {
+    const eye_view = document.querySelectorAll('.fa-eye');
+
+    for (let i = 0; i < eye_view.length; i++) {
+        let input = eye_view[i].parentElement.querySelector('input');
+
+        eye_view[i].addEventListener('click', function () {
+            if(input.className === 'active') {
+                eye_view[i].className = 'fa-eye';
+                input.type = 'password';
+                input.className = '';
+            } else {
+                eye_view[i].className = 'fa-eye-blur';
+                input.type = 'text';
+                input.className = 'active';
+            }
+        })
     }
 }
 
@@ -168,7 +198,7 @@ function addinputListener(btn, work, process) {
         if (process.indexOf("user") > -1) {
             if (work === "id") {
                 id_check(process);
-            } else if (work === "pw") {
+            } else if (work === "password") {
                 pw_check(process);
             } else if (work === "username") {
                 name_check(process, work);
@@ -178,6 +208,8 @@ function addinputListener(btn, work, process) {
         } else if (process.indexOf("server") > -1) {
             if (work === "system") {
                 system_check(process);
+            } else if (work === "password") {
+                name_check(process, work);
             } else if (work === "ip") {
                 ip_check(process);
             } else if (work.indexOf("port") > -1) {
@@ -525,104 +557,110 @@ function lineGraphDataSet(config, port) {
     myChartLine = new Chart(ctx2, config);
 }
 
-function getServerInfo() {
+async function getServerInfo() {
     let httpRequest;
     httpRequest = new XMLHttpRequest();
 
-    httpRequest.onreadystatechange = () => {
-        popupOpen(null, null, "progress");
-        if (httpRequest.readyState === XMLHttpRequest.DONE) {
-            if (httpRequest.status === 200) {
-                let j = 0;
-                const table_id = document.querySelector('#server_list');
-                const tbody = document.querySelector('.server_content');
-                serverlist = [];
-                cpulist = new Map();
-                memorylist = new Map();
-                disklist = new Map();
-                let res = httpRequest.response;
-                let tomcatportlist = [];
+    try {
+        httpRequest.onreadystatechange = () => {
+            popupOpen(null, null, "progress");
+            if (httpRequest.readyState === XMLHttpRequest.DONE) {
+                if (httpRequest.status === 200) {
+                    let j = 0;
+                    const table_id = document.querySelector('#server_list');
+                    const tbody = document.querySelector('.server_content');
+                    serverlist = [];
+                    cpulist = new Map();
+                    memorylist = new Map();
+                    disklist = new Map();
+                    let res = httpRequest.response;
+                    let tomcatportlist = [];
 
-                /* 서버 슬라이드 및 관련 그래프를 만드는데 필요한 데이터 분류 */
-                if (res !== null && res.length !== 0) {
-                    while (tbody.hasChildNodes()) {
-                        tbody.removeChild(tbody.firstChild);
-                    }
+                    /* 서버 슬라이드 및 관련 그래프를 만드는데 필요한 데이터 분류 */
+                    if (res !== null && res.length !== 0) {
+                        while (tbody.hasChildNodes()) {
+                            tbody.removeChild(tbody.firstChild);
+                        }
 
-                    let author = res.author;
-                    let res_list = res.server_list;
-                    if (res_list !== null && res_list !== undefined) {
-                        for (let i = 0; i < res_list.length; i++) {
-                            tableCreate(res_list[i], table_id, author);
-                            tomcatportlist.push(res_list[i].tomcat_port);
-                            if (i === res_list.length - 1 && res_list[j].server_name !== res_list[i].server_name) {
-                                serverlist.push(res_list[j].server_name);
-                                serverlist.push(res_list[i].server_name);
-                                systemlist.set(res_list[j].server_name, res_list[j].system);
-                                systemlist.set(res_list[j].server_name, res_list[j].system);
-                                iplist.set(res_list[j].server_name, res_list[j].ip);
-                                iplist.set(res_list[i].server_name, res_list[i].ip);
-                                cpulist.set(res_list[j].server_name, Number(res_list[j].cpu.substring(0, res_list[j].cpu.length - 1)));
-                                cpulist.set(res_list[i].server_name, Number(res_list[i].cpu.substring(0, res_list[i].cpu.length - 1)));
-                                memorylist.set(res_list[j].server_name, Number(res_list[j].memory.substring(0, res_list[j].memory.length - 1)));
-                                memorylist.set(res_list[i].server_name, Number(res_list[i].memory.substring(0, res_list[i].memory.length - 1)));
-                                disklist.set(res_list[j].server_name, Number(res_list[j].disk.substring(0, res_list[j].disk.length - 1)));
-                                disklist.set(res_list[i].server_name, Number(res_list[i].disk.substring(0, res_list[i].disk.length - 1)));
-                                tomcatportlist.splice(tomcatportlist.length - 1);
-                                tomcatportMap.set(res_list[j].server_name, tomcatportlist);
-                                tomcatportlist = [];
+                        let author = res.author;
+                        let res_list = res.server_list;
+                        if (res_list !== null && res_list !== undefined) {
+                            for (let i = 0; i < res_list.length; i++) {
+                                tableCreate(res_list[i], table_id, author);
                                 tomcatportlist.push(res_list[i].tomcat_port);
-                                tomcatportMap.set(res_list[i].server_name, tomcatportlist);
-                            } else if ((res_list[j].ip !== res_list[i].ip) || (i === res_list.length - 1 && res_list[j].server_name === res_list[i].server_name)) {
-                                serverlist.push(res_list[j].server_name);
-                                systemlist.set(res_list[j].server_name, res_list[j].system);
-                                iplist.set(res_list[j].server_name, res_list[j].ip);
-                                cpulist.set(res_list[j].server_name, Number(res_list[j].cpu.substring(0, res_list[j].cpu.length - 1)));
-                                memorylist.set(res_list[j].server_name, Number(res_list[j].memory.substring(0, res_list[j].memory.length - 1)));
-                                disklist.set(res_list[j].server_name, Number(res_list[j].disk.substring(0, res_list[j].disk.length - 1)));
-                                tomcatportlist.splice(tomcatportlist.length - 1);
-                                if (i === res_list.length - 1) {
+                                if (i === res_list.length - 1 && res_list[j].server_name !== res_list[i].server_name) {
+                                    serverlist.push(res_list[j].server_name);
+                                    serverlist.push(res_list[i].server_name);
+                                    systemlist.set(res_list[j].server_name, res_list[j].system);
+                                    systemlist.set(res_list[j].server_name, res_list[j].system);
+                                    iplist.set(res_list[j].server_name, res_list[j].ip);
+                                    iplist.set(res_list[i].server_name, res_list[i].ip);
+                                    cpulist.set(res_list[j].server_name, Number(res_list[j].cpu.substring(0, res_list[j].cpu.length - 1)));
+                                    cpulist.set(res_list[i].server_name, Number(res_list[i].cpu.substring(0, res_list[i].cpu.length - 1)));
+                                    memorylist.set(res_list[j].server_name, Number(res_list[j].memory.substring(0, res_list[j].memory.length - 1)));
+                                    memorylist.set(res_list[i].server_name, Number(res_list[i].memory.substring(0, res_list[i].memory.length - 1)));
+                                    disklist.set(res_list[j].server_name, Number(res_list[j].disk.substring(0, res_list[j].disk.length - 1)));
+                                    disklist.set(res_list[i].server_name, Number(res_list[i].disk.substring(0, res_list[i].disk.length - 1)));
+                                    tomcatportlist.splice(tomcatportlist.length - 1);
+                                    tomcatportMap.set(res_list[j].server_name, tomcatportlist);
+                                    tomcatportlist = [];
+                                    tomcatportlist.push(res_list[i].tomcat_port);
+                                    tomcatportMap.set(res_list[i].server_name, tomcatportlist);
+                                } else if ((res_list[j].ip !== res_list[i].ip) || (i === res_list.length - 1 && res_list[j].server_name === res_list[i].server_name)) {
+                                    serverlist.push(res_list[j].server_name);
+                                    systemlist.set(res_list[j].server_name, res_list[j].system);
+                                    iplist.set(res_list[j].server_name, res_list[j].ip);
+                                    cpulist.set(res_list[j].server_name, Number(res_list[j].cpu.substring(0, res_list[j].cpu.length - 1)));
+                                    memorylist.set(res_list[j].server_name, Number(res_list[j].memory.substring(0, res_list[j].memory.length - 1)));
+                                    disklist.set(res_list[j].server_name, Number(res_list[j].disk.substring(0, res_list[j].disk.length - 1)));
+                                    tomcatportlist.splice(tomcatportlist.length - 1);
+                                    if (i === res_list.length - 1) {
+                                        tomcatportlist.push(res_list[i].tomcat_port);
+                                    }
+                                    tomcatportMap.set(res_list[j].server_name, tomcatportlist);
+
+                                    tomcatportlist = [];
                                     tomcatportlist.push(res_list[i].tomcat_port);
                                 }
-                                tomcatportMap.set(res_list[j].server_name, tomcatportlist);
-
-                                tomcatportlist = [];
-                                tomcatportlist.push(res_list[i].tomcat_port);
+                                j = i;
                             }
-                            j = i;
                         }
-                    }
-                    /*서버 리스트 테이블을 만드는 함수*/
-                    tableRowSpan(table_id);
 
-                    /* 서버 선택창을 만드는 함수 */
-                    selectOptionCreate();
-                    /* Bar그래프를 불러오는 함수 */
-                    createGraphBar(selectServer, cpulist, memorylist, disklist);
-                    /* Line그래프를 불러오는 함수 */
-                    trapicGraphData();
-                    /* LogData를 불러오는 함수 */
-                    getLogDataList("main");
-                    /* 전체 서버 종료된 날짜 확인 */
-                    allServerAlarm();
+                        /*서버 리스트 테이블을 만드는 함수*/
+                        tableRowSpan(table_id);
+                        /* 서버 선택창을 만드는 함수 */
+                        selectOptionCreate();
+                        /* Bar그래프를 불러오는 함수 */
+                        createGraphBar(selectServer, cpulist, memorylist, disklist);
+                        /* Line그래프를 불러오는 함수 */
+                        trapicGraphData();
+                        /* LogData를 불러오는 함수 */
+                        getLogDataList("main");
+                        /* 전체 서버 종료된 날짜 확인 */
+                        allServerAlarm();
+                    } else {
+                        popupClose("progress");
+                        error_popupOpen(null, null, "request");
+                        console.log("request error");
+                    }
                 } else {
                     popupClose("progress");
                     error_popupOpen(null, null, "request");
                     console.log("request error");
                 }
-            } else {
-                popupClose("progress");
-                error_popupOpen(null, null, "request");
-                console.log("request error");
             }
         }
-    }
 
-    httpRequest.open('POST', "/server_list", true);
-    httpRequest.responseType = "json";
-    httpRequest.setRequestHeader('Content-Type', 'application/json');
-    httpRequest.setRequestHeader(header, token);
-    httpRequest.send();
+        httpRequest.open('POST', "/server_list", true);
+        httpRequest.responseType = "json";
+        httpRequest.setRequestHeader('Content-Type', 'application/json');
+        httpRequest.setRequestHeader(header, token);
+        httpRequest.send();
+    } catch (e) {
+        popupClose("progress");
+        error_popupOpen(null, null, "request");
+        console.log(e);
+    }
 }
 
 function trapicGraphData() {
@@ -1593,9 +1631,9 @@ function name_check(process, checkname) {
             if (checkname === "server_name") {
                 name_p.innerText = "서버 이름이 입력되지 않았습니다."
             } else if (checkname === "id") {
-                name_p.innerText = "서버 로그인 ID가 입력되지 않았습니다."
+                name_p.innerText = "서버 ID가 입력되지 않았습니다."
             } else if (checkname === "password") {
-                name_p.innerText = "서버 로그인 PW가 입력되지 않았습니다."
+                name_p.innerText = "서버 PW가 입력되지 않았습니다."
             } else if (checkname === "tomcat_dir") {
                 name_p.innerText = "톰캣 폴더 위치가 입력되지 않았습니다."
             } else if (checkname === "username") {
@@ -1791,19 +1829,20 @@ function server_management(process) {
 
         let httpRequest;
         httpRequest = new XMLHttpRequest();
+        popupOpen(null, null, "progress");
 
         httpRequest.onreadystatechange = () => {
-            popupOpen(null, null, "progress");
             if (httpRequest.readyState === XMLHttpRequest.DONE) {
-                popupClose("progress");
                 if (httpRequest.status === 200) {
                     let res = httpRequest.response;
                     if (res.result === "ok") {
                         popupClose(process);
                         result_popupOpen(data, null, process);
                     } else if (res.result === "detect") {
+                        popupClose(process);
                         error_popupOpen(data, "detect", process);
                     } else {
+                        popupClose(process);
                         error_popupOpen(data, null, process);
                     }
                     getServerInfo();
@@ -2162,4 +2201,3 @@ function movePage(page) {
     httpRequest.setRequestHeader(header, token);
     httpRequest.send(JSON.stringify(data));
 }
-

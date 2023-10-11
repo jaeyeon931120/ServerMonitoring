@@ -7,10 +7,12 @@
 --%>
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<div class="hd-alarm">
-    <!-- 알람 리스트 -->
-    <div class="hd-alarm-box none">
-        <ul class="hd-alarm-list">
-        </ul>
+<div class="popup_wrapper system_info">
+    <div class="popup system_info">
+        <div class="popup_head system_info">
+            <a class="btn-close trigger" onclick="popupClose('system_info')">x</a>
+        </div>
+        <div class="popup_body system_info">
+        </div>
     </div>
 </div>

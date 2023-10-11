@@ -16,6 +16,29 @@
     <link rel='stylesheet' type='text/css' href="${pageContext.request.contextPath}/resource/css/monitoring.css">
     <link rel="favicon" href="${pageContext.request.contextPath}/resource/image/favicon.ico"/>
 </head>
+<script>
+    window.onload = function () {
+        passwordView().then();
+
+        /* 비밀번호 보이게하는 이벤트 */
+        async function passwordView() {
+            const eye_view = document.querySelector('.fa-eye')
+            let input = document.getElementById('password');
+
+            await eye_view.addEventListener('click', function () {
+                if(input.className === 'active') {
+                    eye_view.className = 'login fa-eye';
+                    input.type = 'password';
+                    input.className = '';
+                } else {
+                    eye_view.className = 'login fa-eye-blur';
+                    input.type = 'text';
+                    input.className = 'active';
+                }
+            })
+        }
+    }
+</script>
 <body class="login_bg">
 <div class="login_box">
     <img src="${pageContext.request.contextPath}/resource/image/login_box.jpg" alt="" />
@@ -23,7 +46,10 @@
         <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
         <img src="${pageContext.request.contextPath}/resource/image/kevin_logo.jpg" alt=""/>
         <input type="text" id="id" name="id" placeholder="아이디" required="" autofocus="">
-        <input type="password" id="password" name="password" placeholder="비밀번호" required="">
+        <div class="login_pw">
+            <input type="password" id="password" name="password" placeholder="비밀번호" required="">
+            <i class="login fa-eye"></i>
+        </div>
         <span class="error_text">
             <c:if test="${error}">
                 <p class="danger">${exception}</p>

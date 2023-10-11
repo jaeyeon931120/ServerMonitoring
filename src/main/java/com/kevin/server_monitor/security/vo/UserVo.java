@@ -14,4 +14,5 @@ public class UserVo {
     private String password;
     private String author;
     private String memo;
+    private String salt;
 }

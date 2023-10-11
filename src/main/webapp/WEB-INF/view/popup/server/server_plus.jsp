@@ -33,9 +33,12 @@
                 <li>
                     <form class="popup_form" onsubmit="return false;">
                         <label for="server_plus_password">서버 PW</label>
-                        <input type="password" id="server_plus_password" autocomplete="off" placeholder="서버 PW"/>
-                        <p id="password_check_server_plus">서버 로그인 비밀번호를 입력하셔야 됩니다.</p>
+                        <div class="pw_input">
+                            <input type="password" id="server_plus_password" autocomplete="off" placeholder="서버 PW"/>
+                            <i class="fa-eye"></i>
+                        </div>
                     </form>
+                    <p id="password_check_server_plus">서버 로그인 비밀번호를 입력하셔야 됩니다.</p>
                 </li>
                 <li>
                     <label for="server_plus_server_name">서버 이름</label>
