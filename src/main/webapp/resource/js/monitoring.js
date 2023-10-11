@@ -122,7 +122,7 @@ async function passwordView() {
         let input = eye_view[i].parentElement.querySelector('input');
 
         eye_view[i].addEventListener('click', function () {
-            if(input.className === 'active') {
+            if (input.className === 'active') {
                 eye_view[i].className = 'fa-eye';
                 input.type = 'password';
                 input.className = '';
@@ -1938,7 +1938,6 @@ function getLogDataList(process) {
     data.server_name = selectServer;
     data.ip = iplist.get(selectServer);
     if (process === "main") {
-        serverlog_body.replaceChildren();
         let today = new Date();
         data.hours = ('0' + today.getHours()).slice(-2);
         data.process = "main";
@@ -1955,26 +1954,26 @@ function getLogDataList(process) {
                 let res = httpRequest.response;
 
                 if (process === "main") {
-                    if (res != null) {
-                        if (res.list !== null && res.list.length !== 0) {
-                            left_content.style.width = "30%";
-                            log_icon.style.display = 'inline-block';
+                    if (res.list !== null && res.list.length !== 0) {
+                        left_content.style.width = "30%";
+                        log_icon.style.display = 'inline-block';
 
-                            for (let i = 0; i < res.list.length; i++) {
-                                const li = document.createElement("li");
-                                li.textContent = "( " + res.list[i].val_date + " ) " + res.list[i].log;
+                        for (let i = 0; i < res.list.length; i++) {
+                            const li = document.createElement("li");
+                            li.textContent = "( " + res.list[i].val_date + " ) " + res.list[i].log;
 
-                                serverlog_body.appendChild(serverlog_ul);
-                                serverlog_ul.appendChild(li);
-                            }
-                        } else {
-                            left_content.style.width = "33%";
-                            const p = document.createElement('p');
-                            p.textContent = "해당 서버의 최근에 기록된 로그가 없습니다."
-
-                            log_icon.style.display = 'none';
-                            serverlog_body.appendChild(p);
+                            serverlog_body.replaceChildren();
+                            serverlog_body.appendChild(serverlog_ul);
+                            serverlog_ul.appendChild(li);
                         }
+                    } else {
+                        left_content.style.width = "33%";
+                        const p = document.createElement('p');
+                        p.textContent = "해당 서버의 최근에 기록된 로그가 없습니다."
+
+                        log_icon.style.display = 'none';
+                        serverlog_body.replaceChildren();
+                        serverlog_body.appendChild(p);
                     }
                 } else if (process === "popup") {
                     findAlllog(res);
