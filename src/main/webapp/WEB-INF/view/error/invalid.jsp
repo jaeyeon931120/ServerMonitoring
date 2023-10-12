@@ -29,11 +29,11 @@
         </div>
         <span class="inner-status">세션이 유효하지 않습니다.</span>
         <span class="inner-detail">
-            세션이 유효하지 않습니다.새로 로그인 해주시기 바랍니다.
+            세션이 유효하지 않습니다. 대시보드 페이지로 돌아갑니다.
         </span>
         <a href="/login" class="button button-normal btn_error_home">
             <i class="fa fa-home"></i>
-            &nbsp;로그인창으로 돌아가기
+            &nbsp;메인으로 돌아가기
         </a>
     </div>
 </div>
