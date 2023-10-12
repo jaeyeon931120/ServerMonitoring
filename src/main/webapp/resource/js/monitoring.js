@@ -5,7 +5,6 @@ let popuphead;
 let popupbody;
 let h1;
 let select_value;
-let btn_manual;
 let popup_user_plus;
 let id_check_btn;
 let ok_img;
@@ -48,7 +47,6 @@ window.onload = function () {
     popuphead = document.querySelector(".popup_head");
     popupbody = document.querySelector(".popup_body");
     h1 = document.createElement("h1");
-    btn_manual = document.querySelector('.btn_manual_download');
     popup_user_plus = document.querySelector('.popup.user_plus');
     id_check_btn = document.querySelector('.popup_body.user_plus > ul > li > .btn_check');
     ok_img = document.querySelector('.popup_body.user_plus > ul > li > img');
@@ -1050,7 +1048,31 @@ function popupOpen(data, action, process) {
         const popup_server_log = document.querySelector(".popup_wrapper.server_log");
         popup_server_log.className = "popup_wrapper open server_log";
         getLogDataList("popup");
+    } else if(process === 'system_info') {
+        const popup_system_info = document.querySelector(".popup_wrapper.system_info");
+        popup_system_info.className = "popup_wrapper open system_info";
     }
+}
+
+/* 메뉴얼 다운로드 */
+async function manual_download(process) {
+    const downloadName = document.getElementById('system_'+process).value;
+    const nameSplit = downloadName.split('.');
+    const file_format = "." + nameSplit[nameSplit.length - 1];
+    const response = await fetch('/resource/manual/' + process + file_format);
+    console.log('response : ', response);
+    const file = await response.blob(); // file 읽어오기
+    const downloadUrl = window.URL.createObjectURL(file); // 해당 file을 가리키는 url 생성
+    const aElement = document.createElement('a');
+
+    document.body.appendChild(aElement);
+    aElement.download = downloadName; // a tag에 download 속성을 줘서 클릭할 때 다운로드가 일어날 수 있도록 하기
+    aElement.href = downloadUrl; // href에 url 달아주기
+
+    aElement.click(); // 코드 상으로 클릭을 해줘서 다운로드를 트리거
+
+    document.body.removeChild(aElement); // cleanup - 쓰임을 다한 a 태그 삭제
+    window.URL.revokeObjectURL(downloadUrl); // cleanup - 쓰임을 다한 url 객체 삭제
 }
 
 function result_popupOpen(data, action, process) {
@@ -1186,6 +1208,9 @@ function popupClose(process) {
     } else if (process === 'server_log') {
         const popup_server_log = document.querySelector(".popup_wrapper.server_log");
         popup_server_log.className = "popup_wrapper close server_log";
+    } else if (process === 'system_info') {
+        const popup_system_info = document.querySelector(".popup_wrapper.system_info");
+        popup_system_info.className = "popup_wrapper close system_info";
     }
 }
 
@@ -1330,25 +1355,6 @@ function select_function(process) {
     popup_wrapper_select.addEventListener('click', popup_wrapper_select.clickHandler);
     popup_head_select.addEventListener('click', popup_head_select.clickHandler);
     popup_body_select.addEventListener('click', popup_body_select.clickHandler);
-}
-
-/* 메뉴얼 다운로드 */
-async function manual_download() {
-    btn_manual.removeEventListener('click', () => manual_download());
-    const response = await fetch('/resource/manual/manual.docx');
-    const file = await response.blob();
-    const downloadUrl = window.URL.createObjectURL(file); // 해당 file을 가리키는 url 생성
-    const aElement = document.createElement('a');
-
-    document.body.appendChild(aElement);
-    aElement.download = 'KevinLAB 서비스 관리 시스템 메뉴얼'; // a tag에 download 속성을 줘서 클릭할 때 다운로드가 일어날 수 있도록 하기
-    aElement.href = downloadUrl; // href에 url 달아주기
-
-    aElement.click(); // 코드 상으로 클릭을 해줘서 다운로드를 트리거
-
-    document.body.removeChild(aElement); // cleanup - 쓰임을 다한 a 태그 삭제
-    window.URL.revokeObjectURL(downloadUrl); // cleanup - 쓰임을 다한 url 객체 삭제
-    btn_manual.addEventListener('click', () => manual_download());
 }
 
 function id_duplication_check(process) {

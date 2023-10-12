@@ -33,9 +33,8 @@
                 <li><p id="username">${username}님 환영합니다.</p></li>
                 <li><p id="clock">2023-05-31(화) 22:01:31</p></li>
                 <li>
-                    <a class="btn_manual_download" onclick="manual_download()">
-                        <img src="${pageContext.request.contextPath}/resource/image/download.png" alt=""/>
-                        <span>메뉴얼</span>
+                    <a class="btn_manual_download" onclick="popupOpen(null, null, 'system_info')">
+                        <i class="exclamtionmark"></i>
                     </a>
                 </li>
                 <li><a id="logout" onclick="location.href='logout'">로그아웃</a></li>

@@ -276,21 +276,17 @@ header > div {
 }
 
 .btn_manual_download {
-    cursor: pointer;
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
-.btn_manual_download span {
-    margin-left: 5px;
-    font-size: 0.773em;
-    font-weight: bold;
-}
-
-.btn_manual_download img {
-    width: 20px;
-    height: 20px;
+.btn_manual_download i {
+    cursor: pointer;
+    width: 25px;
+    height: 25px;
+    background: url("../image/info-icon.png") no-repeat;
+    background-size: contain;
 }
 
 /* Footer CSS */
@@ -876,7 +872,7 @@ input:-webkit-autofill, input:-webkit-autofill:hover, input:-webkit-autofill:foc
     padding: 12px 27px;
 }
 
-.popup_body.server_plus, .popup_body.server_delete {
+.popup_body.server_plus, .popup_body.server_delete, .popup_body.system_info {
     padding: 15px 30px 0 30px;
     display: flex;
     align-content: center;
@@ -1349,6 +1345,12 @@ input:-webkit-autofill, input:-webkit-autofill:hover, input:-webkit-autofill:foc
 .server_log_table > tbody > tr > td > button > span {
     font-size: 13px;
     font-weight: bold;
+}
+
+/* 시스템 정보 팝업창 */
+.popup_wrapper.system_info {
+    resize: both;
+    overflow: auto;
 }
 
 /* 메뉴 토글 스타일 */
@@ -1833,7 +1835,7 @@ input:-webkit-autofill, input:-webkit-autofill:hover, input:-webkit-autofill:foc
 }
 
 /* 비밀번호 보이게 하는 아이콘 */
-.pw_input {
+.input_image {
     width: 320px;
     display: flex;
     justify-content: flex-end;
@@ -1877,8 +1879,23 @@ input:-webkit-autofill, input:-webkit-autofill:hover, input:-webkit-autofill:foc
     background-size: contain;
 }
 
+/* 시스템 정보 스타일 */
+.fa-download {
+    cursor: pointer;
+    position: fixed;
+    height: 20px;
+    width: 20px;
+    background: url(../image/download.png) no-repeat;
+    background-size: contain;
+    margin-right: 10px;
+}
+
 /* 노트북 반응형 화면 */
 @media screen and (width < 1800px) {
+    .menu_toggle {
+        margin-right: -10px;
+    }
+
     .menu > .menu_head {
         height: 1em;
         margin-left: -15px;
@@ -1967,6 +1984,10 @@ input:-webkit-autofill, input:-webkit-autofill:hover, input:-webkit-autofill:foc
 }
 
 @media screen and (min-height:710px) and (max-height:864px) {
+    .menu_toggle {
+        margin-right: -10px;
+    }
+
     .alarm_list.server {
         height: 35vh;
     }
@@ -1977,6 +1998,10 @@ input:-webkit-autofill, input:-webkit-autofill:hover, input:-webkit-autofill:foc
 }
 
 @media screen and (min-height:1000px) and (min-width:1900px) {
+    .menu_toggle {
+        margin-right: -10px;
+    }
+
     .main_box.flex_box.server {
         height: 45vh;
     }

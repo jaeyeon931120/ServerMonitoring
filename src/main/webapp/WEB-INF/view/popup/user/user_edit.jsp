@@ -22,7 +22,7 @@
                         <label for="user_edit_password">
                             사용자 PW
                         </label>
-                        <div class="pw_input">
+                        <div class="input_image">
                             <input type="password" id="user_edit_password" autocomplete="off" placeholder="영어와 숫자, 특수문자를 포함 8~20자리"/>
                             <i class="fa-eye"></i>
                         </div>

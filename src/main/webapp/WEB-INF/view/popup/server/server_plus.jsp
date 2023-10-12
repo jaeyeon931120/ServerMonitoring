@@ -33,7 +33,7 @@
                 <li>
                     <form class="popup_form" onsubmit="return false;">
                         <label for="server_plus_password">서버 PW</label>
-                        <div class="pw_input">
+                        <div class="input_image">
                             <input type="password" id="server_plus_password" autocomplete="off" placeholder="서버 PW"/>
                             <i class="fa-eye"></i>
                         </div>
