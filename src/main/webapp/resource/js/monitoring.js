@@ -81,7 +81,7 @@ window.onload = function () {
     passwordView().then();
 
     /* 메인데이터를 불러오는 함수(비동기 콜백 방식으로 프로그래스 바 종료) */
-    getServerInfo().then(r => popupClose('progress'));
+    getServerInfo().then();
 
     /* 서버 정보 테이블 바디 크기 재설정*/
     for (let i = 0; i < content.length; i++) {
@@ -636,6 +636,7 @@ async function getServerInfo() {
                         getLogDataList("main");
                         /* 전체 서버 종료된 날짜 확인 */
                         allServerAlarm();
+
                     } else {
                         popupClose("progress");
                         error_popupOpen(null, null, "request");
@@ -659,6 +660,8 @@ async function getServerInfo() {
         error_popupOpen(null, null, "request");
         console.log(e);
     }
+
+    await new Promise(() => popupClose("progress"));
 }
 
 function trapicGraphData() {
@@ -1850,7 +1853,7 @@ function server_management(process) {
                         error_popupOpen(data, null, process);
                     }
                     /* 메인데이터를 불러오는 함수(비동기 콜백 방식으로 프로그래스 바 종료) */
-                    getServerInfo().then(r => popupClose('progress'));
+                    getServerInfo().then();
                 } else {
                     console.log("request error");
                 }
