@@ -1838,20 +1838,19 @@ function server_management(process) {
         popupOpen(null, null, "progress");
 
         httpRequest.onreadystatechange = () => {
+            popupClose(process);
             if (httpRequest.readyState === XMLHttpRequest.DONE) {
                 if (httpRequest.status === 200) {
                     let res = httpRequest.response;
                     if (res.result === "ok") {
-                        popupClose(process);
                         result_popupOpen(data, null, process);
                     } else if (res.result === "detect") {
-                        popupClose(process);
                         error_popupOpen(data, "detect", process);
                     } else {
-                        popupClose(process);
                         error_popupOpen(data, null, process);
                     }
-                    getServerInfo();
+                    /* 메인데이터를 불러오는 함수(비동기 콜백 방식으로 프로그래스 바 종료) */
+                    getServerInfo().then(r => popupClose('progress'));
                 } else {
                     console.log("request error");
                 }
