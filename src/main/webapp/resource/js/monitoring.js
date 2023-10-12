@@ -1117,6 +1117,9 @@ function result_popupOpen(data, action, process) {
 
     if (process.indexOf('user') >= 0) {
         getUserList();
+    } else {
+        /* 메인데이터를 불러오는 함수(비동기 콜백 방식으로 프로그래스 바 종료) */
+        getServerInfo().then();
     }
 }
 
@@ -1181,6 +1184,9 @@ function error_popupOpen(data, action, process) {
 
     if (process.indexOf('user') >= 0) {
         getUserList();
+    } else {
+        /* 메인데이터를 불러오는 함수(비동기 콜백 방식으로 프로그래스 바 종료) */
+        getServerInfo().then();
     }
 }
 
@@ -1852,8 +1858,6 @@ function server_management(process) {
                     } else {
                         error_popupOpen(data, null, process);
                     }
-                    /* 메인데이터를 불러오는 함수(비동기 콜백 방식으로 프로그래스 바 종료) */
-                    getServerInfo().then();
                 } else {
                     console.log("request error");
                 }
