@@ -1049,7 +1049,7 @@ function popupOpen(data, action, process) {
         const popup_server_log = document.querySelector(".popup_wrapper.server_log");
         popup_server_log.className = "popup_wrapper open server_log";
         getLogDataList("popup");
-    } else if(process === 'system_info') {
+    } else if (process === 'system_info') {
         const popup_system_info = document.querySelector(".popup_wrapper.system_info");
         popup_system_info.className = "popup_wrapper open system_info";
     }
@@ -1057,7 +1057,7 @@ function popupOpen(data, action, process) {
 
 /* 메뉴얼 다운로드 */
 async function manual_download(process) {
-    const downloadName = document.getElementById('system_'+process).value;
+    const downloadName = document.getElementById('system_' + process).value;
     const nameSplit = downloadName.split('.');
     const file_format = "." + nameSplit[nameSplit.length - 1];
     const response = await fetch('/resource/manual/' + process + file_format);
@@ -1270,7 +1270,7 @@ function power_work(data, action) {
                 popupbody.appendChild(h1);
                 popupbody.appendChild(btn_box);
                 addListener(btn_submit, data, action, 'power', 'close');
-                getServerInfo();
+                getServerInfo().then();
             } else {
                 if (action === "on") {
                     h1.textContent = datamap.get("server_name") + "서버 구동에 실패했습니다.";
@@ -1366,52 +1366,60 @@ function select_function(process) {
 
 function id_duplication_check(process) {
     const input_id = document.getElementById(process + '_id');
+    const regExp = /^[a-zA-Z0-9]{4,20}$/;
+
     let id = input_id.value;
     let httpRequest;
     if (isStringValue(id)) {
-        let data = {};
-        data.id = id;
-        httpRequest = new XMLHttpRequest();
+        if (regExp.test(id)) {
+            console.log("regExp : ", regExp.test(id));
+            let data = {};
+            data.id = id;
+            httpRequest = new XMLHttpRequest();
 
-        httpRequest.onreadystatechange = () => {
-            popupOpen(null, null, "progress");
-            if (httpRequest.readyState === XMLHttpRequest.DONE) {
-                popupClose("progress");
-                if (httpRequest.status === 200) {
-                    let res = httpRequest.response;
-                    let check = res.result;
-                    if (check === "ok") {
-                        id_check_btn.style.display = "none";
-                        user_plus_id.style.width = "277px";
-                        user_plus_id.disabled = true;
-                        ok_img.style.display = "block";
-                        id_check_plus.style.display = "none";
+            httpRequest.onreadystatechange = () => {
+                popupOpen(null, null, "progress");
+                if (httpRequest.readyState === XMLHttpRequest.DONE) {
+                    popupClose("progress");
+                    if (httpRequest.status === 200) {
+                        let res = httpRequest.response;
+                        let check = res.result;
+                        if (check === "ok") {
+                            id_check_btn.style.display = "none";
+                            user_plus_id.style.width = "277px";
+                            user_plus_id.disabled = true;
+                            ok_img.style.display = "block";
+                            id_check_plus.style.display = "none";
 
-                        id_check_result = true;
-                    } else if (check === "error") {
-                        id_check_plus.innerText = "중복된 ID 확인중에 오류가 발생했습니다."
-                        id_check_plus.style.display = "block";
-                        popup_user_plus.style.overflow = 'hidden';
+                            id_check_result = true;
+                        } else if (check === "error") {
+                            id_check_plus.innerText = "중복된 ID 확인중에 오류가 발생했습니다."
+                            id_check_plus.style.display = "block";
+                            popup_user_plus.style.overflow = 'hidden';
 
-                        id_check_result = false;
-                    } else if (check === "nok") {
-                        id_check_plus.innerText = "중복된 ID가 존재합니다. 다른 ID를 입력해주세요.";
-                        id_check_plus.style.display = "block";
-                        popup_user_plus.style.overflow = 'hidden';
+                            id_check_result = false;
+                        } else if (check === "nok") {
+                            id_check_plus.innerText = "중복된 ID가 존재합니다. 다른 ID를 입력해주세요.";
+                            id_check_plus.style.display = "block";
+                            popup_user_plus.style.overflow = 'hidden';
 
-                        id_check_result = false;
+                            id_check_result = false;
+                        }
+                    } else {
+                        console.log("request error");
                     }
-                } else {
-                    console.log("request error");
                 }
             }
+            httpRequest.open('POST', "/id_check", true);
+            httpRequest.responseType = "json";
+            httpRequest.setRequestHeader('Content-Type', 'application/json');
+            httpRequest.setRequestHeader(header, token);
+            httpRequest.send(JSON.stringify(data));
+        } else {
+            id_check_plus.innerText = "ID는 4~20자 이내의 영문자+숫자로 입력하셔야됩니다."
+            id_check_plus.style.display = "block";
+            popup_user_plus.style.overflow = 'hidden';
         }
-
-        httpRequest.open('POST', "/id_check", true);
-        httpRequest.responseType = "json";
-        httpRequest.setRequestHeader('Content-Type', 'application/json');
-        httpRequest.setRequestHeader(header, token);
-        httpRequest.send(JSON.stringify(data));
     } else {
         id_check_plus.innerText = "ID가 입력되지 않았습니다."
         id_check_plus.style.display = "block";
@@ -1420,6 +1428,8 @@ function id_duplication_check(process) {
 }
 
 function id_check(process) {
+    const regExp = /^[a-zA-Z0-9]{4,20}$/;
+
     if (process === "user_edit") {
         id_check_result = true;
         return true;
@@ -1428,22 +1438,30 @@ function id_check(process) {
     } else {
         const id_input = document.getElementById(process + '_id');
         let id = id_input.value;
+
         if (isStringValue(id)) {
-            if (id_check_result === undefined) {
-                id_check_plus.innerText = "ID 중복체크를 하지 않았습니다. ID 중복체크를 해주세요."
-                id_check_plus.style.display = "block";
-                popup_user_plus.style.overflow = 'hidden';
-                return false;
-            } else if (id_check_result === true) {
-                id_check_btn.style.display = "none";
-                user_plus_id.style.width = "277px";
-                user_plus_id.disabled = true;
-                ok_img.style.display = "block";
-                id_check_plus.style.display = "none";
-                return true;
+            if (regExp.test(id)) {
+                if (id_check_result === undefined) {
+                    id_check_plus.innerText = "ID 중복체크를 하지 않았습니다. ID 중복체크를 해주세요."
+                    id_check_plus.style.display = "block";
+                    popup_user_plus.style.overflow = 'hidden';
+                    return false;
+                } else if (id_check_result === true) {
+                    id_check_btn.style.display = "none";
+                    user_plus_id.style.width = "277px";
+                    user_plus_id.disabled = true;
+                    ok_img.style.display = "block";
+                    id_check_plus.style.display = "none";
+                    return true;
+                } else {
+                    id_check_result = undefined;
+                    id_check_plus.innerText = "ID 중복체크를 하지 않았습니다. ID 중복체크를 해주세요."
+                    id_check_plus.style.display = "block";
+                    popup_user_plus.style.overflow = 'hidden';
+                    return false;
+                }
             } else {
-                id_check_result = undefined;
-                id_check_plus.innerText = "ID 중복체크를 하지 않았습니다. ID 중복체크를 해주세요."
+                id_check_plus.innerText = "ID는 4~20자 이내의 영문자+숫자로 입력하셔야됩니다."
                 id_check_plus.style.display = "block";
                 popup_user_plus.style.overflow = 'hidden';
                 return false;
@@ -1494,16 +1512,14 @@ function pw_check(process) {
                 pw_p.style.display = 'none';
                 return true;
             }
+        } else if (process === "user_edit") {
+            pw_p.style.display = 'none';
+            return true;
         } else {
-            if (process === "user_edit") {
-                pw_p.style.display = 'none';
-                return true;
-            } else {
-                pw_p.innerText = "PW를 입력하지 않았습니다. 패스워드를 입력해주세요.";
-                pw_p.style.display = 'block';
-                popup.style.overflow = 'hidden';
-                return false;
-            }
+            pw_p.innerText = "PW를 입력하지 않았습니다. 패스워드를 입력해주세요.";
+            pw_p.style.display = 'block';
+            popup.style.overflow = 'hidden';
+            return false;
         }
     }
 }
@@ -1613,6 +1629,7 @@ function port_check(process, portname) {
 }
 
 function system_check(process) {
+    const regExp = /^[^]{4,20}$/;
     const popup = document.querySelector(".popup." + process);
     const system_input = document.getElementById(process + '_system');
     const system_p = document.getElementById('system_check_' + process);
@@ -1624,10 +1641,16 @@ function system_check(process) {
         popup.style.overflow = 'hidden';
 
         return false;
-    } else {
+    } else if (regExp.test(system)) {
         system_p.style.display = 'none';
 
         return true;
+    } else {
+        system_p.innerText = "시스템은 1~20자 이내로 작성하셔야 됩니다."
+        system_p.style.display = "block";
+        popup.style.overflow = 'hidden';
+
+        return false;
     }
 }
 
@@ -1638,31 +1661,111 @@ function name_check(process, checkname) {
         const popup = document.querySelector(".popup." + process);
         const input = document.getElementById(process + "_" + checkname);
         const name_p = document.getElementById(checkname + '_check_' + process);
+        const regExp_20 = /^[^]{1,20}$/;
+        const regExp_40 = /^[^]{1,40}$/;
+        const regExp_1000 = /^[^]{1,1000}$/;
         let name = input.value;
 
-        if (!isStringValue(name)) {
-            if (checkname === "server_name") {
-                name_p.innerText = "서버 이름이 입력되지 않았습니다."
-            } else if (checkname === "id") {
-                name_p.innerText = "서버 ID가 입력되지 않았습니다."
-            } else if (checkname === "password") {
-                name_p.innerText = "서버 PW가 입력되지 않았습니다."
-            } else if (checkname === "tomcat_dir") {
-                name_p.innerText = "톰캣 폴더 위치가 입력되지 않았습니다."
-            } else if (checkname === "username") {
-                name_p.innerText = "사용자의 이름이 입력되지 않았습니다."
-            }
-            name_p.style.display = "block";
-            popup.style.overflow = 'hidden';
 
-            return false;
-        } else {
-            if (name_p !== null && name_p !== undefined) {
-                name_p.style.display = 'none';
+        if (checkname === "server_name") {
+            if (!isStringValue(name)) {
+                name_p.innerText = "서버 이름이 입력되지 않았습니다."
+                name_p.style.display = "block";
+                popup.style.overflow = 'hidden';
+
+                return false;
+            } else if (regExp_40.test(name)) {
+                name_p.innerText = "서버 이름은 40자리까지만 입력하셔야됩니다."
+                name_p.style.display = "block";
+                popup.style.overflow = 'hidden';
+
+                return false;
             } else {
+                if (name_p !== null && name_p !== undefined) {
+                    name_p.style.display = 'none';
+                } else {
+                    return true;
+                }
                 return true;
             }
-            return true;
+        } else if (checkname === "id") {
+            if (!isStringValue(name)) {
+                name_p.innerText = "서버 ID가 입력되지 않았습니다."
+                name_p.style.display = "block";
+                popup.style.overflow = 'hidden';
+
+                return false;
+            } else if (regExp_20.test(name)) {
+                name_p.innerText = "서버 ID는 20자리까지만 입력하셔야 됩니다."
+                name_p.style.display = "block";
+                popup.style.overflow = 'hidden';
+
+                return false;
+            } else {
+                if (name_p !== null && name_p !== undefined) {
+                    name_p.style.display = 'none';
+                } else {
+                    return true;
+                }
+                return true;
+            }
+        } else if (checkname === "password") {
+            if (!isStringValue(name)) {
+                name_p.innerText = "서버 PW가 입력되지 않았습니다."
+                name_p.style.display = "block";
+                popup.style.overflow = 'hidden';
+
+                return false;
+            } else {
+                if (name_p !== null && name_p !== undefined) {
+                    name_p.style.display = 'none';
+                } else {
+                    return true;
+                }
+                return true;
+            }
+        } else if (checkname === "tomcat_dir") {
+            if (!isStringValue(name)) {
+                name_p.innerText = "톰캣 폴더 위치가 입력되지 않았습니다."
+                name_p.style.display = "block";
+                popup.style.overflow = 'hidden';
+
+                return false;
+            } else if (regExp_1000.test(name)) {
+                name_p.innerText = "톰캣 폴더 위치는 1000자리까지만 입력하셔야 됩니다."
+                name_p.style.display = "block";
+                popup.style.overflow = 'hidden';
+
+                return false;
+            } else {
+                if (name_p !== null && name_p !== undefined) {
+                    name_p.style.display = 'none';
+                } else {
+                    return true;
+                }
+                return true;
+            }
+        } else if (checkname === "username") {
+            if (!isStringValue(name)) {
+                name_p.innerText = "사용자의 이름이 입력되지 않았습니다."
+                name_p.style.display = "block";
+                popup.style.overflow = 'hidden';
+
+                return false;
+            } else if (regExp_1000.test(name)) {
+                name_p.innerText = "사용자의 이름은 20자리까지만 입력하셔야 됩니다."
+                name_p.style.display = "block";
+                popup.style.overflow = 'hidden';
+
+                return false;
+            } else {
+                if (name_p !== null && name_p !== undefined) {
+                    name_p.style.display = 'none';
+                } else {
+                    return true;
+                }
+                return true;
+            }
         }
     }
 }
