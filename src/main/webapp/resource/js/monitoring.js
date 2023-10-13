@@ -194,9 +194,7 @@ function addinputListener(btn, work, process) {
 
     btn.clickHandler = () => {
         if (process.indexOf("user") > -1) {
-            if (work === "id") {
-                id_check(process);
-            } else if (work === "password") {
+            if (work === "password") {
                 pw_check(process);
             } else if (work === "username") {
                 name_check(process, work);
