@@ -1101,12 +1101,6 @@ input:-webkit-autofill, input:-webkit-autofill:hover, input:-webkit-autofill:foc
     text-align: left;
 }
 
-.popup_body.user_edit > ul > li label {
-    font-size: 13px;
-    width: 120px;
-    font-weight: bold;
-}
-
 .cont-select > label {
     text-align: left;
     font-size: 13px;
@@ -1177,15 +1171,6 @@ input:-webkit-autofill, input:-webkit-autofill:hover, input:-webkit-autofill:foc
 .popup_body.user_plus > ul {
     width: 100%;
     height: calc(100% - 76px);
-}
-
-.popup_body.user_plus > ul > li {
-    display: flex;
-    align-items: center;
-    justify-content: space-around;
-    margin: 15px;
-    text-align: left;
-    flex-wrap: wrap;
 }
 
 .popup_body.user_plus > ul > li > .btn.red {
@@ -1836,7 +1821,7 @@ input:-webkit-autofill, input:-webkit-autofill:hover, input:-webkit-autofill:foc
 
 /* 비밀번호 보이게 하는 아이콘 */
 .input_image {
-    width: 320px;
+    width: 324px;
     display: flex;
     justify-content: flex-end;
     align-items: center;

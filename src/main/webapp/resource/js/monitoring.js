@@ -959,6 +959,7 @@ function popupOpen(data, action, process) {
         const btn_user_plus_submit = document.querySelector(".popup_body.user_plus > .button_box > .btn_submit");
         const btn_user_plus_cancel = document.querySelector(".popup_body.user_plus > .button_box > .btn_cancel");
         const user_plus_id = document.getElementById('user_plus_id');
+        const user_plus_id_li = user_plus_id.parentElement;
         const user_plus_pw = document.getElementById('user_plus_password');
         const user_plus_name = document.getElementById('user_plus_username');
         const user_plus_auth = document.getElementById('user_plus_auth');
@@ -967,7 +968,8 @@ function popupOpen(data, action, process) {
         user_plus_auth.innerText = "사용자 권한";
         user_plus_auth.style.color = "#D3D3D3";
         select_function('user_plus');
-        user_plus_id.style.width = "229px";
+        user_plus_id_li.style.margin = "15px 15px -6px 15px";
+        user_plus_id.style.width = "227px";
         user_plus_id.value = "";
         ok_img.style.display = "none";
         id_check_btn.style.display = "block";
