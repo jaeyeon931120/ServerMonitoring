@@ -67,10 +67,10 @@
         <!-- 일자별 로그파일 최대 보관주기(~일), 해당 설정일 이상된 파일은 자동으로 제거 -->
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <!-- .gz,.zip 등을 넣으면 자동 일자별 로그파일 압축 -->
-            <fileNamePattern>${LOG_PATH}/${LOG_FILE_NAME}.%d{yyyy-MM-dd}_%i.zip</fileNamePattern>
+            <fileNamePattern>${LOG_PATH}/${LOG_FILE_NAME}.%d{yyyy-MM-dd}_%i.log</fileNamePattern>
             <!-- 파일당 최고 용량 kb, mb, gb -->
             <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
-                <maxFileSize>1GB</maxFileSize>
+                <maxFileSize>200MB</maxFileSize>
             </timeBasedFileNamingAndTriggeringPolicy>
             <!-- 일자별 로그파일 최대 보관주기(~일), 해당 설정일 이상된 파일은 자동으로 제거 -->
             <maxHistory>180</maxHistory>
@@ -94,7 +94,7 @@
             <fileNamePattern>${LOG_PATH}/${LOG_FILE_NAME_ERR}.%d{yyyy-MM-dd}_%i.log</fileNamePattern>
             <!-- 파일당 최고 용량 kb, mb, gb -->
             <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
-                <maxFileSize>1GB</maxFileSize>
+                <maxFileSize>200MB</maxFileSize>
             </timeBasedFileNamingAndTriggeringPolicy>
             <!-- 일자별 로그파일 최대 보관주기(~일), 해당 설정일 이상된 파일은 자동으로 제거 -->
             <maxHistory>180</maxHistory>
