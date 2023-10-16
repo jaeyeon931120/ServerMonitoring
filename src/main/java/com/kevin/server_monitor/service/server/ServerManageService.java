@@ -73,7 +73,7 @@ public class ServerManageService {
                     logger.error("Overlapping servers exist. Please check the server list.");
                     resultMap.put("result", "detect");
                 } else {
-                    logger.error("An error occurred while registering the server..");
+                    logger.error("An error occurred while registering the server.");
                     resultMap.put("result", "nok");
                 }
             } else {
@@ -81,6 +81,10 @@ public class ServerManageService {
             }
 
             serverInfoService.partServerInfo(insertMap);
+
+            logger.info("Adding server information. val_date : {}, system : {}, ip : {}, server_name : {}, " +
+                    "tomcat_port : {}, id : {}, server_port : {}, info_dir : {}, tomcat_dir : {}", val_date, system,
+                    ip, server_name, tomcatport, id, serverport, info_dir, tomcat_dir);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -104,6 +108,10 @@ public class ServerManageService {
         detectServer = serverDBService.detectServer(map);
 
         if(detectServer != null) {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
+            Calendar cal = Calendar.getInstance(Locale.KOREA);
+            String val_date = sdf.format(cal.getTime());
+
             int tomcatport = Integer.parseInt(detectServer.get("tomcat_port").toString());
             String id = detectServer.get("id").toString();
             String pw = detectServer.get("pw").toString();
@@ -133,6 +141,10 @@ public class ServerManageService {
                 sshUtils.sftpCommunication(id, pw, ip, serverport, "delete", fileName_info);
                 sshUtils.sftpCommunication(id, pw, ip, serverport, "delete", fileName_power);
             }
+
+            logger.info("Deleting server information. val_date : {}, system : {}, ip : {}, server_name : {}, " +
+                            "tomcat_port : {}, id : {}, server_port : {}", val_date, system, ip, server_name,
+                    tomcatport, id, serverport);
         } else {
             resultMap.put("result", "detect");
         }

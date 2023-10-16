@@ -95,6 +95,8 @@ public class MonitoringService {
                     view.addObject("author", author);
                     view.setViewName("monitoring_user");
                 }
+
+                logger.info("User logging in ID : {}, NAME : {}, author : {}", id, name, author);
             } else {
                 view.setViewName("redirect:/login");
             }
@@ -115,6 +117,7 @@ public class MonitoringService {
         String power = null;
 
         try {
+            logger.info("Power req : {}", req);
             power = req.get("power").toString();
 
             Map<String, Object> detectMap = new HashMap<>();
@@ -144,6 +147,8 @@ public class MonitoringService {
             inputMap.put("server_name", server_name);
 
             if (power.equals("on")) {
+                logger.info("Start Server system : {}, ip : {}, server_port : {}, status : {}, tomcat_port : {}",
+                        req.get("system"), ip, server_port, req.get("status"), tomcat_port);
                 command = command + " on";
                 resultStr = sshUtils.sshControll(id, pw, ip, server_port, command);
                 if (resultStr.contains("Tomcat started.")) {
@@ -160,6 +165,8 @@ public class MonitoringService {
                     result = "nok";
                 }
             } else if (power.equals("off")) {
+                logger.info("Stop Server system : {}, ip : {}, server_port : {}, status : {}, tomcat_port : {}",
+                        req.get("system"), ip, server_port, req.get("status"), tomcat_port);
                 command = command + " off";
                 resultStr = sshUtils.sshControll(id, pw, ip, server_port, command);
 
@@ -199,6 +206,8 @@ public class MonitoringService {
         try {
             String id = req.get("id").toString();
             int result;
+
+            logger.info("Duplication Checking ID : {}", id);
 
             result = userService.getIDCheck(id);
 

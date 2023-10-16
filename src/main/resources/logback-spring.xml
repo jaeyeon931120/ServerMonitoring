@@ -27,16 +27,7 @@
         <!-- ResultSet을 포함한 모든 JDBC 호출 정보를 로그로 남기므로 매우 방대한 양의 로그가 생성됨 -->
         <logger name="jdbc.resultset" level="OFF"/>
         <!-- SQL 결과 조회된 데이터의 table을 로그로 남김 -->
-        <logger name="jdbc.resultsettable" level="INFO"/>
-
-        <!-- Application Loggers -->
-        <logger name="com.kevin.server_monitor.service.mybatis">
-            <level value="error"/>
-        </logger>
-
-        <logger name="com.kevin.server_monitor.service.server.ServerInfoService">
-            <level value="error"/>
-        </logger>
+        <logger name="jdbc.resultsettable" level="OFF"/>
 
         <!-- 3rdparty Loggers -->
         <logger name="org.springframework.core">

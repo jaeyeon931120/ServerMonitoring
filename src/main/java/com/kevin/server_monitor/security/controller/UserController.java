@@ -50,6 +50,8 @@ public class UserController {
         model.addAttribute("id", id);
         model.addAttribute("username", userVo.getUsername());
 
+        logger.info("User logging in ID : {}, NAME : {}", id, userVo.getUsername());
+
         if (isAuthenticated()) {
             return "redirect:/monitoring";
         }
@@ -74,6 +76,7 @@ public class UserController {
     public String loginPage(HttpServletRequest request, Model model) {
 
         Map<String, ?> redirectMap = RequestContextUtils.getInputFlashMap(request);
+        String id = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         if (redirectMap != null) {
             String error = (String) redirectMap.get("error");
@@ -129,6 +132,8 @@ public class UserController {
         Map<String, Object> resultMap = new HashMap<>();
 
         try {
+            logger.info("Adding user ID : {}, NAME : {}, AUTHOR : {}, TEL : {}", userVo.getId(), userVo.getUsername(),
+                    userVo.getAuthor(), userVo.getTel());
             int result = userService.signup(userVo);
 
             if (result > 0) {
@@ -150,6 +155,8 @@ public class UserController {
         Map<String, Object> resultMap = new HashMap<>();
 
         try {
+            logger.info("Editing user ID : {}, NAME : {}, AUTHOR : {}, TEL : {}", userVo.getId(), userVo.getUsername(),
+                    userVo.getAuthor(), userVo.getTel());
             int result = userService.edit(userVo);
 
             if (result > 0) {
@@ -172,6 +179,8 @@ public class UserController {
         Map<String, Object> resultMap = new HashMap<>();
         try {
             for (UserVo user : userVo) {
+                logger.info("Deleting user ID : {}, NAME : {}, AUTHOR : {}, TEL : {}", user.getId(), user.getUsername(),
+                        user.getAuthor(), user.getTel());
                 resultMap = new HashMap<>();
                 String id = user.getId();
                 int result = userService.withdraw(id);
@@ -196,6 +205,7 @@ public class UserController {
 
     @GetMapping("/logout")
     public String userLogout(HttpServletRequest request, HttpServletResponse response) {
+        HttpSession session = request.getSession();
 
         for (Cookie cookie : request.getCookies()) {
             String cookieName = cookie.getName();
@@ -203,6 +213,8 @@ public class UserController {
             cookieToDelete.setMaxAge(0);
             response.addCookie(cookieToDelete);
         }
+
+        logger.info("User logged out ID : {}, NAME : {}", session.getAttribute("id"), session.getAttribute("username"));
 
         return "redirect:/login";
     }

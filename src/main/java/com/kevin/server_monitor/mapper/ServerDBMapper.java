@@ -16,12 +16,6 @@ public interface ServerDBMapper {
     List<Map<String, Object>> detectServerList(Map<String, Object> map);
 
     /**
-     * 서버 정보 리스트 (raw 테이블)
-     * @return 게시글 수
-     */
-    List<Map<String, Object>> detectServerRowList(Map<String, Object> map);
-
-    /**
      * 트래픽 데이터 리스트 (raw 테이블)
      * @return 게시글 수
      */

@@ -18,10 +18,6 @@ public class ServerDBService {
         return serverDBMapper.detectServerList(map);
     }
 
-    public List<Map<String, Object>> detectServerRowList(Map<String, Object> map) {
-        return serverDBMapper.detectServerRowList(map);
-    }
-
     public List<Map<String, Object>> detectTrapicRowList(Map<String, Object> map) {
         return serverDBMapper.detectTrapicRowList(map);
     }

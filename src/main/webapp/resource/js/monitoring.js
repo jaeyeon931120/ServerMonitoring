@@ -1063,7 +1063,6 @@ async function manual_download(process) {
     const nameSplit = downloadName.split('.');
     const file_format = "." + nameSplit[nameSplit.length - 1];
     const response = await fetch('/resource/manual/' + process + file_format);
-    console.log('response : ', response);
     const file = await response.blob(); // file 읽어오기
     const downloadUrl = window.URL.createObjectURL(file); // 해당 file을 가리키는 url 생성
     const aElement = document.createElement('a');
@@ -1374,7 +1373,6 @@ function id_duplication_check(process) {
     let httpRequest;
     if (isStringValue(id)) {
         if (regExp.test(id)) {
-            console.log("regExp : ", regExp.test(id));
             let data = {};
             data.id = id;
             httpRequest = new XMLHttpRequest();
@@ -1643,7 +1641,7 @@ function system_check(process) {
         popup.style.overflow = 'hidden';
 
         return false;
-    } else if (regExp.test(system)) {
+    } else if (!regExp.test(system)) {
         system_p.style.display = 'none';
 
         return true;
@@ -1797,6 +1795,8 @@ function user_management(process) {
         if (checkbox.length <= 0) {
             popupOpen(null, "empty", process);
             return;
+        } else {
+            auth = user_auth
         }
     }
     if (id_check(process)) {
@@ -1950,7 +1950,6 @@ function server_management(process) {
         popupOpen(null, null, "progress");
 
         httpRequest.onreadystatechange = () => {
-            popupClose(process);
             if (httpRequest.readyState === XMLHttpRequest.DONE) {
                 if (httpRequest.status === 200) {
                     let res = httpRequest.response;

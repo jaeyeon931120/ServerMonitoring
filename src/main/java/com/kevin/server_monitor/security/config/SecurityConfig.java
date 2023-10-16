@@ -63,9 +63,9 @@ public class SecurityConfig {
                     .deleteCookies("JSESSIONID", "XSRF-TOKEN") // 로그아웃 후 해당 쿠키 삭제
                 .and()
                     .sessionManagement()
-                    .sessionFixation().changeSessionId()
+                    .sessionFixation().newSession()
                     .invalidSessionUrl("/error/invalid")
-                    .maximumSessions(50)
+                    .maximumSessions(100)
                     .maxSessionsPreventsLogin(false)
                     .expiredUrl("/error/expired");
 

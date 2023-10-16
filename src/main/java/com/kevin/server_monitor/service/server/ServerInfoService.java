@@ -249,12 +249,12 @@ public class ServerInfoService {
 
             Stream<Map<String, Object>> parallelStream_information = serverlist.parallelStream();
             parallelStream_information.forEach(this::serverInformation);
-            logger.info("Server information DATA");
+            logger.info("Server Information DATA Receive Success");
             Stream<Map<String, Object>> parallelStream_log = serverlist.parallelStream();
             parallelStream_log.forEach(this::serverLog);
-            logger.info("Server information LOG");
+            logger.info("Server Information LOG Receive Success");
             saveServerInfo();
-            logger.info("Server information INSERT");
+            logger.info("Server Information DB Insert Success");
         } catch (Exception e) {
             e.printStackTrace();
         }
