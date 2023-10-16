@@ -1676,7 +1676,7 @@ function name_check(process, checkname) {
                 popup.style.overflow = 'hidden';
 
                 return false;
-            } else if (regExp_40.test(name)) {
+            } else if (!regExp_40.test(name)) {
                 name_p.innerText = "서버 이름은 40자리까지만 입력하셔야됩니다."
                 name_p.style.display = "block";
                 popup.style.overflow = 'hidden';
@@ -1697,7 +1697,7 @@ function name_check(process, checkname) {
                 popup.style.overflow = 'hidden';
 
                 return false;
-            } else if (regExp_20.test(name)) {
+            } else if (!regExp_20.test(name)) {
                 name_p.innerText = "서버 ID는 20자리까지만 입력하셔야 됩니다."
                 name_p.style.display = "block";
                 popup.style.overflow = 'hidden';
@@ -1733,7 +1733,7 @@ function name_check(process, checkname) {
                 popup.style.overflow = 'hidden';
 
                 return false;
-            } else if (regExp_1000.test(name)) {
+            } else if (!regExp_1000.test(name)) {
                 name_p.innerText = "톰캣 폴더 위치는 1000자리까지만 입력하셔야 됩니다."
                 name_p.style.display = "block";
                 popup.style.overflow = 'hidden';
@@ -1754,7 +1754,7 @@ function name_check(process, checkname) {
                 popup.style.overflow = 'hidden';
 
                 return false;
-            } else if (regExp_1000.test(name)) {
+            } else if (!regExp_1000.test(name)) {
                 name_p.innerText = "사용자의 이름은 20자리까지만 입력하셔야 됩니다."
                 name_p.style.display = "block";
                 popup.style.overflow = 'hidden';
