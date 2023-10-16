@@ -43,6 +43,8 @@ mybatis:
 #log 설정
 logging:
   config: classpath:logback-spring.xml
+  file:
+    name:
 
 #톰캣 설정
 server:

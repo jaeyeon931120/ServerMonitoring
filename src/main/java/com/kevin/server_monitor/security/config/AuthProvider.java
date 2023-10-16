@@ -42,6 +42,7 @@ public class AuthProvider implements AuthenticationProvider {
                 List<GrantedAuthority> roles = new ArrayList<>();
                 roles.add(new SimpleGrantedAuthority(userVo.getAuthor())); // 권한 부여
 
+                logger.info("User Sucessfully authenticated ID : {}, AUTHOR : {}", id, userVo.getAuthor());
                 // 인증된 user 정보를 담아 SecurityContextHolder에 저장되는 token
                 token = new UsernamePasswordAuthenticationToken(userVo.getId(), null, roles);
 

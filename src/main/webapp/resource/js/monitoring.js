@@ -2115,8 +2115,6 @@ function allServerAlarm() {
     const alarm_ul = document.createElement('ul');
     alarm_ul.className = "alarm_content all"
 
-    alarm_body.replaceChildren();
-
     httpRequest.onreadystatechange = () => {
         if (httpRequest.readyState === XMLHttpRequest.DONE) {
             if (httpRequest.status === 200) {

@@ -95,8 +95,6 @@ public class MonitoringService {
                     view.addObject("author", author);
                     view.setViewName("monitoring_user");
                 }
-
-                logger.info("User logging in ID : {}, NAME : {}, author : {}", id, name, author);
             } else {
                 view.setViewName("redirect:/login");
             }
