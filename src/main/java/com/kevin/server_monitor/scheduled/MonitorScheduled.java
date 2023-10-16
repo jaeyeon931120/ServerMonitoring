@@ -1,6 +1,5 @@
 package com.kevin.server_monitor.scheduled;
 
-import com.kevin.server_monitor.controller.MonitorController;
 import com.kevin.server_monitor.service.server.ServerInfoService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,7 +11,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 @SpringBootApplication
 public class MonitorScheduled {
 
-    private static final Logger logger = LoggerFactory.getLogger(MonitorController.class);
+    private static final Logger logger = LoggerFactory.getLogger(MonitorScheduled.class);
     private final ServerInfoService serverInfoService;
     public MonitorScheduled(ServerInfoService serverInfoService) {
         this.serverInfoService = serverInfoService;
@@ -38,11 +37,13 @@ public class MonitorScheduled {
      */
     @Scheduled(cron = "0 0/1 * * * ?") // 매 1분마다 한번씩 실행
     public void insertServerInfoScheduled() {
+        logger.info("insertServerInfoScheduled start!!");
         serverInfoService.serverInfo();
     }
 
     @Scheduled(cron = "0 0 0 * * ?") // 매일 0시 0분 0초마다 한번씩 실행
     public void deleteServerLogScheduled() {
+        logger.info("deleteServerLog, Raw start!!");
         serverInfoService.deleteServerLog();
         serverInfoService.deleteServerRaw();
     }

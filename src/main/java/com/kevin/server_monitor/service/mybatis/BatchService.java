@@ -103,9 +103,11 @@ public class BatchService {
             }
         } catch (Exception e) {
             if(process.equals("insert")) {
-                logger.error("서버 정보 insert 도중 오류가 발생했습니다. (실패한 시간 : {})", val_date);
+                logger.error("server info insert error. (failed time : {})", val_date);
+                logger.error("server info insert error. (java error : {})", e.getMessage());
             } else if(process.equals("update")) {
-                logger.error("서버 정보 update 도중 오류가 발생했습니다. (실패한 시간 : {})", val_date);
+                logger.error("server info update error. (failed time : {})", val_date);
+                logger.error("server info update error. (java error : {})", e.getMessage());
             }
             e.printStackTrace();
         } finally {
@@ -116,9 +118,9 @@ public class BatchService {
         long resultTime = endTime - startTime;
 
         if (process.equals("insert")) {
-            logger.info("서버 정보 insert에 걸린 시간 : {}", resultTime);
+            logger.info("server info insert time : {}", resultTime);
         } else if (process.equals("update")) {
-            logger.info("서버 정보 update에 걸린 시간 : {}", resultTime);
+            logger.info("server info update time : {}", resultTime);
         }
     }
 }

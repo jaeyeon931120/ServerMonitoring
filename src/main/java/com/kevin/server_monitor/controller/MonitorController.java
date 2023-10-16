@@ -36,7 +36,7 @@ public class MonitorController {
         try {
             returnMap = monitoringService.getServerlist(request);
         } catch (Exception e) {
-            logger.error("서버 정보 리스트를 불러오는 중에 오류가 발생했습니다.");
+            logger.error("An error occurred while retrieving the server information list. error message : {}", e.getMessage());
             e.printStackTrace();
         }
 
@@ -49,6 +49,7 @@ public class MonitorController {
         try {
             view = monitoringService.getMonitoring(request);
         } catch (Exception e) {
+            logger.error("An error occurred while loading the server monitoring page. error message : {}", e.getMessage());
             e.printStackTrace();
         }
 
@@ -63,6 +64,7 @@ public class MonitorController {
         try {
             resultMap = monitoringService.getPower(req);
         } catch (Exception e) {
+            logger.error("An error occurred while control the server. error message : {}", e.getMessage());
             e.printStackTrace();
         }
 
@@ -77,6 +79,7 @@ public class MonitorController {
         try {
             resultMap = monitoringService.getIDCheck(req);
         } catch (Exception e) {
+            logger.error("An error occurred during ID duplication check. error message : {}", e.getMessage());
             e.printStackTrace();
         }
 
@@ -91,6 +94,7 @@ public class MonitorController {
         try {
             resultMap = monitoringService.getServerPlus(req);
         } catch (Exception e) {
+            logger.error("An error occurred while adding a server. error message : {}", e.getMessage());
             resultMap.put("result", "nok");
             e.printStackTrace();
         }
@@ -106,6 +110,7 @@ public class MonitorController {
         try {
             resultMap = monitoringService.getServerDelete(req);
         } catch (Exception e) {
+            logger.error("An error occurred while deleting a server. error message : {}", e.getMessage());
             resultMap.put("result", "nok");
             e.printStackTrace();
         }
@@ -121,7 +126,7 @@ public class MonitorController {
         try {
             returnList = monitoringService.getTrapicDatalist(req);
         } catch (Exception e) {
-            logger.error("서버 정보 리스트를 불러오는 중에 오류가 발생했습니다.");
+            logger.error("An error occurred while retrieving the server information list. error message : {}", e.getMessage(), e);
             e.printStackTrace();
         }
         return returnList;
@@ -135,7 +140,7 @@ public class MonitorController {
         try {
             returnList = monitoringService.getLogDatalist(serverLogDto);
         } catch (Exception e) {
-            logger.error("서버 로그 리스트를 불러오는 중에 오류가 발생했습니다.");
+            logger.error("An error occurred while loading the server log list. error message : {}", e.getMessage());
             e.printStackTrace();
         }
         return returnList;
@@ -149,7 +154,7 @@ public class MonitorController {
         try {
             returnList = monitoringService.getAlarmDatalist(req);
         } catch (Exception e) {
-            logger.error("서버 로그 리스트를 불러오는 중에 오류가 발생했습니다.");
+            logger.error("An error occurred while loading the server alarm list. error message : {}", e.getMessage());
             e.printStackTrace();
         }
         return returnList;

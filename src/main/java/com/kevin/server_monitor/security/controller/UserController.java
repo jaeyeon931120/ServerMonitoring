@@ -117,7 +117,7 @@ public class UserController {
         try {
             resultList = userService.getUserList();
         } catch (Exception e) {
-            logger.error("유저 리스트를 DB에서 가져오는 중에 오류가 발생했습니다.");
+            logger.error("An error occurred while retrieving the user list from the DB. error message : {}", e.getMessage());
             e.printStackTrace();
         }
         return resultList;
@@ -138,7 +138,7 @@ public class UserController {
             }
         } catch (Exception e) {
             resultMap.put("result", "nok");
-            logger.error("사용자를 추가하는 중에 오류가 발생했습니다.");
+            logger.error("An error occurred while adding a user. error message : {}", e.getMessage());
             e.printStackTrace();
         }
         return resultMap;
@@ -159,7 +159,7 @@ public class UserController {
             }
         } catch (Exception e) {
             resultMap.put("result", "nok");
-            logger.error("사용자를 수정하는 중에 오류가 발생했습니다.");
+            logger.error("An error occurred while modifying the user. error message : {}", e.getMessage());
             e.printStackTrace();
         }
         return resultMap;
@@ -188,7 +188,7 @@ public class UserController {
         } catch (Exception e) {
             resultMap.put("result", "error");
             resultList.add(resultMap);
-            logger.error("사용자를 삭제하는 중에 오류가 발생했습니다.");
+            logger.error("An error occurred while deleting the user. error message : {}", e.getMessage());
             e.printStackTrace();
         }
         return resultList;

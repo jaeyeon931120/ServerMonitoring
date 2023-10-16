@@ -1,3 +1,7 @@
+jasypt:
+  encryptor:
+    bean: jasyptEncryptorAES
+
 spring:
   #프로필 설정
   profiles:
@@ -19,30 +23,17 @@ spring:
     #Hikari(springboot 기본 설정)
     hikari:
       driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
-      jdbc-url: jdbc:log4jdbc:mysql://db-fqi4k.pub-cdb.ntruss.com:3306/monitoring_db?rewriteBatchedStatements=true&profileSQL=true&logger=Slf4JLogger&maxQuerySizeToLog=999999&allowMultiQueries=true
-#      jdbc-url: jdbc:mysql://dbkrems.4st.co.kr:3306/monitoring_db?rewriteBatchedStatements=true&profileSQL=true&logger=Slf4JLogger&maxQuerySizeToLog=999999&allowMultiQueries=true
-      username: kremsuser
-      password: kremsuser!
+      jdbc-url: ENC(usGJYpNQ8m33rU6obv4aWZqopmbpQjQTLopzZXBKXbODZHxQdUhJEukuSi9XHKc4mgE9QVvgS6dqbLOnrQfOxtL6lgBkAe0hRf6L/lwYuFsXlc5iG3baAoCZJ0V4ljLng3HqCHxGjkgOUcZvqrk7ITfsuXPgo98BblNsqJdq1Ix3tpsNsBZR5kxbq4oMZZUgcT05A3Hmau1qgbDVpOgT+QoFQeadryRFeYyQim06y5U=)
+      username: ENC(2uWEuyv9oD27KA2PyVfFedMMhVIcNUPZI845AGXzD/mU6Fy2TVKgkB5FlFV/8FiO)
+      password: ENC(In3q14h5m+meWEUsz5ei9N0uYME0rwY1AbT/mXRKX+TzZiUfxgURPImIXmqFgCTn)
       connection-test-query: SELECT 1
       pool-name: SpringBootMyBatisHikariCP
-      maximum-pool-size: 10
+      maximum-pool-size: 20
       minimum-idle: 5
       idle-timeout: 10000
       connection-timeout: 10000
       validation-timeout: 10000
       max-lifetime: 580000
-      data-source-properties:
-        cachePrepStmts: true
-        prepStmtCacheSize: 250
-        prepStmtCacheSqlLimit: 2048
-        useServerPrepStmts: true
-        useLocalSessionState: true
-        useLocalTransactionState: true
-        rewriteBatchedStatements: true
-        cacheResultSetMetadata: true
-        cacheServerConfiguration: true
-        elideSetAutoCommits: true
-        maintainTimeStats: false
 
 #mybatis 설정
 mybatis:
@@ -51,20 +42,6 @@ mybatis:
 
 #log 설정
 logging:
-#  level:
-#    root: info
-#    com:
-#      kevin:
-#        server_monitor: info
-#  logback:
-#    rollingpolicy:
-#      max-file-size: 100MB
-#      max-history: 30
-#      total-size-cap: 1GB
-#      file-name-pattern: "/logs/server_monitoring.log.%d{yyyy-MM-dd}"
-#  file:
-#    path: logs/
-#    name: server_monitoring
   config: classpath:logback-spring.xml
 
 #톰캣 설정
@@ -94,9 +71,9 @@ server:
   #SSL 설정
   ssl:
     enabled: true
-    key-store: /usr/local/apache/conf/cert/monitoring.jks
-    key-store-type: PKCS12
-    key-store-password: kevin003!
+    key-store: ENC(iGXDG2IJTlCc7C+F0w1HGlpcnG0iTyQDRx/Ar3OpWQgNtdGRNmbhKanUMZK+cH9uJ7ufp/9syuSpsPOfQFUlAqvFOO3I4+sxtvNVg8uT1gM=)
+    key-store-type: ENC(XyJsJjB6F5S/PdfY5ITZ7eVE4wv7RM9YIfVX2Qn4d3wTjFrWbkHgDPghsv2tiZFr)
+    key-store-password: ENC(9kC0wx3oaIJwEGX2Hpyayr4weBuPl0j1hnSdiURpxmk72DzBXAlRF+HrB5rYxnqF)
 
   compression:
     enabled: true

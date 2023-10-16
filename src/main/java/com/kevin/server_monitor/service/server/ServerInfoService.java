@@ -101,10 +101,10 @@ public class ServerInfoService {
 
                 serverInfoList.add(resultMap);
             } else {
-                logger.error("{} 서버의 {} 포트의 데이터를 수신하는데 오류가 발생했습니다. 오류내용 : 수신된 데이터가 없음", server_name, tomcatport);
+                logger.error("An error while receiving data on port {} of the {}. error message : no receiving data", tomcatport, server_name);
             }
         } catch (Exception e) {
-            logger.error("{} 서버의 {} 포트의 데이터를 수신하는데 오류가 발생했습니다. 오류내용 : {}", server_name, tomcatport, e.getMessage());
+            logger.error("An error while receiving data on port {} of the {}. error message : {}", tomcatport, server_name, e.getMessage());
             e.printStackTrace();
         }
     }
@@ -189,10 +189,10 @@ public class ServerInfoService {
                     serverLogList.add(resultMap);
                 }
             } else {
-                logger.error("{} 서버의 {} 포트의 로그 내용을 수신하는데 오류가 발생했습니다. 오류내용 : 수신된 데이터가 없음", server_name, tomcatport);
+                logger.error("An error occurred while receiving log contents on port {} of the {}. error message : no receiving data", tomcatport, server_name);
             }
         } catch (Exception e) {
-            logger.error("{} 서버의 {} 포트의 로그 내용을 수신하는데 오류가 발생했습니다. 오류내용 : {}", server_name, tomcatport, e.getMessage());
+            logger.error("An error occurred while receiving log contents on port {} of the {}. error message : {}", tomcatport, server_name, e.getMessage());
             e.printStackTrace();
         }
     }
@@ -208,7 +208,7 @@ public class ServerInfoService {
                 batchService.sqlSessionBatch(dataList, "update", "data");
                 serverInfoList = new ArrayList<>();
             } else {
-                logger.error("서버와 수신중에 오류가 발생하여 데이터가 없어서 DB적제에 실패했습니다.");
+                logger.error("An error occurred while receiving from the server and no data was received, so loading the database failed.");
             }
 
             logList = serverLogList;
@@ -217,7 +217,7 @@ public class ServerInfoService {
                 batchService.sqlSessionBatch(logList, "insert", "log");
                 serverLogList = new ArrayList<>();
             } else {
-                logger.error("서버와 수신중에 오류가 발생하여 기록할 로그가 없어서 DB적제에 실패했습니다.");
+                logger.error("An error occurred while receiving from the server, so loading the DB failed because there were no logs received.");
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -274,7 +274,7 @@ public class ServerInfoService {
         try {
             serverDBService.deleteServerLog();
         } catch (Exception e) {
-            logger.error("서버 LOG테이블 삭제중에 오류가 발생했습니다.");
+            logger.error("An error occurred while deleting the server LOG table.");
             e.printStackTrace();
         }
     }
@@ -283,7 +283,7 @@ public class ServerInfoService {
         try {
             serverDBService.deleteServerRaw();
         } catch (Exception e) {
-            logger.error("서버 RAW테이블 삭제중에 오류가 발생했습니다.");
+            logger.error("An error occurred while deleting the server RAW table.");
             e.printStackTrace();
         }
     }

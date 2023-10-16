@@ -12,6 +12,7 @@ qodana.yaml
 .logs/*
 ChainCA/*
 monitoring.jks
+application.yml
 
 # User-specific stuff
 .idea/**/workspace.xml

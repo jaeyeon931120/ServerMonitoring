@@ -65,7 +65,7 @@ public class SecurityConfig {
                     .sessionManagement()
                     .sessionFixation().changeSessionId()
                     .invalidSessionUrl("/error/invalid")
-                    .maximumSessions(1)
+                    .maximumSessions(50)
                     .maxSessionsPreventsLogin(false)
                     .expiredUrl("/error/expired");
 

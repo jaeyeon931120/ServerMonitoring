@@ -38,8 +38,6 @@ public class AuthProvider implements AuthenticationProvider {
         if (userVo != null) { // 일치하는 user 정보가 있는지 확인
             String salt = userVo.getSalt(); // 무작위 문자열 가져오기
             String hashingPw = userService.getEncrypt(password, salt);
-            logger.info("salt : {}", salt);
-            logger.info("hashingPw : {}", hashingPw);
             if (userVo.getPassword().equals(hashingPw)) {
                 List<GrantedAuthority> roles = new ArrayList<>();
                 roles.add(new SimpleGrantedAuthority(userVo.getAuthor())); // 권한 부여

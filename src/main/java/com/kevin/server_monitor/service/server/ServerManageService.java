@@ -70,10 +70,10 @@ public class ServerManageService {
             if(result <= 0) {
                 detectMap = serverDBService.detectServer(insertMap);
                 if(!detectMap.isEmpty()) {
-                    logger.error("중복되는 서버가 존재합니다. 서버 리스트를 확인해주세요.");
+                    logger.error("Overlapping servers exist. Please check the server list.");
                     resultMap.put("result", "detect");
                 } else {
-                    logger.error("서버 등록중에 오류가 발생했습니다.");
+                    logger.error("An error occurred while registering the server..");
                     resultMap.put("result", "nok");
                 }
             } else {
@@ -84,7 +84,7 @@ public class ServerManageService {
 
         } catch (Exception e) {
             e.printStackTrace();
-            logger.error("서버 등록중에 오류가 발생했습니다.");
+            logger.error("An error occurred while registering the server. error message : {}", e.getMessage());
             resultMap.put("result", "nok");
         }
 

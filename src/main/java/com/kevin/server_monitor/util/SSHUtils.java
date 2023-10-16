@@ -30,7 +30,7 @@ public class SSHUtils {
 
             result = commandLineResult(channel, ip, port);
         } catch (Exception e) {
-            logger.error("서버와의 수신중에 오류가 발생했습니다.(실패한 서버 IP : {}, PORT : {})", ip, port);
+            logger.error("An error occurred while receiving from the server.(fail server IP : {}, PORT : {})", ip, port);
             Thread.currentThread().interrupt();
             e.printStackTrace();
         } finally {
@@ -75,7 +75,7 @@ public class SSHUtils {
                 result.append(commandLine).append("\n");
             }
         } catch (Exception e) {
-            logger.error("서버의 응답정보를 수신중에 오류가 발생했습니다.(실패한 서버 IP : {}, PORT : {})", ip, port);
+            logger.error("An error occurred while receiving response information from the server. (fail server IP : {}, PORT : {})", ip, port);
             e.printStackTrace();
         }
 
@@ -127,7 +127,7 @@ public class SSHUtils {
                 sftpchannel.rmdir("check_server_info");
             }
         } catch (Exception e) {
-            logger.error("서버와의 SFTP 통신중에 오류가 발생했습니다.(실패한 서버 IP : {})", ip);
+            logger.error("An error occurred during SFTP communication with the server. (fail server IP : {})", ip);
             Thread.currentThread().interrupt();
             e.printStackTrace();
         } finally {

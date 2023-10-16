@@ -61,7 +61,7 @@ public class MonitoringService {
             returnMap.put("author", session.getAttribute("author"));
             returnMap.put("server_list", returnList);
         } catch (Exception e) {
-            logger.error("서버 정보 리스트를 불러오는 중에 오류가 발생했습니다.");
+            logger.error("An error occurred while retrieving the server information list. error message : {}", e.getMessage());
             e.printStackTrace();
         }
 
@@ -99,6 +99,7 @@ public class MonitoringService {
                 view.setViewName("redirect:/login");
             }
         } catch (Exception e) {
+            logger.error("An error occurred while loading the server monitoring page. error message : {}", e.getMessage());
             e.printStackTrace();
         }
         return view;
@@ -151,7 +152,7 @@ public class MonitoringService {
                     updateresult = serverDBService.updateServerSensor(inputMap);
 
                     if(updateresult < 0) {
-                        logger.error("서버 가동상태를 DB에 업데이트 도중에 오류가 발생했습니다.");
+                        logger.error("An error occurred while updating the server operation status to the DB.");
                     }
                 } else if (resultStr.contains("during start.") || resultStr.contains("Start aborted.")) {
                     result = "reason";
@@ -169,7 +170,7 @@ public class MonitoringService {
                     updateresult = serverDBService.updateServerSensor(inputMap);
 
                     if(updateresult < 0) {
-                        logger.error("서버 가동상태를 DB에 업데이트 도중에 오류가 발생했습니다.");
+                        logger.error("An error occurred while updating the server operation status to the DB.");
                     }
                 } else if (resultStr.contains("Stop aborted")) {
                     result = "reason";
@@ -184,7 +185,7 @@ public class MonitoringService {
             }
             resultMap.put("result", result);
         } catch (Exception e) {
-            logger.error("서버를 {}",power+" 하는중에 오류가 발생했습니다.");
+            logger.error("An error occurred while {} the server. error message : {}", power, e.getMessage());
             e.printStackTrace();
         }
 
@@ -207,6 +208,7 @@ public class MonitoringService {
                 resultMap.put("result", "ok");
             }
         } catch (Exception e) {
+            logger.error("An error occurred during ID duplication check. error message : {}", e.getMessage());
             resultMap.put("result", "error");
             e.printStackTrace();
         }
@@ -222,6 +224,7 @@ public class MonitoringService {
             resultMap = serverManageService.serverInsertService(req);
             serverInfoService.serverInfo();
         } catch (Exception e) {
+            logger.error("An error occurred while adding a server. error message : {}", e.getMessage());
             resultMap.put("result", "nok");
             e.printStackTrace();
         }
@@ -236,6 +239,7 @@ public class MonitoringService {
         try {
             resultMap = serverManageService.serverDeleteService(req);
         } catch (Exception e) {
+            logger.error("An error occurred while deleting a server. error message : {}", e.getMessage());
             resultMap.put("result", "nok");
             e.printStackTrace();
         }
@@ -263,7 +267,7 @@ public class MonitoringService {
 
             returnList = serverDBService.detectTrapicRowList(req);
         } catch (Exception e) {
-            logger.error("서버 정보 리스트를 불러오는 중에 오류가 발생했습니다.");
+            logger.error("An error occurred while retrieving the server information list. error message : {}", e.getMessage(), e);
             e.printStackTrace();
         }
         return returnList;
@@ -298,7 +302,7 @@ public class MonitoringService {
 
             returnList = pagingService.findAllLog(serverLogDto);
         } catch (Exception e) {
-            logger.error("서버 로그 리스트를 불러오는 중에 오류가 발생했습니다.");
+            logger.error("An error occurred while loading the server log list. error message : {}", e.getMessage());
             e.printStackTrace();
         }
         return returnList;
@@ -328,7 +332,7 @@ public class MonitoringService {
 
             returnList = serverDBService.detectServerList(req);
         } catch (Exception e) {
-            logger.error("서버 로그 리스트를 불러오는 중에 오류가 발생했습니다.");
+            logger.error("An error occurred while loading the server alarm list. error message : {}", e.getMessage());
             e.printStackTrace();
         }
         return returnList;
