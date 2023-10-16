@@ -1,5 +1,6 @@
 package com.kevin.server_monitor.security.config;
 
+import com.kevin.server_monitor.security.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,10 +20,11 @@ import javax.servlet.http.HttpSession;
 public class SecurityConfig {
 
     private final AuthenticationFailureHandler userLoginFailHandler;
+    private final UserService userService;
 
     @Bean
     public AuthenticationFailureHandler failureHandler() {
-        return new UserLoginFailHandler();
+        return new UserLoginFailHandler(userService);
     }
 
     @Bean

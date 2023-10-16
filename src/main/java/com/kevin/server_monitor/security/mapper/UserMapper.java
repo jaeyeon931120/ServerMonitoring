@@ -5,6 +5,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.List;
+import java.util.Map;
 
 @Mapper
 public interface UserMapper {
@@ -15,4 +16,7 @@ public interface UserMapper {
     int deleteUser(String id); // 회원 탈퇴
     int getIDCheck(String id); // 중복 ID 체크
     UserDetails getUserDetails(String id); // 유저 존재 여부 확인
+    void failCntUpdate(String id); // 실패횟수 update
+    Map<String, Object> getFailCnt(String id); // 실패횟수, isEnabled 조회
+    void changeEnabled(String id); // 계정 활성화 여부변경, 1이었으면 0으로 0이었으면 1로 바꾼다, 0은 false, 1은 true이다.
 }

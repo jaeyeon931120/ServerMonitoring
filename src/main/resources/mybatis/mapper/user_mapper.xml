@@ -57,4 +57,26 @@
         FROM monitoring_db.monitoring_admin
         WHERE id = #{id}
     </select>
+
+    <update id="failCntUpdate" parameterType="string">
+        /* 계정실패횟수업데이트 UserMapper.failCntUpdate */
+        UPDATE monitoring_db.monitoring_admin
+        SET failcnt = IFNULL(failcnt, 0) + 1
+        WHERE ID = #{id}
+    </update>
+
+    <select id="getFailCnt" resultType="map">
+        /* 실패횟수조회 UserMapper.getFailCnt */
+        SELECT IFNULL(failcnt, 0) AS failcnt, IFNULL(isenabled, 1) AS isenabled
+        FROM monitoring_db.monitoring_admin
+        WHERE id = #{id}
+    </select>
+
+    <update id="changeEnabled" parameterType="string">
+        /* 계정잠김 UserMapper.changeEnabled */
+        UPDATE monitoring_db.monitoring_admin
+        SET isenabled = IF(isenabled = 0, 1, 0),
+            failcnt = IF(isenabled = 0, 0, failcnt)
+            WHERE ID = #{id}
+    </update>
 </mapper>

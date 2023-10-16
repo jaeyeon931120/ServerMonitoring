@@ -11,6 +11,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class UserService {
@@ -80,6 +81,14 @@ public class UserService {
     public UserDetails getUserDetails(String id) {
         return userMapper.getUserDetails(id);
     }
+
+    public void failCntUpdate(String id) {
+        userMapper.failCntUpdate(id);
+    }
+
+    public Map<String, Object> getFailCnt(String id) { return userMapper.getFailCnt(id); }
+
+    public void changeEnabled(String id) { userMapper.changeEnabled(id); }
 
     /* 무작이 문자열 Salt */
     public String getSalt() {
